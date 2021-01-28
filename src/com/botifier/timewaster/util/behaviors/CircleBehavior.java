@@ -8,6 +8,7 @@ import com.botifier.timewaster.util.Math2;
 
 public class CircleBehavior extends Behavior {
 	public boolean started = false;
+	public boolean direction = false;
 	public int slice = 32;
 	Vector2f circlePos;
 	Vector2f lastCirclePos;
@@ -35,7 +36,7 @@ public class CircleBehavior extends Behavior {
 			float ny = (int) (circlePos.y + (rad*8) * Math.sin(theta));
 			getOwner().getController().dash(nx, ny);
 			if (getOwner().getLocation().distance(new Vector2f(nx,ny)) < getOwner().getController().getPPS() || (getOwner().getController().obeysCollision() == true && getOwner().getController().isBlocked())) {
-				theta += sliceE;
+				theta += sliceE*(direction == false ? 1 : -1);
 				nx = (int) (circlePos.x + (rad*8) * Math.cos(theta));
 				ny = (int) (circlePos.y + (rad*8) * Math.sin(theta));
 				getOwner().getController().dash(nx, ny);

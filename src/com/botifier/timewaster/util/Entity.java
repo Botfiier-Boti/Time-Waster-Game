@@ -329,7 +329,7 @@ public class Entity implements Comparable<Entity> {
 	
 	public void shootBullet(float angle, boolean force) throws SlickException {
 		if (cooldown <= 0 || force) {
-			b.add(new Bullet("Bob", getController().getLoc().x, getController().getLoc().y, 65, angle, 750, 75, 90,this));
+			b.add(new Bullet("Bob", getController().getLoc().x, getController().getLoc().y, 200, angle, 350, 75, 90,this));
 			cooldown = (int)(60/(1.5f + 6.5f*((dex+bDex)/75f)));
 		}
 	}

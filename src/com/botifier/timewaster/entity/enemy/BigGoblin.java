@@ -38,7 +38,7 @@ public class BigGoblin extends Enemy {
 	long distanceDashed = 0;
 	long baseDashDistance = 1;//50
 	long dashcooldown = 0;
-	long basedash = 10;//40
+	long basedash = 0;//40
 	//Current phase
 	int phase = 1;
 	//int rage = 0;
@@ -106,6 +106,7 @@ public class BigGoblin extends Enemy {
 			lastHealth = lastHealth-phasechange;
 			health = maxhealth*lastHealth;
 			dashing = false;
+			dashcooldown = basedash;
 			getController().stop();
 			((SetDashBehavior)behaviors.get(0)).endDash();
 			((CenterBehavior)behaviors.get(1)).reset();
@@ -136,6 +137,7 @@ public class BigGoblin extends Enemy {
 			case 1:
 				//Phase 1
 				currentBehavior = 0;
+				basedash = 40;
 				if (cls == null) {
 					phase = -1;
 					break;
@@ -193,7 +195,7 @@ public class BigGoblin extends Enemy {
 					currentBehavior = 2;
 					((CircleBehavior)behaviors.get(currentBehavior)).started = false;
 					((CircleBehavior)behaviors.get(currentBehavior)).setCirclePos((MainGame.mm.m.getWidthInTiles()*16)/2,(MainGame.mm.m.getHeightInTiles()*16)/2);
-					((CircleBehavior)behaviors.get(currentBehavior)).setRadius(5);
+					((CircleBehavior)behaviors.get(currentBehavior)).setRadius(4);
 				}
 				break;
 			case 3:
@@ -229,18 +231,50 @@ public class BigGoblin extends Enemy {
 				break;
 			case 5:
 				//Phase 4
-				currentBehavior = 2;
+				/*currentBehavior = 1;
 				((CircleBehavior)behaviors.get(currentBehavior)).setCirclePos((MainGame.mm.m.getWidthInTiles()*16)/2,(MainGame.mm.m.getHeightInTiles()*16)/2);
-				((CircleBehavior)behaviors.get(currentBehavior)).setRadius(3);
+				((CircleBehavior)behaviors.get(currentBehavior)).setRadius(3);*/
 				if (spawns.size() < 4) {
 					for (int i = 0; i < 4; i++) 
 						addSpawn(new SnakeHead((MainGame.mm.m.getWidthInTiles() * 16) / 2, (MainGame.mm.m.getHeightInTiles() * 16) / 2, 19,  i*90));
-					cooldown = 150;
+					dashcooldown = 120;
+					invulnerable = true;
+					return;
 				}
-				if (cooldown <= 0) {
-					ep.fire(this, getLocation().x, getLocation().y, 0);
-					cooldown = 150;
-					playAttackAnimation((int)cooldown);
+				if (cls == null) {
+					invulnerable = false;
+					phase = -1;
+					break;
+				}
+				basedash = 20;
+				currentBehavior = 0;
+				dashing = ((SetDashBehavior) behaviors.get(0)).dashing;
+				 ((SetDashBehavior) behaviors.get(0)).setDashDistance(60);
+				if (dashing == false) {
+					if (chaseduration > 0) {
+						if (cls != null && dashcooldown <= 0) {
+							invulnerable = false;
+							((SetDashBehavior) behaviors.get(currentBehavior)).setTarget(cls.getLocation());
+							dashcooldown = basedash;
+						}
+						if (dashcooldown > 0 && dashing == false) {
+							dashcooldown--;
+						}
+					}
+				} else {
+					try {
+						if (cooldown <= 0 && dashing) {
+							sp.fire(this, getController().getLoc().getX(), getController().getLoc().getY(),
+									((SetDashBehavior) behaviors.get(currentBehavior)).getAngle());
+							cooldown = (long) (5 * (3.5f * fireSpeed));
+							playAttackAnimation((int) cooldown);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}	
+				} 
+				if (cls == null && attacking == true) {
+					attacking = false;
 				}
 				break;
 			default:

@@ -8,7 +8,7 @@ import com.botifier.timewaster.util.behaviors.CircleBehavior;
 import com.botifier.timewaster.util.movements.EnemyController;
 
 public class SnakeHead extends Enemy {
-	long shotdelay = 1500;
+	long shotdelay = 2500;
 
 	public SnakeHead(float x, float y, int length) {
 		super("SnakeHead", MainGame.getImage("Head"), new EnemyController(x,y,60,1f,100, false), null, null);
