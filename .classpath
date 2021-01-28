@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Time Waster/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="assets"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/ibxm.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/jinput.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/jnlp.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/jogg-0.0.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/jorbis-0.0.15.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/lwjgl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/lwjgl_util.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/lwjgl_util_applet.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/slick.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/slick-examples.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/tinylinepp.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Botifier/Dropbox/Workpace/lib/yamlbeans-1.12.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
