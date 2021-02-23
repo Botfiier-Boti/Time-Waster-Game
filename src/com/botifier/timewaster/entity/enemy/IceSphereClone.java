@@ -21,12 +21,13 @@ public class IceSphereClone extends Enemy {
 	long dashcooldown;
 
 	public IceSphereClone(float x, float y) throws SlickException {
-		super("Ice Sphere", MainGame.getImage("FakeIce"), new EnemyController(x, y, 100f, 0.1f, 100), null, null,2f);
+		super("Ice Sphere", MainGame.getImage("FakeIce"), new EnemyController(x, y, 0.1f, 100), null, null,2f);
 		sp = new SpherePattern();
 		ep = new ExplodePattern();
 		behaviors.add(new CircleBehavior(this));
 		currentBehavior = 0;
-		def = 20;
+		getStats().setDefense(0);
+		getStats().setSpeed(100);
 	}
 	
 	@Override
@@ -49,14 +50,17 @@ public class IceSphereClone extends Enemy {
 			}
 			//Dash at target 
 			if (cls != null) {
+				getStats().setSpeed(100);
 				currentBehavior = -1;
 				getController().dash(cls.getLocation().x, cls.getLocation().y);
 				dashcooldown = 500;
 				return;
 			} else {
+				getStats().setSpeed(1);
 				getController().wander(false,0.25f);
 			}
 		} else {
+			getStats().setSpeed(1);
 			//wander
 			getController().wander(false,0.25f);
 		}

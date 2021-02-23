@@ -17,15 +17,14 @@ public class MouseFollower extends Enemy {
 	float angleMod = 0;
 	
 	public MouseFollower(float x, float y, float angleMod, Entity owner) {
-		super("Follower", MainGame.getImage("beehive"), new EnemyController(x, y, 500, 3f, 50), null, null);visible = true;
+		super("Follower", MainGame.getImage("beehive"), new EnemyController(x, y, 3f, 50), null, null);visible = true;
 		autoFlip = false;
 		iModifier = 0.1f;
-		maxhealth = 1;
-		health = 1;
 		invulnerable = true;
 		healthbarVisible = false;
 		o = owner;
-		atk = o.atk;
+		getStats().setAttack(o.getAttack());
+		getStats().setSpeed(500);
 		OrbitBehavior b = new OrbitBehavior(this);
 		b.setRadius(1);
 		b.setTarget(o);

@@ -15,6 +15,8 @@ import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.entity.projectile.Beehive;
 import com.botifier.timewaster.main.MainGame;
+import com.botifier.timewaster.states.OverworldState;
+import com.botifier.timewaster.statuseffect.effects.InvulnerabilityEffect;
 //import com.botifier.timewaster.entity.ShotgunPattern;
 import com.botifier.timewaster.util.Entity;
 import com.botifier.timewaster.util.Math2;
@@ -49,7 +51,7 @@ public class Player extends Entity {
 	boolean started = false;
 	
 	public Player(String name, float x, float y) throws SlickException {
-		super(name, MainGame.getImage("PlayerIdle"), new LocalPlayerControl(x, y, 50f));
+		super(name, MainGame.getImage("PlayerIdle"), new LocalPlayerControl(x, y));
 		SpriteSheet ss = new SpriteSheet(MainGame.getImage("PlayerWalk"), 8, 8);
 		walk = new Animation(ss, 100);
 		walk.setLooping(true);
@@ -58,12 +60,11 @@ public class Player extends Entity {
 		getController().setCollision(true);
 		team = Team.ALLY;
 		overrideMove = true;
-		maxhealth = 620;
-		health = maxhealth;
-		atk = 50;
-		//dex = 10000;
-		def = 15;
-		vit = 30;
+		setMaxHealth(620, true);
+		getStats().setAttack(50);
+		getStats().setDefense(15);
+		getStats().setVitality(30);
+		getStats().setSpeed(50);
 		spawncap = 4;
 		//p = new WigglyThingPattern();
 		//p = new SpherePattern();
@@ -94,7 +95,7 @@ public class Player extends Entity {
 		//Perform functions while active
 		if (this.active) {
 			//Set the shot multiplier
-			SPS = 1.5f + 6.5f*((dex+bDex)/75f);
+			SPS = 1.5f + 6.5f*((getDexterity())/75f);
 			if (p != null)
 				SPS *= p.getFireSpeed();
 			//Accept input
@@ -211,7 +212,7 @@ public class Player extends Entity {
 							if (p.lob == true) {
 								p.fire(this, mouse.x, mouse.y, angle);
 							} else if (p.targeted == true) {
-								p.fire(this, getLocation().x, getLocation().y, angle, MainGame.mm.mtrack);
+								p.fire(this, getLocation().x, getLocation().y, angle, ((OverworldState)MainGame.mm.getState(1)).mtrack);
 							}else {
 								p.fire(this, getLocation().x, getLocation().y, angle);
 							}
@@ -232,25 +233,13 @@ public class Player extends Entity {
 			
 			cooldown--;
 			
-			if (health < maxhealth) {
-				//Heal over time
-				health += ((0.0025f*maxhealth)+0.05f*getVitality())/delta;
-			} else if (health <= 0) {
+			getStats().heal(((0.0025f*getMaxHealth())+0.05f*getVitality())/delta, false);
+			
+			if (getStats().getCurrentHealth() <= 0) {
 				//Make player inactive on Death
 				active = false;
-				invincible = true;
+				getStatusEffectManager().addEffect(new InvulnerabilityEffect(5000));
 				return;
-			}
-			
-			//Manages invincibility
-			if (invulPeriod > 0) {
-				if (invincible == false)
-					invincible = true;
-				invulPeriod--;
-			} else {
-				if (invincible == true) {
-					invincible = false;
-				}
 			}
 			
 			//Manage followers

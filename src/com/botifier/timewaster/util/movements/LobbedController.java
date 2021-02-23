@@ -9,13 +9,14 @@ import com.botifier.timewaster.util.Math2;
 public class LobbedController extends EntityController {
 	public Vector2f nextPos;
 	Vector2f originPoint;
+	float speed;
 	float dx = 0;
 	float dy = 0;
 	long d = 0;
 	long dist = 0;
 	long duration = 0;
 	public LobbedController(float x, float y, long duration, Vector2f dst, Entity origin) {
-		super(x, y, 0);
+		super(x, y);
 		this.duration = duration;
 		this.d = duration;
 		this.dst = dst;

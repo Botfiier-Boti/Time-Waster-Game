@@ -23,11 +23,12 @@ public class BulletSpawner extends Enemy {
 	int originD = 0;
 
 	public BulletSpawner(float x, float y, long cooldown) {
-		super("BulletSpawner", MainGame.getImage("Head"), new EnemyController(x, y, 0, 0, 0), null, null);
+		super("BulletSpawner", MainGame.getImage("Head"), new EnemyController(x, y, 0, 0), null, null);
 		basecooldown = cooldown;
 		wtp = new WigglyThingPattern();
 		wtp2 = new WigglyThingPattern();
 		setMaxHealth(45000, true);
+		getStats().setSpeed(0);
 		posMod.y = 3;
 	}
 	
@@ -77,6 +78,11 @@ public class BulletSpawner extends Enemy {
 			delay -= delta;
 		}
 		cooldown3 -= delta;
+	}
+	
+	@Override
+	public String getParameters() {
+		return super.getParameters()+", "+basecooldown;
 	}
 
 }

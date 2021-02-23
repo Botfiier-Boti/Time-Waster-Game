@@ -18,6 +18,8 @@ public class BulletController extends EntityController {
 	private boolean homing = false;
 	public boolean inf = false;
 	public boolean wavy = false;
+	public float PPS;
+	public float speed;
 	public float homingThreshold = 0.65f;
 	public float acceleration = 0f;
 	public float deceleration = 0f;
@@ -39,18 +41,20 @@ public class BulletController extends EntityController {
 	private double wavePos = 0;
 	
 	public BulletController(float x, float y, float speed, long life, float angle, Entity origin) {
-		super(x, y, speed);
+		super(x, y);
 		this.dist = life;
 		this.angle = angle;
+		this.speed = speed;
 		moving = true;
 		this.setOrigin(origin);
 		this.originPoint = this.getLoc();
 	}
 	
 	public BulletController(float x, float y, float speed, long life, float angle, Entity origin, boolean ignoreObstacles, boolean pierceEnemies, boolean boomerang) {
-		super(x, y, speed);
+		super(x, y);
 		this.dist = life;
 		this.angle = angle;
+		this.speed = speed;
 		moving = true;
 		this.setOrigin(origin);
 		this.pierceObstacles = ignoreObstacles;
@@ -120,8 +124,8 @@ public class BulletController extends EntityController {
 				}
 				if (pierceObstacles == false) {
 					Vector2f cLoc = src;
-					if (((int)cLoc.x/16>=0 && cLoc.x/16<MainGame.mm.m.getWidthInTiles()) && (((int)cLoc.y/16>=0) && (int)cLoc.y/16<MainGame.mm.m.getHeightInTiles())) {
-						if (MainGame.mm.m.blocked((int)cLoc.x/16, (int)cLoc.y/16)) {
+					if (((int)cLoc.x/16>=0 && cLoc.x/16<MainGame.getCurrentMap().getWidthInTiles()) && (((int)cLoc.y/16>=0) && (int)cLoc.y/16<MainGame.getCurrentMap().getHeightInTiles())) {
+						if (MainGame.getCurrentMap().blocked((int)cLoc.x/16, (int)cLoc.y/16)) {
 							distTr = 0;
 							dst = null;
 							moving = false;

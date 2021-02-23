@@ -4,12 +4,14 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 import com.botifier.timewaster.main.MainGame;
+import com.botifier.timewaster.statuseffect.StatusEffect;
 import com.botifier.timewaster.util.movements.BulletController;
 import com.botifier.timewaster.util.movements.EntityController;
 
 public class Bullet extends Entity {
 	static Image placehold = null;
 	public int[] basedamage;
+	public StatusEffect effect = null;
 	public boolean ignoresArmor = false;
 	public boolean atkScaling = true;
 	public float spread = 0;

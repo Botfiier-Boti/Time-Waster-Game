@@ -5,13 +5,12 @@ import org.newdawn.slick.Input;
 
 public class LocalPlayerControl extends EntityController {
 	boolean UP, DOWN, LEFT, RIGHT;
-	public LocalPlayerControl(float x, float y, float speed) {
-		super(x, y, speed);
+	public LocalPlayerControl(float x, float y) {
+		super(x, y);
 	}
 	
 	public void control(Input i) {
 		float nx = src.getX(), ny = src.getY();
-		PPS = 0.6f + 1.5f*(speed/75f);
 		if (i.isKeyDown(Input.KEY_W)) {
 			UP = true;
 		} else  {
@@ -36,13 +35,13 @@ public class LocalPlayerControl extends EntityController {
 			//testMove(nx,ny);
 		//}
 		if (UP)
-			ny -= PPS*8;
+			ny -= getOwner().getStats().getPPS()*8;
 		if (DOWN)
-			ny += PPS*8;
+			ny += getOwner().getStats().getPPS()*8;
 		if (LEFT)
-			nx -= PPS*8;
+			nx -= getOwner().getStats().getPPS()*8;
 		if (RIGHT)
-			nx += PPS*8;
+			nx += getOwner().getStats().getPPS()*8;
 		if (nx > src.getX() || nx < src.getX() || ny > src.getY() || ny < src.getY()) {
 			setDestination(nx, ny); 
 		} else {

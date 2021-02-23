@@ -17,7 +17,7 @@ public class Effect extends Entity {
 	boolean shrinks;
 	
 	public Effect(Shape s, long duration, Color c) {
-		super("Effect", null, new EntityController(s.getCenterX(),s.getCenterY(),0), false);
+		super("Effect", null, new EntityController(s.getCenterX(),s.getCenterY()), false);
 		this.c = c;
 		this.s = s;
 		this.duration = duration;

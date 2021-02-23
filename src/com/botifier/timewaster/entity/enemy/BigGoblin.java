@@ -7,6 +7,7 @@ import org.newdawn.slick.SpriteSheet;
 
 import com.botifier.timewaster.entity.FakeBagEntity;
 import com.botifier.timewaster.main.MainGame;
+import com.botifier.timewaster.statuseffect.effects.InvulnerabilityEffect;
 import com.botifier.timewaster.util.Bullet;
 import com.botifier.timewaster.util.Enemy;
 import com.botifier.timewaster.util.Entity;
@@ -49,7 +50,7 @@ public class BigGoblin extends Enemy {
 	float lastHealth = 1.0f;
 
 	public BigGoblin(float x, float y) throws SlickException {
-		super("Big Goblin", MainGame.getImage("BigGobboIdle"), new EnemyController(x, y, 35, 0.25f, 300),
+		super("Big Goblin", MainGame.getImage("BigGobboIdle"), new EnemyController(x, y, 0.25f, 300),
 				new SpriteSheet(MainGame.getImage("BigGobboWalk"), 16, 16),
 				new SpriteSheet(MainGame.getImage("BigGobboAttack"), 16, 16), 1f);
 
@@ -61,13 +62,12 @@ public class BigGoblin extends Enemy {
 	@Override
 	public void init() {
 		super.init();
-		getController().runspeed = 75;
 		activateDelay = 500;
 		solid = false;
-		maxhealth = 20000;
-		health = maxhealth;
+		setMaxHealth(20000,true);
+		getStats().setDefense(20);
+		getStats().setSpeed(75);
 		obstacle = false;
-		def = 40;
 		size = 2.5f;
 		spawncap = 10;
 		sp = new ShotgunPattern();
@@ -81,6 +81,7 @@ public class BigGoblin extends Enemy {
 		chaseduration = 1;//10;
 		currentBehavior = -1;
 		linger = false;
+		this.updateHitboxes();
 	}
 
 	@Override
@@ -99,18 +100,19 @@ public class BigGoblin extends Enemy {
 		}
 		
 		//Phase change 
-		if (this.health/this.maxhealth < lastHealth-phasechange) {
+		if (this.getStats().getCurrentHealth()/this.getMaxHealth() < lastHealth-phasechange) {
 			if (invulnerable)
 				invulnerable = false;
 			spawns.clear();
 			lastHealth = lastHealth-phasechange;
-			health = maxhealth*lastHealth;
+			getStats().setCurrentHealth(getMaxHealth()*lastHealth);
 			dashing = false;
 			dashcooldown = basedash;
 			getController().stop();
 			((SetDashBehavior)behaviors.get(0)).endDash();
 			((CenterBehavior)behaviors.get(1)).reset();
 			((CircleBehavior)behaviors.get(2)).started = false;
+			getStatusEffectManager().removeEffect(InvulnerabilityEffect.class);
 			currentBehavior = -1;
 			phase++;
 		}
@@ -187,15 +189,19 @@ public class BigGoblin extends Enemy {
 				 * 
 				 * beecooldown = basebee; } }
 				 */
-				invulnerable = true;
 				//Perform once centered
 				if (((CenterBehavior)behaviors.get(1)).isCentered()){
 					invulnerable = false;
 					phase = 3;
 					currentBehavior = 2;
 					((CircleBehavior)behaviors.get(currentBehavior)).started = false;
-					((CircleBehavior)behaviors.get(currentBehavior)).setCirclePos((MainGame.mm.m.getWidthInTiles()*16)/2,(MainGame.mm.m.getHeightInTiles()*16)/2);
+					((CircleBehavior)behaviors.get(currentBehavior)).setCirclePos((MainGame.getCurrentMap().getWidthInTiles()*16)/2,(MainGame.getCurrentMap().getHeightInTiles()*16)/2);
 					((CircleBehavior)behaviors.get(currentBehavior)).setRadius(4);
+					getStatusEffectManager().removeEffect(InvulnerabilityEffect.class);
+				} else {
+					InvulnerabilityEffect e = new InvulnerabilityEffect(10);
+					e.setInfinite(true);
+					this.getStatusEffectManager().addEffect(e);
 				}
 				break;
 			case 3:
@@ -236,9 +242,9 @@ public class BigGoblin extends Enemy {
 				((CircleBehavior)behaviors.get(currentBehavior)).setRadius(3);*/
 				if (spawns.size() < 4) {
 					for (int i = 0; i < 4; i++) 
-						addSpawn(new SnakeHead((MainGame.mm.m.getWidthInTiles() * 16) / 2, (MainGame.mm.m.getHeightInTiles() * 16) / 2, 19,  i*90));
+						addSpawn(new SnakeHead((MainGame.getCurrentMap().getWidthInTiles() * 16) / 2, (MainGame.getCurrentMap().getHeightInTiles() * 16) / 2, 19,  i*90));
 					dashcooldown = 120;
-					invulnerable = true;
+					this.getStatusEffectManager().addEffect(new InvulnerabilityEffect(1500));
 					return;
 				}
 				if (cls == null) {
@@ -253,7 +259,6 @@ public class BigGoblin extends Enemy {
 				if (dashing == false) {
 					if (chaseduration > 0) {
 						if (cls != null && dashcooldown <= 0) {
-							invulnerable = false;
 							((SetDashBehavior) behaviors.get(currentBehavior)).setTarget(cls.getLocation());
 							dashcooldown = basedash;
 						}

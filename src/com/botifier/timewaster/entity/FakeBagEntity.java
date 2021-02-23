@@ -15,7 +15,7 @@ public class FakeBagEntity extends Entity {
 	boolean played = false;
 
 	public FakeBagEntity(float x, float y, int type) throws SlickException {
-		super("bag", MainGame.getImage("purplebag"), new EntityController(x,y,0),0f);
+		super("bag", MainGame.getImage("purplebag"), new EntityController(x,y),0f);
 		solid = false;
 		if (type == 1) {
 			this.setImage(MainGame.getImage("whitebag"));

@@ -18,11 +18,12 @@ public class Sheep extends Enemy {
 	SpinPattern sp;
 
 	public Sheep(float x, float y) {
-		super("Sheep", MainGame.getImage("idlesheep"), new EnemyController(x, y, 5, 1f, 20), new SpriteSheet(MainGame.getImage("sheep"), 8, 8), null,0.5f);
+		super("Sheep", MainGame.getImage("idlesheep"), new EnemyController(x, y, 1f, 20), new SpriteSheet(MainGame.getImage("sheep"), 8, 8), null,0.5f);
 		sp = new SpinPattern();
 		team = Team.ENEMY;
-		maxhealth = 500;
-		def = 50;
+		setMaxHealth(500, true);
+		getStats().setSpeed(5);
+		getStats().setDefense(50);
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class Sheep extends Enemy {
 			//Reset last attacker
 			if (lastAttacker.destroy == true) {
 				lastAttacker = null;
-			} else if (lastAttacker.health <= 0) {
+			} else if (lastAttacker.getStats().getCurrentHealth() <= 0) {
 				lastAttacker = null;
 			} else if (lastAttacker.invulnerable == true) {
 				lastAttacker = null;

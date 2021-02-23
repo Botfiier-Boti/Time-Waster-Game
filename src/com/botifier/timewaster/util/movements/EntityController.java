@@ -18,12 +18,9 @@ public class EntityController {
 	public Vector2f src;
 	public Vector2f dst;
 	public Vector2f lDst;
-	public float speed;
-	public float bonusspeed;
 	public float visualAngle;
 	public boolean allyCollision = true;
 	protected float truespeed;
-	protected float PPS;
 	protected boolean moving = false;
 	protected boolean obeysCollision = true;
 	protected Entity owner;
@@ -38,15 +35,13 @@ public class EntityController {
 	protected boolean UP = true, DOWN = true, LEFT = true, RIGHT = true;
 	protected boolean fleeing = false;
 	
-	public EntityController(float x, float y, float speed) {
+	public EntityController(float x, float y) {
 		src = new Vector2f(x, y);
 		this.lDst = src;
-		this.speed = Math2.round(speed, 2);
 	}
 	
-	public EntityController(float x, float y, float speed, boolean obeysCollision) {
+	public EntityController(float x, float y, boolean obeysCollision) {
 		src = new Vector2f(x, y);
-		this.speed = Math2.round(speed, 2);
 		this.obeysCollision = obeysCollision;
 	}
 	
@@ -76,12 +71,10 @@ public class EntityController {
 				arrive();
 				break;
 		}*/
-		truespeed = speed+bonusspeed;
-		PPS = 0.6f + 1.5f*(truespeed/75f);
 		if (dst == null)
 			return;
 		velocity.add(steer);	
-		Vector2f temp = Math2.truncate(velocity,PPS);
+		Vector2f temp = Math2.truncate(velocity,getPPS());
 		visualAngle = angle;
 		angle = Math2.calcAngle(src, dst);
 		lDst = src.copy();
@@ -117,7 +110,7 @@ public class EntityController {
 			temp.x = 0;
 		}
 		
-		if (src.distance(dst) < PPS) {
+		if (src.distance(dst) < getPPS()) {
 			if (obeysCollision) {
 				if (UP && DOWN && LEFT && RIGHT) {
 					temp.x = 0;
@@ -170,8 +163,8 @@ public class EntityController {
 		velocity.scale(0);
 		steer.scale(0);
 		//testBox = null;
-		eC = testMapCollision(src.copy().add(Math2.truncate(velocity,PPS)));
-		if (dst != null && src.distance(dst) < PPS) {
+		eC = testMapCollision(src.copy().add(Math2.truncate(velocity,getPPS())));
+		if (dst != null && src.distance(dst) < getPPS()) {
 			moving = false;
 		} else if (dst == null) {
 			moving = false;
@@ -190,8 +183,8 @@ public class EntityController {
 		desired.sub(dst.copy().sub(src));
 		distance = desired.length();
 		if (distance > 0) {
-			float spd = PPS * (distance/arriveRadius);
-			spd = Math.min(spd, PPS);
+			float spd = getPPS() * (distance/arriveRadius);
+			spd = Math.min(spd, getPPS());
 			desired.scale(spd/distance);
 			steer.sub(desired.copy().sub(velocity));
 			moving = true;
@@ -205,8 +198,8 @@ public class EntityController {
 		desired.sub(src.copy().sub(dst));
 		distance = desired.length();
 		if (distance > 0) {
-			float spd = PPS * (distance/arriveRadius);
-			spd = Math.min(spd, PPS);
+			float spd = getPPS() * (distance/arriveRadius);
+			spd = Math.min(spd, getPPS());
 			desired.scale(spd/distance);
 			steer.sub(desired.copy().sub(velocity));
 			moving = true;
@@ -288,16 +281,16 @@ public class EntityController {
 		}
 		// move the object
 		if (src.getX() != dst.getX())
-			spd.x = Math2.round((float) (Math.cos(angle)*(PPS)), 1);
+			spd.x = Math2.round((float) (Math.cos(angle)*(getPPS())), 1);
 		if (src.getY() != dst.getY())
-			spd.y = Math2.round((float) (Math.sin(angle)*(PPS)), 1);
+			spd.y = Math2.round((float) (Math.sin(angle)*(getPPS())), 1);
 
-		Vector2f steering = Math2.truncate(desired_velocity.sub(spd), PPS*2);
+		Vector2f steering = Math2.truncate(desired_velocity.sub(spd), getPPS()*2);
 		steering.x /= 2;
 		steering.y /= 2;
 				
 		this.velocity = spd;
-		fake.add(Math2.truncate(spd.add(steering), PPS));
+		fake.add(Math2.truncate(spd.add(steering), getPPS()));
 		testBox =  new Rectangle(fake.getX()-owner.collisionbox.getWidth()/2,fake.getY()-owner.collisionbox.getHeight(),owner.collisionbox.getWidth(),owner.collisionbox.getHeight());
 		for (int i = test.size()-1; i >= 0; i--) {
 			Entity en = test.get(i);
@@ -314,43 +307,42 @@ public class EntityController {
 	}
 	
 	public void testMove() {
-		MainGame m = MainGame.mm;
-		if ((((int)(getOwner().collisionbox.getMinX()-PPS)/16 >= 0) && ((int)(getOwner().collisionbox.getMaxX()+PPS)/16 < MainGame.mm.m.getWidthInTiles())) 
-				&& (((int)(getOwner().collisionbox.getMinY()-PPS)/16 >= 0) && ((int)(getOwner().collisionbox.getMaxY()+PPS)/16 < MainGame.mm.m.getHeightInTiles()))) {
-				if (m.m.blocked(null, (int)(getOwner().collisionbox.getMaxX())/16, (int)(getOwner().collisionbox.getMinY()-PPS)/16) == true)
+		if ((((int)(getOwner().collisionbox.getMinX()-getPPS())/16 >= 0) && ((int)(getOwner().collisionbox.getMaxX()+getPPS())/16 < MainGame.getCurrentMap().getWidthInTiles())) 
+				&& (((int)(getOwner().collisionbox.getMinY()-getPPS())/16 >= 0) && ((int)(getOwner().collisionbox.getMaxY()+getPPS())/16 < MainGame.getCurrentMap().getHeightInTiles()))) {
+				if (MainGame.getCurrentMap().blocked(null, (int)(getOwner().collisionbox.getMaxX())/16, (int)(getOwner().collisionbox.getMinY()-getPPS())/16) == true)
 				{
 					UP = false;
 				}
-				if (m.m.blocked(null, (int)(getOwner().collisionbox.getMinX())/16, (int)(getOwner().collisionbox.getMinY()-PPS)/16) == true)
+				if (MainGame.getCurrentMap().blocked(null, (int)(getOwner().collisionbox.getMinX())/16, (int)(getOwner().collisionbox.getMinY()-getPPS())/16) == true)
 				{
 					UP = false;
 				}
 				
 				//DOWN
-				if (m.m.blocked(null, (int)(getOwner().collisionbox.getMaxX())/16, (int)(getOwner().collisionbox.getMaxY()+PPS)/16) == true)
+				if (MainGame.getCurrentMap().blocked(null, (int)(getOwner().collisionbox.getMaxX())/16, (int)(getOwner().collisionbox.getMaxY()+getPPS())/16) == true)
 				{
 					DOWN = false;
 				}
-				if (m.m.blocked(null, (int)(getOwner().collisionbox.getMinX())/16, (int)(getOwner().collisionbox.getMaxY()+PPS)/16) == true)
+				if (MainGame.getCurrentMap().blocked(null, (int)(getOwner().collisionbox.getMinX())/16, (int)(getOwner().collisionbox.getMaxY()+getPPS())/16) == true)
 				{
 					DOWN = false;
 				}
 				//LEFT
-				if (m.m.blocked(null, (int)(getOwner().collisionbox.getMinX()-PPS)/16, (int)(getOwner().collisionbox.getMaxY())/16) == true)
+				if (MainGame.getCurrentMap().blocked(null, (int)(getOwner().collisionbox.getMinX()-getPPS())/16, (int)(getOwner().collisionbox.getMaxY())/16) == true)
 				{
 					LEFT = false;
 				}
-				if (m.m.blocked(null, (int)(getOwner().collisionbox.getMinX()-PPS)/16, (int)(getOwner().collisionbox.getMinY())/16) == true)
+				if (MainGame.getCurrentMap().blocked(null, (int)(getOwner().collisionbox.getMinX()-getPPS())/16, (int)(getOwner().collisionbox.getMinY())/16) == true)
 				{
 					LEFT = false;
 				}
 				
 				//RIGHT
-				if (m.m.blocked(null, (int)(getOwner().collisionbox.getMaxX()+PPS)/16, (int)(getOwner().collisionbox.getMaxY())/16) == true)
+				if (MainGame.getCurrentMap().blocked(null, (int)(getOwner().collisionbox.getMaxX()+getPPS())/16, (int)(getOwner().collisionbox.getMaxY())/16) == true)
 				{
 					RIGHT = false;
 				} 
-				if (m.m.blocked(null, (int)(getOwner().collisionbox.getMaxX()+PPS)/16, (int)(getOwner().collisionbox.getMinY())/16) == true)
+				if (MainGame.getCurrentMap().blocked(null, (int)(getOwner().collisionbox.getMaxX()+getPPS())/16, (int)(getOwner().collisionbox.getMinY())/16) == true)
 				{
 					RIGHT = false;
 				} 
@@ -371,7 +363,7 @@ public class EntityController {
 		testBox = new Rectangle(fake.x-owner.collisionbox.getWidth()/2,fake.y-owner.collisionbox.getHeight()/2,owner.collisionbox.getWidth(),owner.collisionbox.getHeight());
 		int x = (int)dst.x/16;
 		int y = (int)dst.y/16;
-		boolean blocked = MainGame.mm.m.blocked(testBox, x, y);
+		boolean blocked = MainGame.getCurrentMap().blocked(testBox, x, y);
 		if (blocked == true) {
 			float angle = (int) Math.toDegrees(this.angle);
 			if (((angle >= 180 && angle <= 360))) {
@@ -421,7 +413,7 @@ public class EntityController {
 	}
 	
 	public float getPPS() {
-		return PPS;
+		return getOwner().getStats().getPPS();
 	}
 	
 	public float getAngle() {
@@ -476,11 +468,11 @@ public class EntityController {
 		Constructor<? extends EntityController> c = null;
 		try {
 			c = getClass().getConstructor(float.class, float.class, float.class, boolean.class);
-			return c.newInstance(src.x,src.y,speed,obeysCollision);
+			return c.newInstance(src.x,src.y,obeysCollision);
 		} catch (NoSuchMethodException e) {
 			try {
 				c = getClass().getConstructor(float.class, float.class, float.class);
-				return c.newInstance(src.x,src.y,speed);
+				return c.newInstance(src.x,src.y);
 			} catch (NoSuchMethodException e1) {
 				return null;
 			}

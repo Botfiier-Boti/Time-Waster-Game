@@ -13,14 +13,14 @@ public class BeeSwarm extends Enemy{
 	Circle influenceCircle = null;
 	
 	public BeeSwarm(float x, float y, int size, Entity owner) {
-		super("Bee Swarm", MainGame.getImage("beehive"), new EnemyController(x,y,50,3f,50, false), null, null);
+		super("Bee Swarm", MainGame.getImage("beehive"), new EnemyController(x,y,3f,50, false), null, null);
 		visible = true;
 		iModifier = 0.1f;
-		maxhealth = 1;
-		health = 1;
+		setMaxHealth(1,false);
 		spawncap = size;
 		invulnerable = true;
 		healthbarVisible = false;
+		getStats().setSpeed(50);
 		o = owner;
 		//Destroy if owner is invalid
 		if (o == null) {
@@ -30,7 +30,8 @@ public class BeeSwarm extends Enemy{
 		//Create bees
 		for (int i = 0; i < size; i++) {
 			Bee b = new Bee(x,y);
-			b.bAttack = getOwner().atk/4;
+			b.getController().allyCollision = false;
+			b.getStats().setAttack(getOwner().getAttack()/4);
 			b.team = this.team;
 			b.o = this;
 			spawns.add(b);
@@ -54,12 +55,15 @@ public class BeeSwarm extends Enemy{
 			((OrbitBehavior)behaviors.get(0)).setRadius(2);
 			//Orbit owner
 			((OrbitBehavior)behaviors.get(0)).setTarget(this.getOwner());
-			//Change based on owner movement
+			/*Change based on owner movement
 			if (getOwner().getController().isMoving()) {
-				getController().bonusspeed = getOwner().getController().speed;
+
+				getStats().setSpdMod(getOwner().getSpeed()*2);
 			} else {
-				getController().bonusspeed = 0;
-			}
+				getStats().setSpdMod(0);
+			}*/
+
+			getStats().setSpdMod(getOwner().getSpeed()*2);
 			//Iterate through bees
 			for (int i = spawns.size()-1; i > -1; i--) {
 				Bee b = (Bee) spawns.get(i);
@@ -74,11 +78,6 @@ public class BeeSwarm extends Enemy{
 					MainGame.getEntities().add(b);
 				if (b.getController().wanderArea != this.influenceCircle) {
 					b.getController().wanderArea = this.influenceCircle;
-				}
-				if (getOwner().getController().isMoving()) {
-					b.getController().bonusspeed = getOwner().getController().speed;
-				} else {
-					b.getController().bonusspeed = 0;
 				}
 			}
 		} else {

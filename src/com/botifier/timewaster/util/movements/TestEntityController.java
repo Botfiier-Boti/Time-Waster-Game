@@ -1,16 +1,15 @@
 package com.botifier.timewaster.util.movements;
 
 
-import com.botifier.timewaster.util.Math2;
 
 public class TestEntityController extends EntityController {
 	float wanderAngle = 0;
-	public TestEntityController(float x, float y, float speed) {
-		super(x, y, speed);
+	public TestEntityController(float x, float y) {//, float speed) {
+		super(x, y);
 		obeysCollision = false;
 	}
 	
-	@Override
+	/*@Override
 	public void move(int delta) {
 		if (dst == null)
 			return;
@@ -62,6 +61,6 @@ public class TestEntityController extends EntityController {
 			steer.sub(desired.copy().sub(velocity));
 		}
 	}
-	
+	*/
 
 }

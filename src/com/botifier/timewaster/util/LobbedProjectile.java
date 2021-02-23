@@ -26,8 +26,7 @@ public abstract class LobbedProjectile extends Entity {
 		this.o = o;
 		controller.setCollision(false);
 		controller.dst = dst.copy();
-		maxhealth = 1;
-		health = 1;
+		setMaxHealth(1,false);
 		healthbarVisible = false;
 		invulnerable = true;
 		start = controller.getLoc().copy();

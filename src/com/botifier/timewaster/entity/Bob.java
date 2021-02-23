@@ -19,7 +19,8 @@ public class Bob extends Entity {
 	int pos = 0;
 	
 	public Bob() {
-		super("bob", null, new EntityController(32, 32, 75));
+		super("bob", null, new EntityController(32, 32));
+		getStats().setSpeed(75);
 		((Rectangle)hitbox).setWidth(16);
 		((Rectangle)hitbox).setHeight(16);
 	}

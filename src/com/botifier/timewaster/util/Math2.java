@@ -59,6 +59,14 @@ public class Math2 {
 		return newV;
 	}
 	
+	public static boolean rectContains(float x, float y, float width, float height, float px, float py) {
+		float x1 = x+width;
+		float y1 = y;
+		float x2 = x;
+		float y2 = y+height;
+		return (px < x1 &&  px > x2 && py > y1 && py < y2) ? true : false;
+	}
+	
 	public static ArrayList<Vector2f> getIntersected(Shape s1, Shape s2) {
 	
 		return null;
@@ -67,6 +75,15 @@ public class Math2 {
 	public static boolean isInteger(String s) {
 		try {
 			Integer.parseInt(s);	
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static boolean isFloat(String s) {
+		try {
+			Float.parseFloat(s);	
 		} catch (Exception e) {
 			return false;
 		}

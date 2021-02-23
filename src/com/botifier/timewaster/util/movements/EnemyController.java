@@ -13,26 +13,20 @@ public class EnemyController extends EntityController {
 	long paitence = 1000;
 	Random r = new Random();
 	private float wanderMod = 1;
-	public float wanderspeed = 10f;
-	public float runspeed = 35f;
 	long wanderCooldown = 0;
 	long cooldown = 0;
 	public Circle wanderArea = null;
 	
-	public EnemyController(float x, float y, float speed, float wanderMod, long wanderCooldown) {
-		super(x, y, speed);
+	public EnemyController(float x, float y, float wanderMod, long wanderCooldown) {
+		super(x, y);
 		this.obeysCollision = true;
-		this.runspeed = speed;
 		this.wanderMod = wanderMod;
-		this.wanderspeed = speed * wanderMod;
 		this.wanderCooldown = wanderCooldown;
 	}
 	
-	public EnemyController(float x, float y, float speed, float wanderMod, long wanderCooldown, boolean obeysCollision) {
-		super(x, y, speed, obeysCollision);
-		this.runspeed = speed;
+	public EnemyController(float x, float y, float wanderMod, long wanderCooldown, boolean obeysCollision) {
+		super(x, y, obeysCollision);
 		this.wanderMod = wanderMod;
-		this.wanderspeed = speed * wanderMod;
 		this.wanderCooldown = wanderCooldown;
 	}
 
@@ -54,19 +48,13 @@ public class EnemyController extends EntityController {
 		nx = (((int)nx/16)*16)+8;
 		ny = (((int)ny/16)*16)+8;
 		if (force) {
-			if (speed != wanderspeed) {
-				speed = wanderspeed;
-			}
 			dst = null;
 			setDestination(nx, ny); 
 			return;
 		} else if (cooldown <= 0) {
 			if (nx > src.getX() || nx < src.getX() || ny > src.getY() || ny < src.getY()) {
 				//Vector2f v = new Vector2f(nx, ny);
-				if (MainGame.mm.m.blocked(null, nx, ny) == false) {
-					if (speed != wanderspeed) {
-						speed = wanderspeed;
-					}
+				if (MainGame.getCurrentMap().blocked(null, nx, ny) == false) {
 					dst = null;
 					setDestination(nx, ny); 
 					cooldown = (long) ((Math.random()*(wanderCooldown*0.75))+wanderCooldown*0.5);
@@ -80,10 +68,6 @@ public class EnemyController extends EntityController {
 	public void dash(float nx, float ny) {
 		fleeing = false;
 		stop();
-		if (speed != runspeed) {
-			speed = runspeed;
-			PPS = 0.6f + 1.5f*(speed/75f);
-		}
 		Vector2f v = new Vector2f(nx, ny);
 		setDestination(v.x, v.y); 
 	}
@@ -95,16 +79,13 @@ public class EnemyController extends EntityController {
 	
 	public void flee(float nx, float ny) {
 		fleeing = true;
-		if (speed != runspeed) {
-			speed = runspeed;
-		}
 		Vector2f v = new Vector2f(nx, ny);
 		setDestination(v.x, v.y); 
 	}
 	
 	public EnemyController copy() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, SecurityException {
 		try {
-			return getClass().getConstructor(float.class, float.class, float.class, float.class, long.class, boolean.class).newInstance(src.x,src.y,speed,wanderMod,wanderCooldown,obeysCollision);
+			return getClass().getConstructor(float.class, float.class, float.class, float.class, long.class, boolean.class).newInstance(src.x,src.y,wanderMod,wanderCooldown,obeysCollision);
 		} catch (NoSuchMethodException e) {
 			return null;
 		}

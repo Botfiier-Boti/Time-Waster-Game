@@ -15,11 +15,13 @@ import com.botifier.timewaster.util.movements.EnemyController;
 public class SnakeBody extends Enemy{
 	long shotdelay = 6000;
 	public SnakeBody(float x, float y, Entity owner) {
-		super("SnakeBody", MainGame.getImage("Body"), new EnemyController(x,y,200,1f,100,false), null, null);
+		super("SnakeBody", MainGame.getImage("Body"), new EnemyController(x,y,1f,100,false), null, null);
 		setMaxHealth(2000, true);
 		o = owner;
-		def = 50;
-		dex = 1;
+		getStats().setDefense(50);
+		getStats().setDexterity(50);
+		getStats().setSpeed(200);
+		getController().allyCollision = false;
 		posMod.y = 3;
 		linger = false;
 		healthbarVisible = false;
@@ -52,7 +54,7 @@ public class SnakeBody extends Enemy{
 			Bullet bul = Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 70, angle, 4000, 75, 0,this,false,true,false,false,false);
 			bul.setImage(MainGame.getImage("smallrock"));
 			b.add(bul);
-			cooldown = (int)(60/(2.5f + 6.5f*((dex+bDex)/75f)));
+			cooldown = (int)(60/(2.5f + 6.5f*((getDexterity())/75f)));
 		}
 		fb.setTarget(o);
 		/*if (index > 0) {
@@ -60,6 +62,6 @@ public class SnakeBody extends Enemy{
 		} else {
 			fb.setTarget(o);
 		}*/
-		getController().speed = o.getController().speed*2;
+		getStats().setSpeed(o.getSpeed()*2);
 	}
 }

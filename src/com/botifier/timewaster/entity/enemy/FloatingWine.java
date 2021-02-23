@@ -21,13 +21,14 @@ public class FloatingWine extends Enemy {
 	long cooldown = 20;
 
 	public FloatingWine(float x, float y) {
-		super("Floating Wine", MainGame.getImage("WineGlass"), new EnemyController(x,y,5f, 1f, 100), new SpriteSheet(MainGame.getImage("FloatingWine"),16,16), new SpriteSheet(MainGame.getImage("WineAttack"),16,16),2);
+		super("Floating Wine", MainGame.getImage("WineGlass"), new EnemyController(x,y, 1f, 100), new SpriteSheet(MainGame.getImage("FloatingWine"),16,16), new SpriteSheet(MainGame.getImage("WineAttack"),16,16),2);
 		size = 0.75f;
 		iModifier = 0.20f;
 		healthbarVisible = false;
 		FollowBehavior fb = new FollowBehavior(this);
 		fb.setMaxDistance(10);
 		behaviors.add(fb);
+		getStats().setSpeed(5);
 		currentBehavior = 0;
 	}
 	

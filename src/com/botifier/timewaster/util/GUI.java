@@ -69,6 +69,10 @@ public class GUI {
 		}
 	}
 	
+	public Component getComponent(int i) {
+		return components.get(i);
+	}
+	
 	public void addComponent(Component c) {
 		components.addFirst(c);
 	}

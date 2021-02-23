@@ -14,6 +14,7 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.main.MainGame;
+import com.botifier.timewaster.util.managers.StatusEffectManager;
 import com.botifier.timewaster.util.movements.EntityController;
 
 public class Entity implements Comparable<Entity> {
@@ -23,6 +24,8 @@ public class Entity implements Comparable<Entity> {
 	protected int spawncap = 3;
 	private String name;
 	private EntityController controller;
+	private StatusEffectManager sem;
+	private Stats stats;
 	public ArrayList<Entity> b = MainGame.getEntityManager().getBullets();
 	public LinkedList<Entity> followers = new LinkedList<Entity>();
 	public ArrayList<Entity> spawns = new ArrayList<Entity>();
@@ -37,18 +40,8 @@ public class Entity implements Comparable<Entity> {
 	public float iModifier = 1.0f;
 	public float size = 1.0f;
 	public float lSize = 1.0f;
-	public float health = 800;
-	public float maxhealth = 800;
-	public float atk = 50;
-	public float def = 0;
-	public float vit = 0;
-	public float dex = 35;
 	public float angle = 0;
 	public float rotation = 0;
-	public float bAttack = 0;
-	public float bVit = 0;
-	public float bDef = 0;
-	public float bDex = 0;
 	public boolean solid = true;
 	public boolean destroy = false;
 	public boolean obstacle = false;
@@ -139,6 +132,8 @@ public class Entity implements Comparable<Entity> {
 			((Rectangle)hitbox).setSize(image.getWidth()*size, image.getHeight()*size);
 			influence = (24*((image.getWidth()+image.getHeight())/2))*iModifier*size;
 		}
+		stats = new Stats(this);
+		sem = new StatusEffectManager(this);
 		initialized = true;
 	}
 	
@@ -176,10 +171,7 @@ public class Entity implements Comparable<Entity> {
 		if (spawns.size() > 0 && spawns.size() > spawncap) {
 			spawns.get(0).onDeath();
 		}
-		if (health > maxhealth) {
-			health = maxhealth;
-		}
-		if (health <= 0) {
+		if (stats.getCurrentHealth() <= 0) {
 			onDeath();
 			destroy = true;
 			return;
@@ -196,16 +188,9 @@ public class Entity implements Comparable<Entity> {
 				init();
 				lSize = size;
 			} 
-			if (hitbox instanceof Rectangle && wOverride >= 0  && hitbox.getWidth() != wOverride)
-				((Rectangle)hitbox).setWidth(wOverride);
-			if ( hitbox instanceof Rectangle && hOverride >= 0 && hitbox.getHeight() != hOverride)
-				((Rectangle)hitbox).setHeight(hOverride);
+			updateHitboxes();
 			if (!overrideMove && controller != null)
 				controller.move(delta);
-			collisionbox.setCenterX(getLocation().getX());
-			collisionbox.setY(getLocation().getY()-posMod.y-(collisionbox.getHeight()));
-			hitbox.setCenterX(getLocation().getX());
-			hitbox.setY(getLocation().getY()-posMod.y-(hitbox.getHeight()));
 			if (spawns.size() > 0) {
 				for (int i = spawns.size()-1; i > -1; i--) {
 					Entity e = spawns.get(i);
@@ -235,6 +220,7 @@ public class Entity implements Comparable<Entity> {
 					e.forceUpdate(delta);
 				}
 			}
+			sem.update(delta);
 			cooldown--;
 		} else {
 			return;
@@ -245,6 +231,17 @@ public class Entity implements Comparable<Entity> {
 	public void forceUpdate(int delta) throws SlickException {
 		force = true;
 		update(delta);
+	}
+	
+	public void updateHitboxes() {
+		if (hitbox instanceof Rectangle && wOverride >= 0  && hitbox.getWidth() != wOverride)
+			((Rectangle)hitbox).setWidth(wOverride);
+		if ( hitbox instanceof Rectangle && hOverride >= 0 && hitbox.getHeight() != hOverride)
+			((Rectangle)hitbox).setHeight(hOverride);
+		collisionbox.setCenterX(getLocation().getX());
+		collisionbox.setY(getLocation().getY()-posMod.y-(collisionbox.getHeight()));
+		hitbox.setCenterX(getLocation().getX());
+		hitbox.setY(getLocation().getY()-posMod.y-(hitbox.getHeight()));
 	}
 	
 	public void onDeath() throws SlickException {
@@ -261,41 +258,11 @@ public class Entity implements Comparable<Entity> {
 	public void onAttackHit(Bullet b, int dmg) {}
 	
 	public void heal(float amount) {
-		float nAmount = amount;
-		if (nAmount > maxhealth-health)
-			nAmount = maxhealth-health;
-		if (nAmount < 0)
-			nAmount = 0;
-		if (nAmount == 0)
-			return;
-		try {
-			MainGame.spawnTempText("+"+(int)nAmount, hitbox.getMinX(), hitbox.getMinY(), Color.green);
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
-		health += nAmount;
+		stats.heal(amount);
 	}
 	
 	public void onHit(int damage, Entity origin, boolean ignoresDefense) {
-		if (active == false)
-			return;
-		if (origin.team == this.team || origin == this || invincible == true)
-			return;
-		int d = 0;
-		if (invulnerable)
-			return;
-		else if (ignoresDefense == false) 
-			d = (int) Math.max(damage*0.15f, damage-(getDefense()));
-		else 
-			d = damage;
-		if (d > 0) {
-			try {
-				MainGame.spawnTempText("-"+d, hitbox.getCenterX(), hitbox.getMinY(), Color.red);
-			} catch (SlickException e) {
-				e.printStackTrace();
-			}
-		}
-		health -= d;
+		stats.damage(damage, origin, ignoresDefense);
 	}
 	
 	public void onHitByBullet(Bullet b) {
@@ -305,6 +272,8 @@ public class Entity implements Comparable<Entity> {
 		if (origin.team == this.team || origin == this || invincible == true)
 			return;
 		int damage = 0;
+		if (b.effect != null)
+			sem.addEffect(b.effect);
 		if (b.scalesWithAtk()) {
 			if (b.basedamage[0] >= b.basedamage[1]) {
 				damage =(int) ((b.basedamage[0]*(0.5f+(origin.getAttack()/50f))));
@@ -330,7 +299,7 @@ public class Entity implements Comparable<Entity> {
 	public void shootBullet(float angle, boolean force) throws SlickException {
 		if (cooldown <= 0 || force) {
 			b.add(new Bullet("Bob", getController().getLoc().x, getController().getLoc().y, 200, angle, 350, 75, 90,this));
-			cooldown = (int)(60/(1.5f + 6.5f*((dex+bDex)/75f)));
+			cooldown = (int)(60/(1.5f + 6.5f*((getDexterity())/75f)));
 		}
 	}
 	
@@ -350,9 +319,7 @@ public class Entity implements Comparable<Entity> {
 	}
 	
 	public void setMaxHealth(float maxhealth, boolean heal) {
-		this.maxhealth = maxhealth;
-		if (heal)
-			health = maxhealth;
+		stats.setMaxHealth(maxhealth, heal);
 	}
 	
 
@@ -382,6 +349,10 @@ public class Entity implements Comparable<Entity> {
 		return name;
 	}
 	
+	public StatusEffectManager getStatusEffectManager() {
+		return sem;
+	}
+	
 	public EntityController getController() {
 		return controller;
 	}
@@ -398,16 +369,36 @@ public class Entity implements Comparable<Entity> {
 		return invincible;
 	}
 	
+	public float getMaxHealth() {
+		return stats.getMaxHealth()+stats.getHealthMod();
+	}
+	
 	public float getAttack() {
-		return atk+bAttack;
+		return stats.getAttack()+stats.getAtkMod();
+	}
+	
+	public float getDexterity() {
+		return stats.getDexterity()+stats.getDexMod();
 	}
 	
 	public float getDefense() {
-		return def+bDef;
+		return stats.getDefense()+stats.getDefMod();
 	}
 	
 	public float getVitality() {
-		return vit+bVit;
+		return stats.getVitality()+stats.getVitMod();
+	}
+	
+	public float getSpeed() {
+		return stats.getSpeed()+stats.getSpdMod();
+	}
+	
+	public String getParameters() {
+		return getLocation().x+", "+getLocation().y;
+	}
+	
+	public Stats getStats() {
+		return stats;
 	}
 
 	@Override

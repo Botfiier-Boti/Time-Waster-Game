@@ -31,8 +31,20 @@ public abstract class Component {
 		pos = v;
 	}
 	
+	public void setColor(Color color) {
+		c = color;
+	}
+	
 	public Vector2f getPosition() {
 		return pos;
+	}
+	
+	public float getX() {
+		return pos.x;
+	}
+	
+	public float getY() {
+		return pos.y;
 	}
 	
 	public GUI getOwner() {

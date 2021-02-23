@@ -18,6 +18,8 @@ public class Camera {
 	
 	public Rectangle r;
 	
+	public float zoom = 1;
+	
 	public float cx, cy;
 	
 	float rotation = 0;
@@ -25,6 +27,7 @@ public class Camera {
 	public Camera(float width, float height) {
 		r = new Rectangle(0,0,width+20,height+20);
 		center = new Vector2f();
+		zoom = MainGame.camRatio;
 	}
 	
 	public void update(GameContainer gc) {
@@ -44,16 +47,22 @@ public class Camera {
 	public void draw(GameContainer gc, Graphics g) {
 		Input in = gc.getInput();
 		g.setDrawMode(Graphics.MODE_NORMAL);
-		in.setScale(1/MainGame.camRatio, 1/MainGame.camRatio);
-		g.scale(MainGame.camRatio, MainGame.camRatio);
+		in.setScale(1/zoom, 1/zoom);
+		g.scale(zoom, zoom);
 		if (centerE == null) {
 			g.translate(-center.getX(), -center.getY());
+			in.setOffset(center.getX(), center.getY());
+			//if (MainGame.mm.getCurrentStateID() == 2)
+			//	g.rotate(r.getCenterX(), r.getCenterY(), rotation);
 		} else {
 			cx = getWidth()/2 - centerE.getLocation().getX() - centerE.hitbox.getWidth()*1.20f;
 			cy = getHeight()/2 - centerE.getLocation().getY() - centerE.hitbox.getHeight();
 			in.setOffset(-cx, -cy);
 			g.translate(cx, cy);
+			//if (MainGame.mm.getCurrentStateID() == 2)
+			//	g.rotate(centerE.getLocation().getX(), centerE.getLocation().getY(), rotation);
 		}
+		//g.scale(zoom, zoom);
 		//g.setWorldClip(r);
 	}
 	

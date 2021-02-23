@@ -26,18 +26,16 @@ public class ExternalPlayer extends Entity {
 	BulletPattern p;
 	
 	public ExternalPlayer(String name, float x, float y) throws SlickException {
-		super(name, MainGame.getImage("debugman"), new ExternalPlayerControl(x, y, 50f));
+		super(name, MainGame.getImage("debugman"), new ExternalPlayerControl(x, y));
 		s = new Sound("bladeSwing.wav");
 		getController().setCollision(true);
 		team = Team.ALLY;
 		overrideMove = true;
-		def = 20;
-		vit = 75;
 	}
 	
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input i = gc.getInput();
-		if (health <= 0) {
+		if (getStats().getCurrentHealth() <= 0) {
 			active = false;
 		}
 		if (this.active) {
@@ -73,23 +71,6 @@ public class ExternalPlayer extends Entity {
 				}
 			}
 			cooldown--;
-			if (health < maxhealth) {
-				health += 0.1f+0.005f*vit;
-			} else if (health <= 0) {
-				active = false;
-				invincible = true;
-				return;
-			}
-			
-			if (invulPeriod > 0) {
-				if (invincible == false)
-					invincible = true;
-				invulPeriod--;
-			} else {
-				if (invincible == true) {
-					invincible = false;
-				}
-			}
 		}
 		//JOptionPane.
 	}

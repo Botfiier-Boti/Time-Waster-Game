@@ -15,7 +15,7 @@ public class FollowBehavior extends Behavior{
 
 	public FollowBehavior(Enemy owner) {
 		super(owner);
-		speed = owner.getController().speed;
+		speed = owner.getSpeed();
 	}
 
 	@Override

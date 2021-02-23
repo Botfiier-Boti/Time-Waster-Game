@@ -30,7 +30,7 @@ public class Enemy extends Entity {
 		this.walk = walk;
 		this.attack = attack;
 		if (walk != null) {
-			aWalk = new Animation(walk, (int)(300-(Math.max(0.6f + 1.5f*(getController().speed/75f), 1))));
+			aWalk = new Animation(walk, (int)(300-(Math.max(0.6f + 1.5f*(getSpeed()/75f), 1))));
 			aWalk.setLooping(true);
 			aWalk.start();
 		}
@@ -47,7 +47,7 @@ public class Enemy extends Entity {
 		this.walk = walk;
 		this.attack = attack;
 		if (walk != null) {
-			aWalk = new Animation(walk, (int)(300-(Math.max(0.6f + 1.5f*(getController().speed/75f), 1))));
+			aWalk = new Animation(walk, (int)(300-(Math.max(0.6f + 1.5f*(getSpeed()/75f), 1))));
 			aWalk.setLooping(true);
 			aWalk.start();
 		}

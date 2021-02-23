@@ -25,7 +25,7 @@ public class Dungeon {
 		this.num_rooms = num_rooms;
 		this.min_size = min_size;
 		this.max_size = max_size;
-		tiles = new char[MainGame.mm.m.getWidthInTiles()][MainGame.mm.m.getHeightInTiles()];
+		tiles = new char[MainGame.getCurrentMap().getWidthInTiles()][MainGame.getCurrentMap().getHeightInTiles()];
 		generate();
 	}
 	
@@ -33,13 +33,13 @@ public class Dungeon {
 		this.num_rooms = num_rooms;
 		this.min_size = min_size;
 		this.max_size = max_size;
-		tiles = new char[MainGame.mm.m.getWidthInTiles()][MainGame.mm.m.getHeightInTiles()];
+		tiles = new char[MainGame.getCurrentMap().getWidthInTiles()][MainGame.getCurrentMap().getHeightInTiles()];
 		r.setSeed(seed);
 		generate();
 	}
 	
 	public Dungeon() {
-		tiles = new char[MainGame.mm.m.getWidthInTiles()][MainGame.mm.m.getHeightInTiles()];
+		tiles = new char[MainGame.getCurrentMap().getWidthInTiles()][MainGame.getCurrentMap().getHeightInTiles()];
 		generate();
 	}
 	
@@ -50,8 +50,8 @@ public class Dungeon {
 			int size = min_size;
 			if (max_size > min_size)
 				size += r.nextInt(max_size-min_size);
-			int x = 1+r.nextInt(MainGame.mm.m.getWidthInTiles()-size-1);
-			int y = 1+r.nextInt(MainGame.mm.m.getHeightInTiles()-size-1);
+			int x = 1+r.nextInt(MainGame.getCurrentMap().getWidthInTiles()-size-1);
+			int y = 1+r.nextInt(MainGame.getCurrentMap().getHeightInTiles()-size-1);
 			System.out.println(x+", "+y);
 			Room ro = new Room(new Vector2f(x,y),size);
 			boolean failed = false;
@@ -82,7 +82,7 @@ public class Dungeon {
 				}
 			}
 		}
-		MainGame.mm.m.tiles = tiles;
+		MainGame.getCurrentMap().tiles = tiles;
 	}
 	
 	private void hCorri(int x1, int x2, int y) {

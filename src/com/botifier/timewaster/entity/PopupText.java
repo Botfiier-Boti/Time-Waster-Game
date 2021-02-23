@@ -16,9 +16,10 @@ public class PopupText extends Entity {
 	boolean inf = false;
 	
 	public PopupText(String text, float x, float y, Color c) throws SlickException {
-		super("Text", null, new EntityController(x, y, 15));
+		super("Text", null, new EntityController(x, y));
 		getController().setDestination(x, y-30);
 		getController().setCollision(false);
+		getStats().setSpeed(15);
 		this.text = text;
 		this.c = c;
 		solid = false;

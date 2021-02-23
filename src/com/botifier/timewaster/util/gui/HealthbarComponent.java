@@ -17,14 +17,15 @@ public class HealthbarComponent extends Component {
 		this.e = e;
 		r1 = new RectangleComponent(g, Color.red, x, y, width, height,false);
 		r2 = new RectangleComponent(g, Color.green, x, y, width, height,true);
-		String pH = (int)e.health+"/"+(int)e.maxhealth;
+		String pH = (int)e.getStats().getCurrentHealth()+"/"+(int) e.getMaxHealth();
 		t = new TextComponent(g, Color.white, pH, x, y, true);
+		t.setCentered(true);
 	}
 	
 	@Override
 	public void update(int delta) {
-		t.setText((int) e.health + "/" + (int) e.maxhealth);
-		r2.setWidth((e.health / e.maxhealth) * ((r1.getWidth())));
+		t.setText((int) e.getStats().getCurrentHealth() + "/" + (int) e.getMaxHealth());
+		r2.setWidth((e.getStats().getCurrentHealth() / e.getMaxHealth()) * ((r1.getWidth())));
 	}
 
 	@Override

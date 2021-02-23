@@ -22,13 +22,12 @@ public class Bee extends Enemy {
 	long cooldown = 0;
 
 	public Bee(float x, float y) {
-		super("Bee", MainGame.getImage("Bee"), new EnemyController(x,y, (float) (20+Math.random()*50), 0.5f, 0), null, null);
+		super("Bee", MainGame.getImage("Bee"), new EnemyController(x,y, 0.5f, 0), null, null);
 		s = MainGame.getSound("yalikejazz");
 		iModifier = 0.1f;
-		maxhealth = 150;
-		health = 150;
-		atk = 10;
-		def = 20000;
+		setMaxHealth(250, true);
+		getStats().setDefense(20000);
+		getStats().setSpeed((float) (20+Math.random()*50));
 		fireSpeed = 1f;
 		linger = false;
 		behaviors.add(new OrbitBehavior(this));
@@ -78,7 +77,7 @@ public class Bee extends Enemy {
 			}
 		}
 		//Die over time
-		health -= 0.1f;
+		getStats().setCurrentHealth(getStats().getCurrentHealth()-0.1f);
 		cooldown--;
 	}
 	

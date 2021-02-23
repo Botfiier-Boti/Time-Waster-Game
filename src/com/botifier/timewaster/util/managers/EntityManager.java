@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 //import java.util.Random;
+import java.util.Map.Entry;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -35,8 +36,11 @@ public class EntityManager {
 	private ArrayList<Entity> visualEffects = new ArrayList<Entity>();
 	private ArrayList<Entity> overlaidEffects = new ArrayList<Entity>();
 
-	public EntityManager(MainGame m) throws SlickException {
+	public EntityManager(MainGame m) {
 		this.m = m;
+	}
+	
+	public void init() throws SlickException {
 		shadowImage = MainGame.getImage("Shadow");
 		loadAliases();
 		loadEntities();
@@ -168,17 +172,27 @@ public class EntityManager {
 			}
 		}
 		
-		//Rendering healthbars
+		//Rendering healthbars and status effects
 		for (int i = entities.size()-1; i > -1; i--) {
 			Entity en = entities.get(i);
 			if (en == null)
 				continue;
 			if (en.seen == true) {
+				if (en.getStatusEffectManager().getStatusEffects().isEmpty() == false) {
+					ArrayList<Image> symbols = en.getStatusEffectManager().getVisuals();
+					int offset = symbols.size() > 1 ? 8*(symbols.size()/2)-8 : 4;
+					for (int e = symbols.size()-1; e > -1; e--) {
+						Image im = symbols.get(e);
+						if (im == null)
+							continue;
+						im.draw(en.hitbox.getCenterX()-offset-(e*8), en.hitbox.getMinY()-8);
+					}
+				}
 				if (en.isHealthbarVisible()) {
 					g.setColor(Color.red);
 					g.fillRect(en.hitbox.getCenterX()-6, en.hitbox.getMaxY()+1, 12, 3);
 					g.setColor(Color.green);
-					g.fillRect(en.hitbox.getCenterX()-6, en.hitbox.getMaxY()+1, (12)*(Math.max(en.health, 0)/en.maxhealth), 3);
+					g.fillRect(en.hitbox.getCenterX()-6, en.hitbox.getMaxY()+1, (12)*(Math.max(en.getStats().getCurrentHealth(), 0)/en.getMaxHealth()), 3);
 					if (en.invulnerable == false || en.isInvincible() == true)
 						g.setColor(Color.black);
 					else
@@ -234,7 +248,7 @@ public class EntityManager {
 			return new Class[] {float.class, float.class};
 	}
 	
-	public static String getAlias(String name) {
+	public static String getFromAlias(String name) {
 		return entityAliases.get(name.toLowerCase());
 	}
 	
@@ -242,15 +256,24 @@ public class EntityManager {
 		return entityAliases.containsKey(name.toLowerCase());
 	}
 	
+	public static String getAlias(Class<?> c) {
+		for (Entry<String, String> entry : entityAliases.entrySet()) {
+			if (entry.getValue().equals(c.getName())) {
+				return entry.getKey();
+			}
+		}
+		return null;
+	}
+	
 	public static Entity createEntityOfType(String name, Object... args) {
 		Entity e = null;
 		try {
 			String truename = name.toLowerCase();
 			if (hasAlias(name) == true)
-				truename = getAlias(name);
+				truename = getFromAlias(name);
 			e = (Entity) Class.forName(truename).getConstructor(getEntityInstArgs(name)).newInstance(args);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException | ClassNotFoundException e1) {
+				| NoSuchMethodException | SecurityException | ClassNotFoundException e1 ) {
 			e1.printStackTrace();
 		}
 		return e;

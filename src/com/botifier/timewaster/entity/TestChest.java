@@ -13,19 +13,15 @@ public class TestChest extends Entity {
 	Random r = new Random();
 
 	public TestChest(float x, float y) throws SlickException {
-		super("Test Chest", MainGame.getImage("TestChest"), new EntityController(x, y, 0), 0f);
+		super("Test Chest", MainGame.getImage("TestChest"), new EntityController(x, y), 0f);
 		solid = true;
 		obstacle = true;
-		maxhealth = 2500;
-		health = maxhealth;
+		setMaxHealth(2000, true);
 		size = 1f;
 	}
 	@Override
 	public void update(int delta) throws SlickException {
 		super.update(delta);
-		if (health <= 0) {
-			
-		}
 	}
 	
 	@Override
@@ -35,8 +31,6 @@ public class TestChest extends Entity {
 		if (i == 26) {
 			try {
 				MainGame.getEntityManager().addEntity(new FakeBagEntity(getController().src.x,getController().src.y, 1));
-				MainGame.mm.p.atk++;
-				MainGame.mm.p.dex++;
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}

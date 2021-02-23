@@ -28,13 +28,13 @@ public class Beehive extends LobbedProjectile{
 		float y =  getLocation().getY();
 		if (x < 0)
 			return;
-		if (x > MainGame.mm.m.getWidthInTiles()*16)
+		if (x > MainGame.getCurrentMap().getWidthInTiles()*16)
 			return;
 		if (y < 0)
 			return;
-		if (y > MainGame.mm.m.getHeightInTiles()*16)
+		if (y > MainGame.getCurrentMap().getHeightInTiles()*16)
 			return;
-		if (!MainGame.mm.m.blocked(null, (int)x/16, (int)y/16)) {
+		if (!MainGame.getCurrentMap().blocked(null, (int)x/16, (int)y/16)) {
 			BeeSwarm isc = new BeeSwarm(x, y, 5, o);
 			o.spawns.add(isc);	
 		}
