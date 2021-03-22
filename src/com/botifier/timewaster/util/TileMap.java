@@ -1,20 +1,17 @@
 package com.botifier.timewaster.util;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -30,9 +27,11 @@ import com.botifier.timewaster.util.managers.EntityManager;
 
 public class TileMap  {
 	//ArrayList<Rectangle> r = new ArrayList<Rectangle>();
+	public EntityManager eM;
 	HashMap<Character, String> tileTypes = new HashMap<Character, String>();
 	ArrayList<Entity> initialEntities = new ArrayList<Entity>();
 	Vector2f spawnTile = new Vector2f(2,2);
+	Vector2f origin = new Vector2f(0,0);
 	String walkable = "";
 	char[][] tiles;
 	int width = 0;
@@ -45,12 +44,21 @@ public class TileMap  {
 	}
 	
 	public TileMap(String s) throws IOException {
+		eM = new EntityManager(MainGame.mm);
 		loadFromFile(s);
 	}
 	
+	public void init() throws SlickException {
+		if (eM == null)
+			eM = new EntityManager(MainGame.mm);
+		eM.init();
+	}
+	
 	public boolean blocked( int tx, int ty) {
-		if ((tx > -1) && (ty >-1) && (ty < tiles.length) && (tx < tiles[ty].length)) {
-			char c = tiles[ty][tx];
+		int nx = (int) (tx - origin.x);
+		int ny = (int) (ty - origin.y);
+		if ((nx > -1) && (ny >-1) && (ny < tiles.length) && (nx < tiles[ny].length)) {
+			char c = tiles[ny][nx];
 			if (walkable.contains(c+"") == false) {
 				return true;
 			}
@@ -113,6 +121,23 @@ public class TileMap  {
 		return tiles[y][x];
 	}
 	
+	public void update(GameContainer gc, int delta) throws SlickException {
+		handleEntities(gc, delta);
+	}
+	
+	public void handleEntities(GameContainer gc, int delta) throws SlickException {
+		eM.update(gc, delta);
+	}
+	
+	public void reset() {
+		eM.getBullets().clear();
+		eM.getOverlayedEffects().clear();
+		eM.getEntities().clear();
+		for (Entity e : getInitialEntities()) {
+			eM.addEntity(e.copy());
+		}
+	}
+	
 	public void draw(GameContainer gc, Graphics g) {
 		draw(gc,g,true);
 	}
@@ -122,19 +147,18 @@ public class TileMap  {
 		for (int y = 0; y < getHeightInTiles(); y++) {
 			for (int x = 0; x < getWidthInTiles(); x++) {
 				char tile = tiles[y][x];
-				if (c.centerE.getLocation().distance(new Vector2f((x * 16)+8, (y * 16)+8)) >= MainGame.getViewDistance() && vision == true) {
+				float dist = c.getCenter().distance(new Vector2f((x * 16)+8+origin.x*16, (y * 16)+8+origin.x*16));
+				if (dist > MainGame.getViewDistance() && dist < MainGame.getViewDistance()*2 && vision == true) {
 					if (tileTypes.containsKey(tile)) {
 						Image e = MainGame.getImage(tileTypes.get(tile));
 						if (e != null) {
-							e = e.copy();
-							e.setImageColor(255, 255, 255,0.5f);
-							g.drawImage(e, x * 16, y * 16);
+							g.drawImage(e, x * 16+origin.x*16, y * 16+origin.y*16, new Color(255, 255, 255,0.5f));
 						}
 					} else if (tile == ' '){
 						continue;
 					} else {
 						g.setColor(Color.darkGray);
-						g.fillRect(x * 16, y * 16, 16, 16);
+						g.fillRect(x * 16+origin.x*16, y * 16+origin.y*16, 16, 16);
 					}
 					g.setColor(Color.white);
 						
@@ -155,18 +179,18 @@ public class TileMap  {
 						break;
 					}
 					g.setColor(Color.white);*/
-				} else {
+				} else if (dist <= MainGame.getViewDistance()){
 					if (tileTypes.containsKey(tile)) {
 						Image i = MainGame.getImage(tileTypes.get(tile));
 						if (i != null)
-							g.drawImage(i, x * 16, y * 16);
+							g.drawImage(i, x * 16+origin.x*16, y * 16+origin.y*16);
 					} else if (tile == ' ') {
 						continue;
 					}else {
 						g.setColor(Color.darkGray);
-						g.fillRect(x * 16, y * 16, 16, 16);
+						g.fillRect(x * 16+origin.x*16, y * 16+origin.y*16, 16, 16);
 						g.setColor(Color.black);
-						g.drawRect(x*16, y*16, 16, 16);
+						g.drawRect(x*16+origin.x*16, y*16+origin.y*16, 16, 16);
 					}
 					g.setColor(Color.white);
 					/*switch (tile) {
@@ -218,7 +242,7 @@ public class TileMap  {
 		System.out.println("Writing entities...");
 		for (Entity e : initialEntities) {
 			String name = e.getClass().getName();
-			if (EntityManager.hasAlias(e.getClass().getName()) == true); 
+			if (EntityManager.isAlias(e.getClass().getName()) == true); 
 				name = EntityManager.getAlias(e.getClass());
 			String param = e.getParameters();
 			bw.write("addentity "+name+", "+param+"\n");
@@ -250,6 +274,14 @@ public class TileMap  {
 	public void loadFromFile(InputStream fis) throws IOException {
 		Reader r = new InputStreamReader(fis);
 		BufferedReader br = new BufferedReader(r);
+		if (eM == null) {
+			eM = new EntityManager(MainGame.mm);
+			try {
+				eM.init();
+			} catch (SlickException e) {
+				e.printStackTrace();
+			}
+		}
 		tileTypes.clear();
 		initialEntities.clear();
 		System.out.println("Reading mapfile...");
@@ -299,7 +331,7 @@ public class TileMap  {
 				if (s != null && s.length > 2) {
 					Object[] args = new Object[s.length-1];
 					String eName = s[0];
-					if (EntityManager.hasAlias(eName)) {
+					if (EntityManager.isAlias(eName)) {
 						if (args.length == EntityManager.getEntityInstArgs(eName).length) {
 							for (int i = 1; i < s.length; i++) {
 								String st = s[i];
@@ -320,7 +352,7 @@ public class TileMap  {
 								}
 							}
 							Entity e = EntityManager.createEntityOfType(eName, args);
-							MainGame.getEntityManager().addEntity(e);
+							eM.addEntity(e);
 							Entity e2 = EntityManager.createEntityOfType(eName, args);
 							initialEntities.add(e2);
 							System.out.println("Spawned Entity "+eName+".");
@@ -377,8 +409,63 @@ public class TileMap  {
 		return build;
 	}
 	
+	public void resize(int width, int height) {
+		char[][] newTiles = new char[height][width];
+		for (int y = 0; y < (tiles.length > height ? height : tiles.length); y++) {
+			for (int x = 0; x < (tiles[0].length > width ? width : tiles[0].length); x++) {
+				newTiles[y][x] = tiles[y][x];
+			}
+		}
+		this.width = width;
+		this.height = height;
+		this.tiles = newTiles;
+		System.out.println("Resized map to: "+width+","+height);
+	}
+	
+	public void addTileType(char symbol, String name, boolean walkable) {
+		if (!tileTypes.containsKey(symbol))
+			tileTypes.put(symbol, name);
+		if (walkable) 
+			this.walkable += symbol+"";
+	}
+	
+	public void setOrigin(float x, float y) {
+		origin.set(x, y);
+	}
+	
+	public char getTileChar(String name) {
+		if (hasTileType(name)) {
+			for (Entry<Character, String> e : tileTypes.entrySet()) {
+				if (e.getValue().equalsIgnoreCase(name))
+					return e.getKey();
+			}
+		}
+		System.out.println("Cannot find tile: "+name);
+		return 0;
+	}
+	
+	public String getTileName(char c) {
+		return tileTypes.get(c);
+	}
+	
+	public EntityManager getEntityManager() {
+		return eM;
+	}
+	
+	public HashMap<Character, String> getTileTypes() {
+		return tileTypes;
+	}
+	
 	public ArrayList<Entity> getInitialEntities() {
 		return initialEntities;
+	}
+	
+	public boolean hasTileType(String name) {
+		return tileTypes.containsValue(name);
+	}
+	
+	public boolean isTileTypeTaken(char c) {
+		return tileTypes.containsKey(c);
 	}
 
 	public int getHeightInTiles() {
@@ -389,12 +476,22 @@ public class TileMap  {
 		return width;
 	}
 	
+	public Vector2f getTileLocationRelativeToOrigin(Vector2f v) {
+		float x = v.x+(origin.x*16-8);
+		float y = v.y+(origin.y*16-8);
+		return new Vector2f(x,y);
+	}
+	
+	public Vector2f getOrigin() {
+		return origin;
+	}
+	
 	public Vector2f getSpawnPoint() {
-		return new Vector2f((spawnTile.x*16)-8, (spawnTile.y*16)-8);
+		return new Vector2f(((spawnTile.x+origin.x)*16)-8, ((spawnTile.y+origin.y)*16)-8);
 	}
 	
 	public Vector2f getCenter() {
-		return new Vector2f((width*16)/2, (height*16)/2);
+		return new Vector2f(((width/2)*16+origin.x*16)+8, ((height/2)*16+origin.y*16)+8);
 	}
 
 }

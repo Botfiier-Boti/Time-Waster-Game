@@ -38,7 +38,7 @@ public class SetDashBehavior extends Behavior {
 		this.target = target;
 		dashing = true;
 		if (target != null)
-			angle =  Math2.calcAngle(getOwner().getController().src, target);
+			angle =  Math2.calcAngle(getOwner().getLocation(), target);
 		distanceDashed = 0;
 	}
 	

@@ -29,7 +29,7 @@ import com.botifier.timewaster.util.TileMap;
 import com.botifier.timewaster.util.managers.EntityManager;
 
 public class MainGame extends StateBasedGame {
-	private static final String versionId = "0.0.6";
+	private static final String versionId = "0.0.7";
 	private static boolean loaded = false;
 	public static String startMap = "testmap.map";
 	public static boolean debug = false;
@@ -95,6 +95,8 @@ public class MainGame extends StateBasedGame {
 		i.put("slow", new Image("Images/Slow.png"));
 		i.put("invulnerable", new Image("Images/Invulnerable.png"));
 		i.put("pickblock", new Image("Images/Pickblock.png"));
+		i.put("v", new Image("Images/V.png"));
+		i.put("notv", new Image("Images/NotV.png"));
 		Iterator<Entry<String, Image>> it = i.entrySet().iterator();
 		while (it.hasNext()) {
 			Image i = it.next().getValue();
@@ -114,7 +116,7 @@ public class MainGame extends StateBasedGame {
 	}
 
 	public static EntityManager getEntityManager() {
-		return ((OverworldState)mm.getState(1)).eM;
+		return ((OverworldState)mm.getState(1)).getEntityManager();
 	}
 
 	public static Image getImage(String name) {
@@ -167,15 +169,15 @@ public class MainGame extends StateBasedGame {
 	}
 
 	public static int getViewDistance() {
-		return ((OverworldState)mm.getState(1)).viewDistance;
+		return  mm.getCurrentStateID() == MapEditorState.ID ? ((mm.gc.getWidth())+(mm.gc.getHeight()))/2 : ((OverworldState)mm.getState(OverworldState.ID)).viewDistance;
 	}
 
 	public static Camera getCamera() {
-		return ((OverworldState)mm.getState(1)).c;
+		return mm.getCurrentStateID() == MapEditorState.ID ? ((MapEditorState)mm.getState(MapEditorState.ID)).c : ((OverworldState)mm.getState(OverworldState.ID)).c;
 	}
 	
 	public static TileMap getCurrentMap() {
-		return ((OverworldState)MainGame.mm.getState(1)).m;
+		return ((OverworldState)MainGame.mm.getState(OverworldState.ID)).m;
 	}
 
 	@Override
@@ -190,6 +192,8 @@ public class MainGame extends StateBasedGame {
 		}
 		loadImages();
 		loadSounds();
+		EntityManager.loadAliases();
+		EntityManager.loadEntities();
 		ttf = new AngelCodeFont("PressStart2P-mid.fnt", getImage("fontmedium"));
 		ttfB = new AngelCodeFont("Fonts/PressStart2P.fnt", getImage("font"));
 		ttfS = new AngelCodeFont("PressStart2P-sml.fnt", getImage("fontsmall"));

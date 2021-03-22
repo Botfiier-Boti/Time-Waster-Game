@@ -40,9 +40,9 @@ public class PopupText extends Entity {
 	public void draw(Graphics g) {
 		g.setColor(Color.black);
 		g.setFont(MainGame.ttfS);
-		g.drawString(text, getController().src.x+1, getController().src.y+1-y);
+		g.drawString(text, getLocation().x+1, getLocation().y+1-y);
 		g.setColor(c);
-		g.drawString(text, getController().src.x, getController().src.y-y);
+		g.drawString(text, getLocation().x, getLocation().y-y);
 		g.setFont(MainGame.ttf);
 		g.setColor(Color.white);
 	}

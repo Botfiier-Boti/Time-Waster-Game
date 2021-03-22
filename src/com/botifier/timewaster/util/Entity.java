@@ -1,9 +1,9 @@
 package com.botifier.timewaster.util;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.UUID;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -14,10 +14,12 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.main.MainGame;
+import com.botifier.timewaster.util.managers.EntityManager;
 import com.botifier.timewaster.util.managers.StatusEffectManager;
 import com.botifier.timewaster.util.movements.EntityController;
 
 public class Entity implements Comparable<Entity> {
+	UUID uuid;
 	Random r = new Random();
 	Color c = Color.black;
 	protected long cooldown = 0;
@@ -26,7 +28,7 @@ public class Entity implements Comparable<Entity> {
 	private EntityController controller;
 	private StatusEffectManager sem;
 	private Stats stats;
-	public ArrayList<Entity> b = MainGame.getEntityManager().getBullets();
+	public ArrayList<Entity> b = new ArrayList<Entity>();
 	public LinkedList<Entity> followers = new LinkedList<Entity>();
 	public ArrayList<Entity> spawns = new ArrayList<Entity>();
 	public Vector2f posMod;
@@ -109,17 +111,13 @@ public class Entity implements Comparable<Entity> {
 	public Entity(Entity e) {
 		this.name = e.name;
 		this.image = e.image.copy();
-		try {
-			this.controller = e.controller.copy();
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| SecurityException e1) {
-			e1.printStackTrace();
-		}
+		this.controller = e.controller.copy(this);
 		this.iModifier = e.iModifier;
 		this.init();
 	}
 	
 	public void init() {
+		uuid = UUID.randomUUID();
 		collisionbox = new Rectangle(getLocation().getX(), getLocation().getY(), 1, 1);
 		hitbox = new Rectangle(getLocation().getX(), getLocation().getY(), 1, 1);
 		posMod = new Vector2f(0,0);
@@ -150,7 +148,7 @@ public class Entity implements Comparable<Entity> {
 				y.draw(iLoc.x-y.getWidth()/2, iLoc.y-y.getHeight(),y.getWidth(),y.getHeight());
 			}
 			else
-				g.drawString(name.substring(0, 1), controller.src.getX(), controller.src.getY());
+				g.drawString(name.substring(0, 1),getLocation().getX(), getLocation().getY());
 			//g.drawLine(getLocation().getX(), getLocation().getY(), getLocation().getX()+((float)Math.cos(angle)*5), getLocation().getY()+((float)Math.sin(angle)*5));
 			/*if (controller.dst != null)
 				g.drawLine(controller.src.getX(), controller.src.getY(), controller.dst.getX(), controller.dst.getY());*/
@@ -173,7 +171,6 @@ public class Entity implements Comparable<Entity> {
 		}
 		if (stats.getCurrentHealth() <= 0) {
 			onDeath();
-			destroy = true;
 			return;
 		}
 		if (o != null && linger == false) {
@@ -188,9 +185,21 @@ public class Entity implements Comparable<Entity> {
 				init();
 				lSize = size;
 			} 
-			updateHitboxes();
 			if (!overrideMove && controller != null)
 				controller.move(delta);
+			updateHitboxes();
+			if (b.size() > 0) {
+				for (int i = b.size()-1; i > -1; i--) {
+					Entity e = b.get(i);
+					if (e.destroy == true) {
+						b.remove(e);
+						b.trimToSize();
+						continue;
+					}
+					if (!MainGame.getEntityManager().getBullets().contains(e) && e.destroy != true)
+						MainGame.getEntityManager().addBullet(e);
+				}
+			}
 			if (spawns.size() > 0) {
 				for (int i = spawns.size()-1; i > -1; i--) {
 					Entity e = spawns.get(i);
@@ -397,12 +406,42 @@ public class Entity implements Comparable<Entity> {
 		return getLocation().x+", "+getLocation().y;
 	}
 	
+	public Object[] getObjectParameters() {
+		String[] args = getParameters().replace(" ", "").split(",");
+		Object[] tArgs = new Object[args.length];
+		for (int i = 0; i < args.length; i++) {
+			String st = args[i];
+			if (Math2.isInteger(st)) {
+				tArgs[i] = Integer.parseInt(st);
+			} else if (Math2.isLong(st)) {
+				tArgs[i] = Long.parseLong(st);
+			} else if (Math2.isFloat(st)) {
+				tArgs[i] = Float.parseFloat(st);
+			} else if (st.equalsIgnoreCase("true")) {
+				tArgs[i] = true;
+			} else if (st.equalsIgnoreCase("false")) {
+				tArgs[i] = false;
+			} else if (st.equalsIgnoreCase("null")) {
+				tArgs[i] = null;
+			} else {
+				tArgs[i] = st;
+			}
+		}
+		return tArgs;
+	}
+	
 	public Stats getStats() {
 		return stats;
+	}
+	
+	public UUID getUUID() {
+		return uuid;
 	}
 
 	@Override
 	public int compareTo(Entity o) {
+		if (o == null)
+			return 0;
 		float y1 = (getLocation().y-posMod.y);//+hitbox.getHeight()/2;
 		float y2 = (o.getLocation().y-o.posMod.y);//+o.hitbox.getHeight()/2;
 		return y1 > y2
@@ -415,7 +454,11 @@ public class Entity implements Comparable<Entity> {
 	}
 	
 	public Entity copy() {
-		Entity e = new Entity(this);
+		String name = getClass().getName();
+		if (EntityManager.classHasAlias(getClass()) == true) {
+			name = EntityManager.getAlias(getClass());
+		}
+		Entity e = EntityManager.createEntityOfType(name, getObjectParameters());
 		return e;
 	}
 }

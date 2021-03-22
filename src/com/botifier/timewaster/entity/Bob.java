@@ -28,12 +28,12 @@ public class Bob extends Entity {
 	@Override
 	public void draw(Graphics g) {
 		g.setColor(Color.red);
-		g.fillRect(getController().src.x, getController().src.y, 16, 16);
+		g.fillRect(getLocation().x, getLocation().y, 16, 16);
 		g.setColor(Color.white);
 		if (p != null) {
 			if ( e != null) {
 				//g.draw(e);
-				g.drawString("X: "+ getController().src.x + " Y: "+ getController().src.y + " Length: "+p.getLength() + " PPS: " + getController().getPPS(), 10, 460);
+				g.drawString("X: "+ getLocation().x + " Y: "+ getLocation().y + " Length: "+p.getLength() + " PPS: " + getController().getPPS(), 10, 460);
 			}
 		}
 	}

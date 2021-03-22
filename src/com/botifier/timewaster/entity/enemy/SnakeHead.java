@@ -9,6 +9,11 @@ import com.botifier.timewaster.util.movements.EnemyController;
 
 public class SnakeHead extends Enemy {
 	long shotdelay = 2500;
+	
+	public SnakeHead(float x, float y) {
+		super("SnakeHead", MainGame.getImage("Head"), new EnemyController(x,y,1f,100, false), null, null);
+		setup(x,y,0,10);
+	}
 
 	public SnakeHead(float x, float y, int length) {
 		super("SnakeHead", MainGame.getImage("Head"), new EnemyController(x,y,1f,100, false), null, null);

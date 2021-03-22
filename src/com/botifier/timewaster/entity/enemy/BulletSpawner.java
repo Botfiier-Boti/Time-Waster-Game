@@ -18,9 +18,10 @@ public class BulletSpawner extends Enemy {
 	long cooldown = 0;
 	long cooldown2 = 0;
 	long cooldown3 = 0;
-	long delay = 2250;
+	long delay = 2450;
 	int originU = 0;
 	int originD = 0;
+	int counter = 0;
 
 	public BulletSpawner(float x, float y, long cooldown) {
 		super("BulletSpawner", MainGame.getImage("Head"), new EnemyController(x, y, 0, 0), null, null);
@@ -32,11 +33,24 @@ public class BulletSpawner extends Enemy {
 		posMod.y = 3;
 	}
 	
+	public BulletSpawner(float x, float y) {
+		super("BulletSpawner", MainGame.getImage("Head"), new EnemyController(x, y, 0, 0), null, null);
+		basecooldown = 750;
+		wtp = new WigglyThingPattern();
+		wtp2 = new WigglyThingPattern();
+		setMaxHealth(45000, true);
+		getStats().setSpeed(0);
+		posMod.y = 3;
+	}
+	
 	@Override
 	public void update(int delta) throws SlickException {
 		super.update(delta);
 
-		
+		if (counter >= 3) {
+			counter = 0;
+			cooldown = (long) (basecooldown*1.5);
+		}
 		if (cooldown3 <= 0) {
 
 			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, (float)Math.toRadians(180), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
@@ -47,6 +61,7 @@ public class BulletSpawner extends Enemy {
 			if (cooldown <= 0) {
 				wtp.fire(this, getLocation().x,  getLocation().y, (float)Math.toRadians(-90));
 				wtp2.fire(this, getLocation().x,  getLocation().y, (float)Math.toRadians(90));
+				counter++;
 				/*for (int i = 0; i < length; i++) {
 					float fireLoc = getLocation().x-15*i;
 					if (i > originU+1 || i < originU-1)
@@ -64,11 +79,11 @@ public class BulletSpawner extends Enemy {
 				cooldown = basecooldown;
 			}
 			if (cooldown2 <= 0) {
-				for (int i = 0; i < 8; i++) {
-					b.add(Bullet.createBullet("Bob", getController().getLoc().x-(length*15)-(i*15), getController().getLoc().y, 60, (float)Math.toRadians(90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
-					b.add(Bullet.createBullet("Bob", getController().getLoc().x-(length*15)-(i*15), getController().getLoc().y, 60, (float)Math.toRadians(-90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
-					b.add(Bullet.createBullet("Bob", getController().getLoc().x+(length*15)+(i*15), getController().getLoc().y, 60, (float)Math.toRadians(90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
-					b.add(Bullet.createBullet("Bob", getController().getLoc().x+(length*15)+(i*15), getController().getLoc().y, 60, (float)Math.toRadians(-90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
+				for (int i = 0; i < 16; i++) {
+					b.add(Bullet.createBullet("Bob", getController().getLoc().x-(length*15)-(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
+					b.add(Bullet.createBullet("Bob", getController().getLoc().x-(length*15)-(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(-90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
+					b.add(Bullet.createBullet("Bob", getController().getLoc().x+(length*15)+(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
+					b.add(Bullet.createBullet("Bob", getController().getLoc().x+(length*15)+(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(-90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
 				}
 				cooldown2 = 300;
 			}
@@ -82,7 +97,7 @@ public class BulletSpawner extends Enemy {
 	
 	@Override
 	public String getParameters() {
-		return super.getParameters()+", "+basecooldown;
+		return super.getParameters()+", "+(long)basecooldown;
 	}
 
 }

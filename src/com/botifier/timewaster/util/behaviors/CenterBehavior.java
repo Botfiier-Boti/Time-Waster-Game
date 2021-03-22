@@ -13,10 +13,10 @@ public class CenterBehavior extends Behavior {
 
 	@Override
 	public void run() {
-		if ((getOwner().getLocation().x != (MainGame.getCurrentMap().getWidthInTiles()*16)/2) || (getOwner().getLocation().y != (MainGame.getCurrentMap().getHeightInTiles()*16)/2)) {
+		if ((getOwner().getLocation().x != (MainGame.getCurrentMap().getCenter().x) || (getOwner().getLocation().y != (MainGame.getCurrentMap().getCenter().y)))) {
 			isCentered = false;
-			getOwner().getController().dash((MainGame.getCurrentMap().getWidthInTiles()*16)/2, (MainGame.getCurrentMap().getHeightInTiles()*16)/2);
-		} else if (MainGame.getCurrentMap().blocked((MainGame.getCurrentMap().getWidthInTiles()*16)/2, (MainGame.getCurrentMap().getHeightInTiles()*16)/2)) {
+			getOwner().getController().dash(MainGame.getCurrentMap().getCenter().x, MainGame.getCurrentMap().getCenter().y);
+		} else if (MainGame.getCurrentMap().blocked((int)MainGame.getCurrentMap().getCenter().x, (int)MainGame.getCurrentMap().getCenter().y)) {
 			isCentered = true;
 			getOwner().getController().stop();
 		}else {
@@ -26,7 +26,7 @@ public class CenterBehavior extends Behavior {
 	}
 	
 	public boolean isCentered() {
-		if ((getOwner().getLocation().x != (MainGame.getCurrentMap().getWidthInTiles()*16)/2) || (getOwner().getLocation().y != (MainGame.getCurrentMap().getHeightInTiles()*16)/2))
+		if ((getOwner().getLocation().x != (MainGame.getCurrentMap().getCenter().x) || (getOwner().getLocation().y != (MainGame.getCurrentMap().getCenter().y))))
 			isCentered = false;
 		return isCentered;
 	}

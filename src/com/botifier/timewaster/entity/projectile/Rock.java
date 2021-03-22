@@ -49,10 +49,10 @@ public class Rock extends LobbedProjectile {
 		if (cls == null) {
 			rsp.fire(this, this.getLocation().getX(),  this.getLocation().getY(), (float)Math.toRadians(r.nextInt(360)));
 		} else {
-			float angle = Math2.calcAngle(getController().src,cls.getLocation());
+			float angle = Math2.calcAngle(getLocation(),cls.getLocation());
 			rsp.fire(this, this.getLocation().getX(),  this.getLocation().getY(), angle);
 		}
-		//MainGame.getSound("explode").play(1, 0.25f);
+		destroy = true;
 	}
 
 }

@@ -76,6 +76,11 @@ public class Bullet extends Entity {
 	}
 	
 	@Override
+	public void addBullet(Entity e) {
+		o.addBullet(e);
+	}
+	
+	@Override
 	public BulletController getController() {
 		return ((BulletController)super.getController());
 	}

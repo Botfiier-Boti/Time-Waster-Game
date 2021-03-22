@@ -7,6 +7,7 @@ import org.newdawn.slick.geom.Vector2f;
 import com.botifier.timewaster.util.GUI;
 
 public abstract class Component {
+	private boolean visible = true;
 	private boolean outline;
 	private Color c;
 	private GUI g;
@@ -22,6 +23,22 @@ public abstract class Component {
 	public abstract void draw(Graphics g);
 	
 	public void update(int delta) {}
+	
+	public void destroy() {
+		g.removeComponent(this);
+	}
+	
+	public void focus() {
+		g.focusComponent(this);
+	}
+	
+	public void unfocus() {
+		g.unfocus();
+	}
+	
+	public void setVisible(boolean b) {
+		visible = b;
+	}
 	
 	public void setPosition(float x, float y) {
 		pos = new Vector2f(x,y);
@@ -55,7 +72,15 @@ public abstract class Component {
 		return c;
 	}
 	
+	public boolean isVisible() {
+		return visible;
+	}
+	
 	public boolean hasOutline() {
 		return outline;
+	}
+	
+	public boolean isFocused() {
+		return this == g.getFocused();
 	}
 }

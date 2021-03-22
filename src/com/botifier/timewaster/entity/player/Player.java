@@ -10,7 +10,6 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Line;
-import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.entity.projectile.Beehive;
@@ -61,7 +60,7 @@ public class Player extends Entity {
 		team = Team.ALLY;
 		overrideMove = true;
 		setMaxHealth(620, true);
-		getStats().setAttack(50);
+		getStats().setAttack(1000);
 		getStats().setDefense(15);
 		getStats().setVitality(30);
 		getStats().setSpeed(50);
@@ -74,6 +73,7 @@ public class Player extends Entity {
 	}
 	
 	public void update(GameContainer gc, int delta) throws SlickException {
+		super.update(delta);
 		//Get input
 		Input i = gc.getInput();
 		
@@ -81,15 +81,6 @@ public class Player extends Entity {
 		if (spawns.size() > 0 && spawns.size() > spawncap) {
 			spawns.get(0).destroy = true;
 			spawns.remove(0);
-		}
-		
-		//Iterate and manage spawns
-		for (int w = spawns.size()-1; w > -1; w--) {
-			Entity e = spawns.get(w);
-			if (!MainGame.getEntities().contains(e) && e.destroy != true)
-				MainGame.getEntities().add(e);
-			if (e.team != this.team)
-				e.team = this.team;
 		}
 		
 		//Perform functions while active
@@ -102,29 +93,13 @@ public class Player extends Entity {
 			getController().control(i);
 			//Move player
 			getController().move(delta);
+			updateHitboxes();
 			//Move through walking animation while moving
 			if (getController().isMoving() == true)
 				walk.update(delta);
-			//Update if increased in size
-			if (size != lSize) {
-				init();
-				lSize = size;
-			} 
 			
 			if (i.isKeyPressed(Input.KEY_I))
 				autofire = !autofire;
-			//Modify hitbox and collisionbox
-			if (wOverride > 0  && hitbox.getWidth() != wOverride)
-				((Rectangle)hitbox).setWidth(wOverride);
-			if (hOverride > 0 && hitbox.getHeight() != hOverride)
-				((Rectangle)hitbox).setHeight(hOverride);
-			collisionbox.setCenterX(getLocation().getX());
-			collisionbox.setY(getLocation().getY()-collisionbox.getHeight()-posMod.y);
-			hitbox.setCenterX(getLocation().getX());
-			hitbox.setY(getLocation().getY()-hitbox.getHeight()-posMod.y);
-			/*if(i.isKeyPressed(Input.KEY_B)) {
-				build = !build;
-			}*/
 			
 			//Lob functionality
 			if (lob == true || (p != null && p.lob)) {
@@ -234,30 +209,6 @@ public class Player extends Entity {
 			cooldown--;
 			
 			getStats().heal(((0.0025f*getMaxHealth())+0.05f*getVitality())/delta, false);
-			
-			if (getStats().getCurrentHealth() <= 0) {
-				//Make player inactive on Death
-				active = false;
-				getStatusEffectManager().addEffect(new InvulnerabilityEffect(5000));
-				return;
-			}
-			
-			//Manage followers
-			if (followers.size() > 0) {
-				for (int i1 = 0; i1 < followers.size(); i1++) {
-					Entity e = followers.get(i1);
-					if (e.destroy == true) {
-						followers.remove(e);
-						i1--;
-						continue;
-					}
-					if (e.team != this.team)
-						e.team = this.team;
-					if (!MainGame.getEntities().contains(e) && e.destroy != true)
-						MainGame.getEntities().add(e);
-					e.forceUpdate(delta);
-				}
-			}
 		}
 		//JOptionPane.
 	}
@@ -290,12 +241,19 @@ public class Player extends Entity {
 		if (MainGame.displayHitboxes) {
 			g.drawLine(getLocation().getX(), getLocation().getY(), getLocation().getX()+((float)Math.cos(angle)*5), getLocation().getY()+((float)Math.sin(angle)*5));
 			g.draw(hitbox);
+			g.draw(collisionbox);
 			if (getController().testBox != null)
 				g.draw(getController().testBox);
 			if (getController().dst != null) {
-				g.drawLine(getController().src.getX(), getController().src.getY(), getController().dst.getX(), getController().dst.getY());
+				g.drawLine(getLocation().getX(), getLocation().getY(), getController().dst.getX(), getController().dst.getY());
 			}
 		}
+	}
+	
+	@Override
+	public void onDeath() {
+		active = false;
+		getStatusEffectManager().addEffect(new InvulnerabilityEffect(5000));
 	}
 
 	@Override

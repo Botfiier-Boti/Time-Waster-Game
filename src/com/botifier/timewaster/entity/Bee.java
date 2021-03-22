@@ -64,7 +64,7 @@ public class Bee extends Enemy {
 			//Fire bullet if target is found
 			if (cls != null) {
 				try {
-					float angle = Math2.calcAngle(getController().src,cls.getLocation());
+					float angle = Math2.calcAngle(getLocation(),cls.getLocation());
 					gb.fire(this, getLocation().getX(),  getLocation().getY(), angle, cls);
 					cooldown = (long)(60-60/3.5f*fireSpeed*Math.random());
 					attacking = true;

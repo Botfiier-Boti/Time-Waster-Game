@@ -53,7 +53,6 @@ public class BigGoblin extends Enemy {
 		super("Big Goblin", MainGame.getImage("BigGobboIdle"), new EnemyController(x, y, 0.25f, 300),
 				new SpriteSheet(MainGame.getImage("BigGobboWalk"), 16, 16),
 				new SpriteSheet(MainGame.getImage("BigGobboAttack"), 16, 16), 1f);
-
 		this.behaviors.add(new SetDashBehavior(this));
 		this.behaviors.add(new CenterBehavior(this));
 		this.behaviors.add(new CircleBehavior(this));
@@ -87,6 +86,8 @@ public class BigGoblin extends Enemy {
 	@Override
 	public void update(int delta) throws SlickException {
 		super.update(delta);
+		if (behaviors.size() <= 0)
+			return;
 		//Find target
 		cls = null;
 		if (currentBehavior == 0 || currentBehavior == -1)
@@ -195,7 +196,7 @@ public class BigGoblin extends Enemy {
 					phase = 3;
 					currentBehavior = 2;
 					((CircleBehavior)behaviors.get(currentBehavior)).started = false;
-					((CircleBehavior)behaviors.get(currentBehavior)).setCirclePos((MainGame.getCurrentMap().getWidthInTiles()*16)/2,(MainGame.getCurrentMap().getHeightInTiles()*16)/2);
+					((CircleBehavior)behaviors.get(currentBehavior)).setCirclePos(MainGame.getCurrentMap().getCenter().x,MainGame.getCurrentMap().getCenter().y);
 					((CircleBehavior)behaviors.get(currentBehavior)).setRadius(4);
 					getStatusEffectManager().removeEffect(InvulnerabilityEffect.class);
 				} else {
@@ -242,7 +243,7 @@ public class BigGoblin extends Enemy {
 				((CircleBehavior)behaviors.get(currentBehavior)).setRadius(3);*/
 				if (spawns.size() < 4) {
 					for (int i = 0; i < 4; i++) 
-						addSpawn(new SnakeHead((MainGame.getCurrentMap().getWidthInTiles() * 16) / 2, (MainGame.getCurrentMap().getHeightInTiles() * 16) / 2, 19,  i*90));
+						addSpawn(new SnakeHead(MainGame.getCurrentMap().getCenter().x, MainGame.getCurrentMap().getCenter().y, 19,  i*90));
 					dashcooldown = 120;
 					this.getStatusEffectManager().addEffect(new InvulnerabilityEffect(1500));
 					return;
@@ -304,13 +305,13 @@ public class BigGoblin extends Enemy {
 		int i = r.nextInt(300);
 		if (i == 26) {
 			try {
-				MainGame.getEntityManager().addEntity(new FakeBagEntity(getController().src.x,getController().src.y, 1));
+				MainGame.getEntityManager().addEntity(new FakeBagEntity(getLocation().x, getLocation().y, 1));
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}
 		} else if (i > 26 || i < 100) {
 			try {
-				MainGame.getEntityManager().addEntity(new FakeBagEntity(getController().src.x,getController().src.y, 0));
+				MainGame.getEntityManager().addEntity(new FakeBagEntity(getLocation().x,getLocation().y, 0));
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}

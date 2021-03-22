@@ -30,13 +30,13 @@ public class TestChest extends Entity {
 		int i = r.nextInt(300);
 		if (i == 26) {
 			try {
-				MainGame.getEntityManager().addEntity(new FakeBagEntity(getController().src.x,getController().src.y, 1));
+				MainGame.getEntityManager().addEntity(new FakeBagEntity(getLocation().x,getLocation().y, 1));
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}
 		} else if (i > 26 || i < 100) {
 			try {
-				MainGame.getEntityManager().addEntity(new FakeBagEntity(getController().src.x,getController().src.y, 0));
+				MainGame.getEntityManager().addEntity(new FakeBagEntity(getLocation().x,getLocation().y, 0));
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}

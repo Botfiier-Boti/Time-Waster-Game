@@ -87,6 +87,11 @@ public abstract class LobbedProjectile extends Entity {
 	}
 	
 	@Override
+	public void addBullet(Entity e) {
+		o.addBullet(e);
+	}
+	
+	@Override
 	public LobbedController getController() {
 		return (LobbedController)super.getController();
 	}

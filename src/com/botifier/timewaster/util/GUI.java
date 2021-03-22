@@ -11,21 +11,18 @@ import com.botifier.timewaster.util.gui.*;
 
 public class GUI {
 	LinkedList<Component> components = new LinkedList<Component>();
+	Component focused;
 	Player p;
 
 	public GUI(Player p) {
 		this.p = p;
 	}
 	
-	public void setup(GameContainer gc) {
-		addComponent(new RectangleComponent(this, Color.gray, gc.getWidth() * 0.75f, -1, gc.getWidth() * 0.25f, gc.getHeight() + 1,true));
-		addComponent(new HealthbarComponent(this, p, gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.25f, (gc.getWidth() / 4) - 20, 20, true));
-		addComponent(new RectangleComponent(this, Color.darkGray, gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.05f,(gc.getWidth()/4)-20,(gc.getHeight()/5)-20,true));
-		addComponent(new RectangleComponent(this, Color.darkGray, gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.335f,(gc.getWidth()/4)-20,(gc.getHeight()/2)+(gc.getHeight()/8),true));
-	}
-	
 	public void update(GameContainer gc, int delta) {
-		for (Component c : components) {
+		for (int i = 0; i < components.size(); i++) {
+			Component c = components.get(i);
+			if (c == null)
+				continue;
 			c.update(delta);
 		}
 	}
@@ -64,9 +61,31 @@ public class GUI {
 				gc.getHeight() * 0.05f + g.getFont().getLineHeight() * 5);*/
 		for (int i = components.size()-1; i > -1; i--) {
 			Component c = components.get(i);
-			c.draw(g);
+			if (c.isVisible())
+				c.draw(g);
 			g.setColor(Color.white);
 		}
+	}
+	
+	public void unfocus() {
+		focused = null;
+	}
+	
+	public void focusComponent(Component c) {
+		focused = c;
+	}
+	
+	public Component getFocused() {
+		return focused;
+	}
+	
+	public boolean hasComponentType(Class<?> c) {
+		for (int i = components.size()-1; i > -1; i--) {
+			Component co = components.get(i);
+			if (co.getClass() == c)
+				return true;
+		}
+		return false;
 	}
 	
 	public Component getComponent(int i) {
@@ -75,6 +94,10 @@ public class GUI {
 	
 	public void addComponent(Component c) {
 		components.addFirst(c);
+	}
+	
+	public void removeComponent(Component c) {
+		components.remove(c);
 	}
 
 }

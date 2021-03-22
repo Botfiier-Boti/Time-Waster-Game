@@ -106,7 +106,7 @@ public class BulletController extends EntityController {
 				Vector2f nLoc = new Vector2f(x, y);
 				for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
 					Entity en = MainGame.getEntities().get(i);
-					if (getOrigin() == null  || en instanceof Bullet || en.isInvincible()
+					if (en == null || getOrigin() == null  || en instanceof Bullet || en.isInvincible()
 							|| en == getOrigin() || en.team == getOrigin().team || en.invulnerable == true || en.active == false || en.getLocation().distance(getLoc()) < PPS || enemiesHit.contains(en))
 						continue;
 					if (en.hitbox.intersects(getOwner().hitbox)) {
@@ -124,13 +124,11 @@ public class BulletController extends EntityController {
 				}
 				if (pierceObstacles == false) {
 					Vector2f cLoc = src;
-					if (((int)cLoc.x/16>=0 && cLoc.x/16<MainGame.getCurrentMap().getWidthInTiles()) && (((int)cLoc.y/16>=0) && (int)cLoc.y/16<MainGame.getCurrentMap().getHeightInTiles())) {
-						if (MainGame.getCurrentMap().blocked((int)cLoc.x/16, (int)cLoc.y/16)) {
-							distTr = 0;
-							dst = null;
-							moving = false;
-							return;
-						}
+					if (MainGame.getCurrentMap().blocked((int)cLoc.x/16, (int)cLoc.y/16)) {
+						distTr = 0;
+						dst = null;
+						moving = false;
+						return;
 					}
 				}
 				src.add(nLoc);

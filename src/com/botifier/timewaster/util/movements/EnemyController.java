@@ -1,6 +1,5 @@
 package com.botifier.timewaster.util.movements;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
 import org.newdawn.slick.geom.Circle;
@@ -35,7 +34,7 @@ public class EnemyController extends EntityController {
 		Entity e = owner;
 		float rad = 0;
 		int nx = 0, ny = 0;
-		double theta =  (Math.random()*2*Math.PI);
+		double theta =  (Math.random()*2*Math.PI)*wanderMod;
 		if (wanderArea != null) {
 			rad =(float) ((wanderArea.getRadius()*rangeMult)*Math.sqrt(Math.random()));
 			nx = (int) (wanderArea.getCenterX() + rad * Math.cos(theta));
@@ -82,13 +81,4 @@ public class EnemyController extends EntityController {
 		Vector2f v = new Vector2f(nx, ny);
 		setDestination(v.x, v.y); 
 	}
-	
-	public EnemyController copy() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, SecurityException {
-		try {
-			return getClass().getConstructor(float.class, float.class, float.class, float.class, long.class, boolean.class).newInstance(src.x,src.y,wanderMod,wanderCooldown,obeysCollision);
-		} catch (NoSuchMethodException e) {
-			return null;
-		}
-	}
-	
 }

@@ -5,7 +5,7 @@ define B BlankTile
 define # BrickWall
 dwalkable F RockTile
 dwalkable U TileDarkUp
-addentity BigGoblin, 174, 174
+addentity BigGoblin, 176, 176
 startmap
 BBBBBBBBBBBBBBBBBBBBBB
 BBBBBBBBBBBBBBBBBBBBBB

@@ -22,18 +22,21 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import com.botifier.timewaster.entity.player.Player;
+import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.util.Camera;
 import com.botifier.timewaster.util.Entity;
 import com.botifier.timewaster.util.GUI;
 import com.botifier.timewaster.util.TileMap;
+import com.botifier.timewaster.util.gui.ButtonComponent;
+import com.botifier.timewaster.util.gui.HealthbarComponent;
+import com.botifier.timewaster.util.gui.RectangleComponent;
 import com.botifier.timewaster.util.managers.EntityManager;
 import com.botifier.timewaster.util.movements.EntityController;
 
 public class OverworldState extends BasicGameState {
-	
+	public static final int ID = 1;
 	public char[][] tiles;
 	public long tps = 0, ticks = 0, tticks = 0, delta = 0, natspawns = 0;
-	public EntityManager eM;
 	public Entity mtrack;
 	public Entity dead;
 	public TileMap m;
@@ -42,26 +45,30 @@ public class OverworldState extends BasicGameState {
 	public int viewDistance = 200;
 	public Camera c;
 	Random r = new Random();
+	EntityManager eM;
 	private GUI g;
-	
-	public OverworldState() {
-		eM = new EntityManager(mm);
-	}
 
 	@Override
 	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
-		eM.init();
 		tiles = new char[32][32];
 		s.clear();
-		m = new TileMap(tiles);
-		try {
-			m.loadFromFile(startMap);
-		} catch (IOException e) {
-			System.out.println("An Error occured loading the map.");
-			e.printStackTrace();
+		if (m == null) {
+			m = new TileMap(tiles);
+			try {
+				m.loadFromFile(startMap);
+			} catch (IOException e) {
+				System.out.println("An Error occured loading the map.");
+				e.printStackTrace();
+			}
 		}
+		m.init();
+		eM = m.getEntityManager();
 		c = new Camera(gc.getWidth() * 0.75f / camRatio, gc.getHeight() / camRatio);
-		p = new Player("George", 100, 100);
+		if (p == null)
+			p = new Player("George", 100, 100);
+		else {
+			p.heal(p.getMaxHealth());
+		}
 		dead = new Entity("The Dead", getImage("idlesheep"), new EntityController(100, 100, false), 0f) {
 			// long wait = 0;
 			@Override
@@ -104,7 +111,17 @@ public class OverworldState extends BasicGameState {
 		p.getController().teleport(m.getSpawnPoint());
 		eM.addEntity(p);
 		g = new GUI(p);
-		g.setup(gc);
+		g.addComponent(new RectangleComponent(g, Color.gray, gc.getWidth() * 0.75f, -1, gc.getWidth() * 0.25f, gc.getHeight() + 1,true));
+		g.addComponent(new HealthbarComponent(g, p, gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.25f, (gc.getWidth() / 4) - 20, 20, true));
+		g.addComponent(new RectangleComponent(g, Color.darkGray, gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.05f,(gc.getWidth()/4)-20,(gc.getHeight()/5)-20,true));
+		g.addComponent(new RectangleComponent(g, Color.darkGray, gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.335f,(gc.getWidth()/4)-20,(gc.getHeight()/2)+(gc.getHeight()/8),true));
+		if (MainGame.debug)
+			g.addComponent(new ButtonComponent(g, "Edit Map", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
+				@Override
+				public void run() {
+					mm.enterState(MapEditorState.ID);
+				}
+			},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.05f, (gc.getWidth() / 4) - 20, 20, true));
 	}
 
 	@Override
@@ -127,7 +144,7 @@ public class OverworldState extends BasicGameState {
 		}
 		getCamera().draw(gc, g);
 		m.draw(gc, g);
-		eM.draw(gc, g);
+		m.getEntityManager().draw(gc, g);
 		/*
 		 * for (int i = 0; i < s.size(); i++) { for (int y = 0; y < s.get(0).length(); y
 		 * ++) { if (s.get(i).length() > 0) if (s.get(i).charAt(y) == '#') {
@@ -190,6 +207,9 @@ public class OverworldState extends BasicGameState {
 		ticks++;
 		tticks += delta;
 		dead.update(delta);
+		
+		if (c.centerE == null)
+			c.setCenterEntity(p);
 
 		if (targeted != null && targeted.destroy) {
 			targeted = null;
@@ -221,9 +241,17 @@ public class OverworldState extends BasicGameState {
 		if (p != null &&  p.getStats().getCurrentHealth() > 0 || getCamera().centerE == mtrack) {
 			g.update(gc, delta);
 			getCamera().update(gc);
-			handleEntities(gc, delta);
-			if (getCamera().centerE == mtrack) {
-
+			m.update(gc, delta);
+			//handleEntities(gc, delta);
+			for (int ie = eM.getEntities().size() - 1; ie >= 0; ie--) {
+				Entity en = eM.getEntities().get(ie);
+				if (getCamera().centerE != null && getCamera().centerE == mtrack) {
+					if (en.hitbox.contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
+						if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+							targeted = en;
+						}
+					}
+				}
 			}
 
 			if (p != null && p.build) {
@@ -267,31 +295,19 @@ public class OverworldState extends BasicGameState {
 		i.clearKeyPressedRecord();
 		
 	}
-
-	public void handleEntities(GameContainer gc, int delta) throws SlickException {
-		eM.update(gc, delta);
-		for (int ie = eM.getEntities().size() - 1; ie >= 0; ie--) {
-			Entity en = eM.getEntities().get(ie);
-			if (getCamera().centerE != null && getCamera().centerE == mtrack) {
-				if (en.hitbox.contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
-					if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-						targeted = en;
-					}
-				}
-			}
-		}
-	}
 	
 	public void reset(GameContainer gc) throws SlickException {
-		eM.getBullets().clear();
-		eM.getOverlayedEffects().clear();
-		eM.getEntities().clear();
+		m.reset();
 		init(gc, mm);
+	}
+	
+	public EntityManager getEntityManager() {
+		return eM;
 	}
 	
 	@Override
 	public int getID() {
-		return 1;
+		return ID;
 	}
 
 }

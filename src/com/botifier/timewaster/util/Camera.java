@@ -35,6 +35,10 @@ public class Camera {
 			r.setCenterX(centerE.getLocation().x-10);
 			r.setCenterY(centerE.getLocation().y-10);
 		}
+		if (zoom < 0.4f)
+			zoom = 0.4f;
+		if (zoom > 3)
+			zoom = 3;
 		Input i = gc.getInput();
 		if (i.isKeyDown(KEY_Q)) {
 			rotation+=1f;
@@ -50,11 +54,16 @@ public class Camera {
 		in.setScale(1/zoom, 1/zoom);
 		g.scale(zoom, zoom);
 		if (centerE == null) {
-			g.translate(-center.getX(), -center.getY());
-			in.setOffset(center.getX(), center.getY());
+			cx = getWidth()/2 - center.getX()*1.20f;
+			cy = getHeight()/2 - center.getY();
+			in.setOffset(-cx, -cy);
+			g.translate(cx, cy);
+			//g.translate(-center.getX(), -center.getY());
+			//in.setOffset(center.getX(), center.getY());
 			//if (MainGame.mm.getCurrentStateID() == 2)
 			//	g.rotate(r.getCenterX(), r.getCenterY(), rotation);
 		} else {
+			center.set(centerE.getLocation().getX(), centerE.getLocation().getY());
 			cx = getWidth()/2 - centerE.getLocation().getX() - centerE.hitbox.getWidth()*1.20f;
 			cy = getHeight()/2 - centerE.getLocation().getY() - centerE.hitbox.getHeight();
 			in.setOffset(-cx, -cy);
@@ -68,6 +77,12 @@ public class Camera {
 	
 	public void setCenterEntity(Entity e) {
 		this.centerE = e;
+	}
+	
+	public Vector2f getCenter() {
+		if (centerE != null)
+			return centerE.getLocation();
+		return center;
 	}
 
 	public float getWidth() {

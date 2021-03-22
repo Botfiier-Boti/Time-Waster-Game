@@ -1,6 +1,5 @@
 package com.botifier.timewaster.util.managers;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +12,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Shape;
+
 import com.botifier.timewaster.entity.Effect;
 import com.botifier.timewaster.entity.PopupText;
 import com.botifier.timewaster.entity.TestChest;
@@ -42,8 +42,6 @@ public class EntityManager {
 	
 	public void init() throws SlickException {
 		shadowImage = MainGame.getImage("Shadow");
-		loadAliases();
-		loadEntities();
 	}
 	
 	public void update(GameContainer gc, int delta) throws SlickException {
@@ -133,7 +131,7 @@ public class EntityManager {
 			Entity en = entities.get(i);
 			if (en == null)
 				continue;
-			if (en.getLocation().distance(c.centerE.getLocation()) <= MainGame.getViewDistance()) {
+			if (en.getLocation().distance(c.getCenter()) <= MainGame.getViewDistance()) {
 				en.seen = true;
 				if (en.visible && en.hasshadow && shadowImage != null)
 					shadowImage.draw(en.getLocation().getX() - en.collisionbox.getWidth() / 2,
@@ -149,7 +147,7 @@ public class EntityManager {
 			Entity bu = bullets.get(i);
 			if (bu == null)
 				continue;
-			if (bu.getLocation().distance(c.centerE.getLocation()) <= MainGame.getViewDistance()) {
+			if (bu.getLocation().distance(c.getCenter()) <= MainGame.getViewDistance()) {
 				bu.seen = true;
 				if (bu.hasshadow)
 					shadowImage.draw(bu.getLocation().getX() - bu.collisionbox.getWidth() / 2,
@@ -190,14 +188,14 @@ public class EntityManager {
 				}
 				if (en.isHealthbarVisible()) {
 					g.setColor(Color.red);
-					g.fillRect(en.hitbox.getCenterX()-6, en.hitbox.getMaxY()+1, 12, 3);
+					g.fillRect(en.getLocation().x-6, en.hitbox.getMaxY()+1, 12, 3);
 					g.setColor(Color.green);
-					g.fillRect(en.hitbox.getCenterX()-6, en.hitbox.getMaxY()+1, (12)*(Math.max(en.getStats().getCurrentHealth(), 0)/en.getMaxHealth()), 3);
+					g.fillRect(en.getLocation().x-6, en.hitbox.getMaxY()+1, (12)*(Math.max(en.getStats().getCurrentHealth(), 0)/en.getMaxHealth()), 3);
 					if (en.invulnerable == false || en.isInvincible() == true)
 						g.setColor(Color.black);
 					else
 						g.setColor(Color.blue);
-					g.drawRect(en.hitbox.getCenterX()-6, en.hitbox.getMaxY()+1, 12, 3);
+					g.drawRect(en.getLocation().x-6, en.hitbox.getMaxY()+1, 12, 3);
 					g.setColor(Color.white);
 				}
 			}
@@ -229,12 +227,12 @@ public class EntityManager {
 		
 	}
 	
-	public void loadEntities() throws SlickException {
+	public static void loadEntities() throws SlickException {
 		entityClasses.put("dammahclone", new Class[] {float.class, float.class, long.class});
 		//entityClasses.put("biggoblin", new Class[] {float.class, float.class});
 	}
 	
-	public void loadAliases() {
+	public static void loadAliases() {
 		entityAliases.put("biggoblin", BigGoblin.class.getName());
 		entityAliases.put("dammahclone", BulletSpawner.class.getName());
 		entityAliases.put("testchest", TestChest.class.getName());
@@ -252,8 +250,12 @@ public class EntityManager {
 		return entityAliases.get(name.toLowerCase());
 	}
 	
-	public static boolean hasAlias(String name) {
+	public static boolean isAlias(String name) {
 		return entityAliases.containsKey(name.toLowerCase());
+	}
+	
+	public static boolean classHasAlias(Class<?> c) {
+		return entityAliases.containsValue(c.getName());
 	}
 	
 	public static String getAlias(Class<?> c) {
@@ -268,12 +270,11 @@ public class EntityManager {
 	public static Entity createEntityOfType(String name, Object... args) {
 		Entity e = null;
 		try {
-			String truename = name.toLowerCase();
-			if (hasAlias(name) == true)
+			String truename = name;
+			if (isAlias(name) == true)
 				truename = getFromAlias(name);
 			e = (Entity) Class.forName(truename).getConstructor(getEntityInstArgs(name)).newInstance(args);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException | ClassNotFoundException e1 ) {
+		} catch (Exception e1 ) {
 			e1.printStackTrace();
 		}
 		return e;

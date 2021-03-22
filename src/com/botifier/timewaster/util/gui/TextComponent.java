@@ -18,11 +18,11 @@ public class TextComponent extends Component {
 	public void draw(Graphics g) {
 		float x = getPosition().x;
 		float y = getPosition().y;
-		if (isCentered()) {
-			x+= g.getFont().getWidth(text)/2;
-			y+= g.getFont().getHeight(text)/2;
+		if (isCentered() == true) {
+			x-= g.getFont().getWidth(text)/2;
+			y-= g.getFont().getHeight(text)/2;
 		}
-		if (hasOutline()) {
+		if (hasOutline() == true) {
 			g.setColor(Color.black);
 			g.drawString(text, x+1, y+1);
 		}

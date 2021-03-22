@@ -16,7 +16,7 @@ public class Enemy extends Entity {
 	protected Animation aWalk;
 	protected Animation aAttack;
 	SpriteSheet walk;
-	SpriteSheet attack;
+	protected SpriteSheet attack;
 	protected float fireSpeed = 0.95f;
 	protected long activateDelay = 0;
 	protected boolean attacking = false;	
@@ -46,6 +46,24 @@ public class Enemy extends Entity {
 		super(name, i, controller, imod);
 		this.walk = walk;
 		this.attack = attack;
+		if (walk != null) {
+			aWalk = new Animation(walk, (int)(300-(Math.max(0.6f + 1.5f*(getSpeed()/75f), 1))));
+			aWalk.setLooping(true);
+			aWalk.start();
+		}
+		if (attack != null) {
+			aAttack = new Animation(attack,(int)(200-(Math.max(60/3.5f*fireSpeed, 1))));
+			aAttack.setLooping(false);
+			aAttack.start();
+		}
+		team = Team.ENEMY;
+	}
+	
+	public Enemy(Enemy e) {
+		super(e);
+		System.out.println("I live.");
+		this.walk = e.walk;
+		this.attack = e.attack;
 		if (walk != null) {
 			aWalk = new Animation(walk, (int)(300-(Math.max(0.6f + 1.5f*(getSpeed()/75f), 1))));
 			aWalk.setLooping(true);
@@ -133,7 +151,7 @@ public class Enemy extends Entity {
 				}
 			}
 			else
-				g.drawString(getName().substring(0, 1), getController().src.getX(), getController().src.getY());
+				g.drawString(getName().substring(0, 1), getLocation().getX(), getLocation().getY());
 			
 			if (MainGame.displayHitboxes) {
 				g.drawLine(getLocation().getX(), getLocation().getY(), getLocation().getX()+((float)Math.cos(angle)*5), getLocation().getY()+((float)Math.sin(angle)*5));
@@ -141,7 +159,7 @@ public class Enemy extends Entity {
 				if (getController().testBox != null)
 					g.draw(getController().testBox);
 				if (getController().dst != null) {
-					g.drawLine(getController().src.getX(), getController().src.getY(), getController().dst.getX(), getController().dst.getY());
+					g.drawLine(getLocation().getX(), getLocation().getY(), getController().getDst().getX(), getController().getDst().getY());
 				}
 					
 			}

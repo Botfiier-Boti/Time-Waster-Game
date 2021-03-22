@@ -9,8 +9,8 @@ public class WigglyThingPattern extends BulletPattern {
 	
 	public WigglyThingPattern() {
 		fireSpeed = 0.1f;
-		bulletSpeed = 50f;
-		duration = 20000;
+		bulletSpeed = 30f;
+		duration = 25000;
 		shots = 10;
 		spread = 0;
 		mindamage = 200; 
