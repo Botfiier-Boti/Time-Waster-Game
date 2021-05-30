@@ -30,6 +30,8 @@ public class EnemyController extends EntityController {
 	}
 
 	public void wander(boolean force, float rangeMult) {
+		if (isMoving() == true)
+			return;
 		fleeing = false;
 		Entity e = owner;
 		float rad = 0;
@@ -37,15 +39,13 @@ public class EnemyController extends EntityController {
 		double theta =  (Math.random()*2*Math.PI)*wanderMod;
 		if (wanderArea != null) {
 			rad =(float) ((wanderArea.getRadius()*rangeMult)*Math.sqrt(Math.random()));
-			nx = (int) (wanderArea.getCenterX() + rad * Math.cos(theta));
-			ny = (int) (wanderArea.getCenterY() + rad * Math.sin(theta));
+			nx = (int) (wanderArea.getCenterX() + rad * (r.nextBoolean() == true ? -1 : 1 ) * Math.cos(theta));
+			ny = (int) (wanderArea.getCenterY() + rad * (r.nextBoolean() == true ? -1 : 1 ) * Math.sin(theta));
 		} else {
 			rad = (float) (((e.influence*rangeMult)*Math.sqrt(Math.random())));
-			nx = (int) (e.getLocation().x + rad * Math.cos(theta));
-			ny = (int) (e.getLocation().y + rad * Math.sin(theta));
+			nx = (int) (e.getLocation().x + rad * (r.nextBoolean() == true ? -1 : 1 ) * Math.cos(theta));
+			ny = (int) (e.getLocation().y + rad * (r.nextBoolean() == true ? -1 : 1 ) * Math.sin(theta));
 		}
-		nx = (((int)nx/16)*16)+8;
-		ny = (((int)ny/16)*16)+8;
 		if (force) {
 			dst = null;
 			setDestination(nx, ny); 
@@ -53,10 +53,12 @@ public class EnemyController extends EntityController {
 		} else if (cooldown <= 0) {
 			if (nx > src.getX() || nx < src.getX() || ny > src.getY() || ny < src.getY()) {
 				//Vector2f v = new Vector2f(nx, ny);
-				if (MainGame.getCurrentMap().blocked(null, nx, ny) == false) {
+				if (MainGame.getCurrentMap().blocked(nx/16, ny/16) == false) {
 					dst = null;
 					setDestination(nx, ny); 
 					cooldown = (long) ((Math.random()*(wanderCooldown*0.75))+wanderCooldown*0.5);
+				} else {
+					wander(force, rangeMult);
 				}
 			}
 		}else if (cooldown > 0)

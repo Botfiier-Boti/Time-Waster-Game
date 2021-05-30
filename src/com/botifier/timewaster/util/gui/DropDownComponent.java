@@ -20,9 +20,26 @@ public class DropDownComponent extends Component {
 	ArrayList<ButtonComponent> buttons = new ArrayList<ButtonComponent>();
 	Object selected = null;
 
-	public DropDownComponent(GUI g, Color c, ArrayList<String> options, float width, float height, float x, float y, boolean outline) {
+	public DropDownComponent(GUI g, Color c, ArrayList<String> options, float x, float y, float width, float height, boolean outline) {
 		super(g, c, x, y, outline);
 		this.options = options;
+		this.container = new RectangleComponent(g, c, x, y, width, height, outline);
+		this.tic = new TextInputComponent(g, c, x, y, width*0.85f, height, "", outline);
+		tic.setMaxLength(16);
+		tic.setCanEdit(false);
+		this.button = new ButtonComponent(g, "v", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
+			@Override
+			public void run() {
+				holder.setVisible(!holder.isVisible());
+			}
+		},x+(width*0.85f), y, width*0.15f, height, true);
+		button.setTogglable(true);
+		changeDisplaySize(display);
+	}
+	
+	public DropDownComponent(GUI g, Color c, float x, float y, float width, float height, boolean outline) {
+		super(g, c, x, y, outline);
+		this.options = new  ArrayList<String>();
 		this.container = new RectangleComponent(g, c, x, y, width, height, outline);
 		this.tic = new TextInputComponent(g, c, x, y, width*0.85f, height, "", outline);
 		tic.setMaxLength(16);
@@ -42,11 +59,16 @@ public class DropDownComponent extends Component {
 		container.update(delta);
 		tic.update(delta);
 		button.update(delta);
-		if (holder != null && holder.isVisible() == true)
+		if (holder != null && holder.isVisible() == true) {
+			holder.focus();
 			for (ButtonComponent b : buttons) {
 				if (b != null)
 					b.update(delta);
 			}
+		} else {
+			if (holder != null && holder.isFocused())
+				holder.unfocus();
+		}
 		updateButtons();
 	}
 
@@ -65,6 +87,8 @@ public class DropDownComponent extends Component {
 		}
 		button.draw(g);
 	}
+	
+	public void onChange() {}
 	
 	public void generateButtons() {
 		buttons.clear();
@@ -101,6 +125,7 @@ public class DropDownComponent extends Component {
 					selected = b;
 					setText(b.getText());
 					holder.setVisible(false);
+					onChange();
 					unfocus();
 				}
 				

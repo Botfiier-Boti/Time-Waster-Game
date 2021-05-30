@@ -18,7 +18,7 @@ public class PopInputComponent extends PopupComponent {
 
 	private PopInputComponent(GUI g, Color c, String title, String defaultText, TextInputComponent target, float x, float y, float width, float height, boolean outline, int state) {
 		super(g, title, c, x, y, width, height, outline);
-		tic = new TextInputComponent(g, c, x+(width*0.1f), y+(height/2)-15, width*(0.80f),30, defaultText, false);
+		tic = new TextInputComponent(g, c, x+(width*0.1f), y+(height/6), width*(0.80f),30, defaultText, false);
 		tic.maxlength = (int) ((width*(0.80f))/11);
 		tic.resetOnClick = true;
 		switch (state) {
@@ -104,7 +104,7 @@ public class PopInputComponent extends PopupComponent {
 
 	public static PopInputComponent createPopup(GUI g, Color c, String title, String defaultText, TextInputComponent target, float x, float y, float width, float height, boolean outline, int state) {
 		PopInputComponent pic = new PopInputComponent(g, c, title, defaultText, target, x, y, width, height, outline, state);
-		if (g.hasComponentType(PopInputComponent.class)) {
+		if (g.hasComponentType(InputComponent.class)) {
 			return null;
 		}
 		g.addComponent(pic);

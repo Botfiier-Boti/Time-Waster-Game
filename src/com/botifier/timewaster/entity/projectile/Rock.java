@@ -6,7 +6,6 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.main.MainGame;
-import com.botifier.timewaster.util.Bullet;
 import com.botifier.timewaster.util.Entity;
 import com.botifier.timewaster.util.LobbedProjectile;
 import com.botifier.timewaster.util.Math2;
@@ -35,17 +34,7 @@ public class Rock extends LobbedProjectile {
 	
 	@Override
 	public void onLand() throws SlickException {
-		cls = null;
-		for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
-			Entity en = MainGame.getEntities().get(i);
-			if (en instanceof Bullet || en.isInvincible() || en == this || en.team == team || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > influence)
-				continue;
-			if (cls == null)
-				cls = en;
-			if (getLocation().distance(en.getLocation()) < getLocation().distance(cls.getLocation())) {
-				cls = en;
-			}
-		}
+		cls = MainGame.getEntityManager().findClosestEnemy(this, 1000);
 		if (cls == null) {
 			rsp.fire(this, this.getLocation().getX(),  this.getLocation().getY(), (float)Math.toRadians(r.nextInt(360)));
 		} else {

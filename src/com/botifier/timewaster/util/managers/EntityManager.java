@@ -3,8 +3,11 @@ package com.botifier.timewaster.util.managers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 //import java.util.Random;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -19,8 +22,10 @@ import com.botifier.timewaster.entity.TestChest;
 import com.botifier.timewaster.entity.enemy.BigGoblin;
 import com.botifier.timewaster.entity.enemy.BulletSpawner;
 import com.botifier.timewaster.entity.enemy.Sheep;
+import com.botifier.timewaster.entity.enemy.SpearBeing;
 import com.botifier.timewaster.entity.player.Player;
 import com.botifier.timewaster.main.MainGame;
+import com.botifier.timewaster.util.Bullet;
 import com.botifier.timewaster.util.Camera;
 import com.botifier.timewaster.util.Entity;
 
@@ -32,10 +37,10 @@ public class EntityManager {
 	private Image shadowImage;
 	//private Random r = new Random();
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
-	private ArrayList<Entity> bullets = new ArrayList<Entity>(200000);
+	private ArrayList<Entity> bullets = new ArrayList<Entity>();
 	private ArrayList<Entity> visualEffects = new ArrayList<Entity>();
 	private ArrayList<Entity> overlaidEffects = new ArrayList<Entity>();
-
+	
 	public EntityManager(MainGame m) {
 		this.m = m;
 	}
@@ -136,7 +141,7 @@ public class EntityManager {
 				if (en.visible && en.hasshadow && shadowImage != null)
 					shadowImage.draw(en.getLocation().getX() - en.collisionbox.getWidth() / 2,
 							en.getLocation().getY() - en.collisionbox.getHeight()+1, en.collisionbox.getWidth(),
-							en.collisionbox.getHeight() + 1);
+							en.collisionbox.getHeight());
 			} else {
 				en.seen = false;
 			}
@@ -157,7 +162,6 @@ public class EntityManager {
 				bu.seen = false;
 			}
 		}
-		
 		g.setColor(Color.white);
 		//Rendering entities
 		for (int i = entities.size() - 1; i > -1; i--) {
@@ -169,14 +173,13 @@ public class EntityManager {
 				en.draw(g);
 			}
 		}
-		
 		//Rendering healthbars and status effects
 		for (int i = entities.size()-1; i > -1; i--) {
 			Entity en = entities.get(i);
 			if (en == null)
 				continue;
 			if (en.seen == true) {
-				if (en.getStatusEffectManager().getStatusEffects().isEmpty() == false) {
+				if (en.getStatusEffectManager() != null && en.getStatusEffectManager().getStatusEffects().isEmpty() == false) {
 					ArrayList<Image> symbols = en.getStatusEffectManager().getVisuals();
 					int offset = symbols.size() > 1 ? 8*(symbols.size()/2)-8 : 4;
 					for (int e = symbols.size()-1; e > -1; e--) {
@@ -227,6 +230,101 @@ public class EntityManager {
 		
 	}
 	
+	public void clearBullets() {
+		for (int i = entities.size()-1; i >= 0; i--) {
+			Entity e = entities.get(i);
+			e.b.clear();
+		}
+		bullets.clear();
+	}
+	
+	public ArrayList<Entity> getAllVisibleEntities() {
+		Stream<Entity> ent = entities.stream()
+		.filter(e -> e != null)
+		.filter(e -> e.seen == true)
+		.filter(e -> e.visible == true);
+		List<Entity> l = ent.collect(Collectors.toList());
+		ArrayList<Entity> al = new ArrayList<Entity>(l);
+		return al;
+	}
+	
+	public ArrayList<Entity> getAllNearbyEntities(Entity e, float max) {
+		Stream<Entity> ent = entities.stream()
+			.filter(e2 -> e2 != null)
+			.filter(e2 -> e2.getLocation().distance(e.getLocation()) <= max)
+			.filter(e2 -> e2.visible == true);
+		List<Entity> l = ent.collect(Collectors.toList());
+		ArrayList<Entity> al = new ArrayList<Entity>(l);
+		return al;
+	}
+	
+	public ArrayList<Entity> getAllNearbyEnemies(Entity e, float max) {
+		Stream<Entity> ent = entities.stream()
+			.filter(e2 -> e2 != null)
+			.filter(e2 -> e2.team != e.team)
+			.filter(e2 -> e2.getLocation().distance(e.getLocation()) <= max)
+			.filter(e2 -> e2.visible == true);
+		List<Entity> l = ent.collect(Collectors.toList());
+		ArrayList<Entity> al = new ArrayList<Entity>(l);
+		return al;
+	}
+	
+	
+	public Entity findClosest(Entity e, float max) {
+		for (int i = entities.size()-1; i > -1; i--) {
+			Entity e2 = entities.get(i);
+			float dist = e2.getLocation().distance(e.getLocation());
+			if (dist > max)
+				continue;
+			if ((i-1 >= 0 && dist > entities.get(i-1).getLocation().distance(e.getLocation())))
+				return e2;
+			if (i+1 < entities.size() && dist > entities.get(i+1).getLocation().distance(e.getLocation()))
+				return e2;
+		}
+		return null;
+	}
+	
+	public Entity findClosestEnemy(Entity e, float max) {
+		if (entities.size() < 4) {
+			Entity cls = null;
+			for (int i = entities.size() - 1; i > -1; i--) {
+				Entity en = entities.get(i);
+				if (en instanceof Bullet || en.isInvincible() || en == e || en.team == e.team || en.invulnerable == true
+						|| en.active == false || en.visible == false
+						|| e.getLocation().distance(en.getLocation()) > max || (cls != null && e.getLocation().distance(en.getLocation()) > e.getLocation().distance(cls.getLocation())))
+					continue;
+				cls = en;
+			}
+			return cls;
+		}
+		for (int i = entities.size() - 1; i > -1; i--) {
+			Entity e2 = entities.get(i);
+			float dist = e2.getLocation().distance(e.getLocation());
+			if (dist > max || e2.team == e.team || e2 == e)
+				continue;
+			if ((i-1 >= 0 && dist > entities.get(i-1).getLocation().distance(e.getLocation())))
+				return e2;
+			if (i+1 < entities.size() && dist > entities.get(i+1).getLocation().distance(e.getLocation()))
+				return e2;
+		}
+		return null;
+	}
+	
+	public Entity findClosestAlly(Entity e, float max) {
+		for (int i = entities.size()-1; i > -1; i--) {
+			Entity e2 = entities.get(i);
+			float dist = e2.getLocation().distance(e.getLocation());
+			System.out.println(dist);
+			if (dist > max || e2.team != e.team)
+				continue;
+			if ((i-1 >= 0 && dist > entities.get(i-1).getLocation().distance(e.getLocation())))
+				return e2;
+			if (i+1 < entities.size() && dist > entities.get(i+1).getLocation().distance(e.getLocation()))
+				return e2;
+		}
+		return null;
+	}
+	
 	public static void loadEntities() throws SlickException {
 		entityClasses.put("dammahclone", new Class[] {float.class, float.class, long.class});
 		//entityClasses.put("biggoblin", new Class[] {float.class, float.class});
@@ -237,6 +335,7 @@ public class EntityManager {
 		entityAliases.put("dammahclone", BulletSpawner.class.getName());
 		entityAliases.put("testchest", TestChest.class.getName());
 		entityAliases.put("sheep", Sheep.class.getName());
+		entityAliases.put("spearman", SpearBeing.class.getName());
 	}
 	
 	public static Class<?>[] getEntityInstArgs(String name) {

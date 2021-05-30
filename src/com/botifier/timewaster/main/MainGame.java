@@ -25,11 +25,12 @@ import com.botifier.timewaster.states.MapEditorState;
 import com.botifier.timewaster.states.OverworldState;
 import com.botifier.timewaster.util.Camera;
 import com.botifier.timewaster.util.Entity;
+import com.botifier.timewaster.util.GUI;
 import com.botifier.timewaster.util.TileMap;
 import com.botifier.timewaster.util.managers.EntityManager;
 
 public class MainGame extends StateBasedGame {
-	private static final String versionId = "0.0.7";
+	private static final String versionId = "0.0.8";
 	private static boolean loaded = false;
 	public static String startMap = "testmap.map";
 	public static boolean debug = false;
@@ -97,6 +98,15 @@ public class MainGame extends StateBasedGame {
 		i.put("pickblock", new Image("Images/Pickblock.png"));
 		i.put("v", new Image("Images/V.png"));
 		i.put("notv", new Image("Images/NotV.png"));
+		i.put("patterntile", new Image("Images/PatternTile.png"));
+		i.put("spearman", new Image("Images/SpearManIdle.png"));
+		i.put("spearmanwalk", new Image("Images/SpearManWalk.png"));
+		i.put("fly",new Image("Images/Fly.png"));
+		i.put("weaponslot", new Image("Images/Inventory/WeaponSlot.png"));
+		i.put("ringslot", new Image("Images/Inventory/RingSlot.png"));
+		i.put("abilityslot", new Image("Images/Inventory/AbilitySlot.png"));
+		i.put("armorslot", new Image("Images/Inventory/ArmorSlot.png"));
+		i.put("genericsword", new Image("Images/GenericSword.png"));
 		Iterator<Entry<String, Image>> it = i.entrySet().iterator();
 		while (it.hasNext()) {
 			Image i = it.next().getValue();
@@ -117,6 +127,10 @@ public class MainGame extends StateBasedGame {
 
 	public static EntityManager getEntityManager() {
 		return ((OverworldState)mm.getState(1)).getEntityManager();
+	}
+	
+	public static HashMap<String, Image> getAllImages() {
+		return mm.i;
 	}
 
 	public static Image getImage(String name) {
@@ -148,7 +162,7 @@ public class MainGame extends StateBasedGame {
 	public static void main(String[] args) throws SlickException {
 		mm = new MainGame();
 		AppGameContainer gc = new AppGameContainer(mm, 640, 480, false);
-		gc.setTargetFrameRate(59);
+		//gc.setTargetFrameRate(59);
 		gc.setMinimumLogicUpdateInterval(16);
 		gc.setMaximumLogicUpdateInterval(16);
 		gc.setShowFPS(false);
@@ -166,6 +180,10 @@ public class MainGame extends StateBasedGame {
 			}
 		}
 		gc.start();
+	}
+	
+	public static GUI getGUI() {
+		return mm.getCurrentStateID() == MapEditorState.ID ? ((MapEditorState)mm.getState(MapEditorState.ID)).getGUI() : ((OverworldState)mm.getState(OverworldState.ID)).getGUI();
 	}
 
 	public static int getViewDistance() {
@@ -200,7 +218,7 @@ public class MainGame extends StateBasedGame {
 		gc.getGraphics().setFont(ttf);
 		addState(new OverworldState());
 		addState(new MapEditorState());
-		this.enterState(2);
+		//this.enterState(2);
 		loaded = true;
 	}
 

@@ -22,8 +22,8 @@ public class LobbedController extends EntityController {
 		this.dst = dst;
 		this.originPoint = new Vector2f(x,y);
 		this.nextPos = originPoint.copy();
-		this.dx=(dst.x-getLoc().x)/getTimeLeft();
-		this.dy =(dst.y-getLoc().y)/getTimeLeft();
+		this.dx = (dst.x-getLoc().x)/getTimeLeft();
+		this.dy = (dst.y-getLoc().y)/getTimeLeft();
 		angle = Math2.calcAngle(getLoc(), dst);
 		dist = (long) (dst.distance(getLoc()));
 		speed = 60*dist/duration;

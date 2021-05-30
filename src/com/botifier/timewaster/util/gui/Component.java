@@ -8,6 +8,7 @@ import com.botifier.timewaster.util.GUI;
 
 public abstract class Component {
 	private boolean visible = true;
+	private boolean enabled = true;
 	private boolean outline;
 	private Color c;
 	private GUI g;
@@ -20,11 +21,13 @@ public abstract class Component {
 		setPosition(x,y);
 	}
 	
-	public abstract void draw(Graphics g);
-	
 	public void update(int delta) {}
 	
+	public abstract void draw(Graphics g);
+	
 	public void destroy() {
+		enabled = false;
+		unfocus();
 		g.removeComponent(this);
 	}
 	
@@ -34,6 +37,10 @@ public abstract class Component {
 	
 	public void unfocus() {
 		g.unfocus();
+	}
+	
+	public void setEnabled(boolean b) {
+		enabled = b;
 	}
 	
 	public void setVisible(boolean b) {
@@ -70,6 +77,10 @@ public abstract class Component {
 
 	public Color getColor() {
 		return c;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
 	}
 	
 	public boolean isVisible() {

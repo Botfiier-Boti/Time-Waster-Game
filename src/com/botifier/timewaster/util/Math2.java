@@ -31,6 +31,9 @@ public class Math2 {
 		return a+c*(b-a);
 	}
 	
+	public static float getCloser(float a, float b, float c) {
+		return (Math.abs(c-a) < Math.abs(c-b)) ? a : b;
+	}
 	
 	public static float round(float f, int dec) {
 		String d = "#";

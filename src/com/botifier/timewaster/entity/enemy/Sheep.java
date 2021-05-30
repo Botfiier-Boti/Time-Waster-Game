@@ -18,7 +18,7 @@ public class Sheep extends Enemy {
 	SpinPattern sp;
 
 	public Sheep(float x, float y) {
-		super("Sheep", MainGame.getImage("idlesheep"), new EnemyController(x, y, 1f, 20), new SpriteSheet(MainGame.getImage("sheep"), 8, 8), null,0.5f);
+		super("Sheep", MainGame.getImage("idlesheep"), new EnemyController(x, y, 1f, 200), new SpriteSheet(MainGame.getImage("sheep"), 8, 8), null,0.5f);
 		sp = new SpinPattern();
 		team = Team.ENEMY;
 		setMaxHealth(500, true);
@@ -56,7 +56,7 @@ public class Sheep extends Enemy {
 			}
 		} else {
 			//wander
-			getController().wander(false, 2f);
+			getController().wander(false, 1f);
 		}
 		
 	}

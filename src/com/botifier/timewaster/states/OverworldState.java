@@ -29,7 +29,12 @@ import com.botifier.timewaster.util.GUI;
 import com.botifier.timewaster.util.TileMap;
 import com.botifier.timewaster.util.gui.ButtonComponent;
 import com.botifier.timewaster.util.gui.HealthbarComponent;
+import com.botifier.timewaster.util.gui.InventoryComponent;
+import com.botifier.timewaster.util.gui.ItemPickupComponent;
 import com.botifier.timewaster.util.gui.RectangleComponent;
+import com.botifier.timewaster.util.items.AdminRing;
+import com.botifier.timewaster.util.items.AdminRock;
+import com.botifier.timewaster.util.items.DefenseTestSword;
 import com.botifier.timewaster.util.managers.EntityManager;
 import com.botifier.timewaster.util.movements.EntityController;
 
@@ -109,6 +114,12 @@ public class OverworldState extends BasicGameState {
 		};
 		getCamera().setCenterEntity(p);
 		p.getController().teleport(m.getSpawnPoint());
+		p.ei.purge();
+		p.inv.purge();
+		p.inv.addItem(new AdminRing(), 3);
+		p.inv.addItem(new AdminRock(), 0);
+		p.inv.addItem(new DefenseTestSword(), 1);
+		
 		eM.addEntity(p);
 		g = new GUI(p);
 		g.addComponent(new RectangleComponent(g, Color.gray, gc.getWidth() * 0.75f, -1, gc.getWidth() * 0.25f, gc.getHeight() + 1,true));
@@ -119,9 +130,20 @@ public class OverworldState extends BasicGameState {
 			g.addComponent(new ButtonComponent(g, "Edit Map", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
 				@Override
 				public void run() {
+					m.eM.getBullets().clear();
 					mm.enterState(MapEditorState.ID);
 				}
 			},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.05f, (gc.getWidth() / 4) - 20, 20, true));
+		g.addComponent(new InventoryComponent(g, Color.lightGray,  gc.getWidth() * 0.75f + 10f, gc.getHeight()*0.335f+4, true, p.ei));
+		g.addComponent(new InventoryComponent(g, Color.lightGray,  gc.getWidth() * 0.75f + 10f, gc.getHeight()*0.335f+40, true, p.inv));
+		g.addComponent(new ItemPickupComponent(g));
+		
+		/*System.out.println((gc.getWidth()/4)-20);
+		g.addComponent(new RectangleComponent(g, Color.lightGray, gc.getWidth() * 0.75f + 12f, gc.getHeight() * 0.335f,32,32,true));
+		g.addComponent(new RectangleComponent(g, Color.lightGray, gc.getWidth() * 0.75f + 44f, gc.getHeight() * 0.335f,32,32,true));
+		g.addComponent(new RectangleComponent(g, Color.lightGray, gc.getWidth() * 0.75f + 76f, gc.getHeight() * 0.335f,32,32,true));
+		g.addComponent(new RectangleComponent(g, Color.lightGray, gc.getWidth() * 0.75f + 108f, gc.getHeight() * 0.335f,32,32,true));*/
+		
 	}
 
 	@Override
@@ -298,11 +320,17 @@ public class OverworldState extends BasicGameState {
 	
 	public void reset(GameContainer gc) throws SlickException {
 		m.reset();
+		p.b.clear();
+		m.eM.clearBullets();
 		init(gc, mm);
 	}
 	
 	public EntityManager getEntityManager() {
 		return eM;
+	}
+	
+	public GUI getGUI() {
+		return g;
 	}
 	
 	@Override

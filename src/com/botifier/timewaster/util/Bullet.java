@@ -1,4 +1,5 @@
 package com.botifier.timewaster.util;
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -60,8 +61,15 @@ public class Bullet extends Entity {
 
 	@Override
 	public void update(int delta) throws SlickException {
-		super.update(delta);
 		angle = getController().visualAngle;
+		if (!overrideMove && getController() != null)
+			getController().move(delta);
+		if (getController().getOrigin() != null)
+			team = getController().getOrigin().team;
+		if (hitbox != null) {
+			hitbox.setCenterX(getLocation().getX());
+			hitbox.setY(getLocation().getY()-posMod.y-(hitbox.getHeight()));	
+		}
 		rotation = (float) Math.toDegrees(getController().visualAngle);
 		if (getController().isMoving() == false) {
 			onDestroy();
@@ -89,6 +97,7 @@ public class Bullet extends Entity {
 		Bullet b = new Bullet(MainGame.getImage("DefaultShot"), name, x, y, speed, angle, lifeTime, minDmg, maxDmg, origin, pierceObstacles, pierceEnemies, boomerang);
 		b.hasshadow = hasShadow;
 		b.atkScaling = atkScaling;
+		b.team = origin.team;
 		return b;
 	}
 	

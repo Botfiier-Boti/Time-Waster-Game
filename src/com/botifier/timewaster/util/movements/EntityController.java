@@ -1,6 +1,5 @@
 package com.botifier.timewaster.util.movements;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.newdawn.slick.geom.Rectangle;
@@ -171,7 +170,7 @@ public class EntityController implements Cloneable {
 		}
 		if (obeysCollision) {
 			testMove();
-			// eC = testMapCollision(src.copy().add(Math2.truncate(velocity,PPS)));
+			//eC = testMapCollision();//src.copy().add(temp));
 			// mC = testEntityCollision(dst);
 			if (eC || mC) {
 				// return;
@@ -263,8 +262,11 @@ public class EntityController implements Cloneable {
 
 	public void seperate() {
 		int seperateRadius = (int) (getOwner().collisionbox.getWidth() / 4);
+		int count = 0;
 		for (int i = MainGame.getEntities().size() - 1; i > 0; i--) {
 			Entity e = MainGame.getEntities().get(i);
+			if (count > 10)
+				break;
 			if (e == getOwner() || e.getController().isMoving() == false || e.team != getOwner().team
 					|| e.active == false || e.visible == false || e.destroy == true
 					|| e.getController().obeysCollision == false
@@ -275,6 +277,7 @@ public class EntityController implements Cloneable {
 			desired.sub(src.copy().sub(e.getLocation()));
 			desired.sub(velocity);
 			steer.sub(desired);
+			count++;
 		}
 	}
 
@@ -313,7 +316,12 @@ public class EntityController implements Cloneable {
 		src.y = loc.y;
 		dst = null;
 	}
+	
 
+	public void setAngle(float angle) {
+		this.angle = angle;
+	}
+	/*
 	public boolean testAllEntityCollision(Vector2f dst) {
 		if (dst == null)
 			return false;
@@ -357,9 +365,9 @@ public class EntityController implements Cloneable {
 				continue;
 		}
 		return false;
-	}
+	}*/
 
-	public boolean testEntityCollision(Vector2f dst) {
+	/*public boolean testEntityCollision(Vector2f dst) {
 		if (dst == null)
 			return false;
 		int up = 0, down = 0, left = 0, right = 0;
@@ -400,22 +408,44 @@ public class EntityController implements Cloneable {
 			return true;
 		}
 		return false;
-	}
-
-	public boolean testMapCollision(Vector2f dst) {
+	}*/
+	/*public boolean testMapCollision() {
 		Vector2f fake = new Vector2f(src.x, src.y);
 		testBox = new Rectangle(fake.x - owner.collisionbox.getWidth() / 2, fake.y - owner.collisionbox.getHeight() / 2,
 				owner.collisionbox.getWidth(), owner.collisionbox.getHeight());
-		int x = (int) dst.x / 16;
-		int y = (int) dst.y / 16;
-		boolean blocked = MainGame.getCurrentMap().blocked(testBox, x, y);
-		if (blocked == true) {
+		
+		int x = (int) ((fake.x) / 16);
+		int y = (int) ((fake.y) / 16);
+		int rx = (int) ((fake.x+getPPS()) / 16);
+		int dy = (int) ((fake.y+getPPS()) / 16);
+		int lx = (int) ((fake.x-getPPS()) / 16);
+		int uy = (int) ((fake.y-getPPS()) / 16);
+		boolean blocked =false;
+		
+
+		float angle = (int) Math.toDegrees(this.angle);
+		if ((angle >= -180 && angle <= 0) && MainGame.getCurrentMap().blocked(null, x, uy)) {
+			UP = false;
+			blocked = true;
+		}
+		if ((angle <= 180 && angle >= 0) && MainGame.getCurrentMap().blocked(null, x, dy)) {
+			DOWN = false;
+			blocked = true;
+		}
+		if ((angle <= 90 && angle >= -90) && MainGame.getCurrentMap().blocked(null, rx, y)) {
+			RIGHT = false;
+			blocked = true;
+		}
+		if ((angle >= 90 || angle <= -90) &&MainGame.getCurrentMap().blocked(null, lx, y)) {
+			LEFT = false;
+			blocked = true;
+		}
+		/*if (blocked == true) {
 			float angle = (int) Math.toDegrees(this.angle);
-			if (((angle >= 180 && angle <= 360))) {
-				// float disty = (y*16)-(src.y);
-				dst.y = src.y;
-				UP = false;
-			} else if ((angle <= 180 && angle >= 0)) {
+			if (((angle >= 270 || angle <= 90))) {
+				
+			} 
+			if ((angle <= 270 && angle >=90)) {
 				// float disty = (src.y)-(y*16);
 				dst.y = src.y;
 				DOWN = false;
@@ -429,11 +459,13 @@ public class EntityController implements Cloneable {
 				System.out.println("Error");
 		}
 		return blocked;
-	}
+	}*/
 
 	public void testMove() {
 		TileMap m = MainGame.getCurrentMap();
 
+		/*int cX = (int) ((getOwner().collisionbox.getCenterX()) / 16);
+		int cY = (int) ((getOwner().collisionbox.getCenterY()) / 16);
 		int minX = (int) ((getOwner().collisionbox.getMinX() / 16));
 		int maxX = (int) ((getOwner().collisionbox.getMaxX() / 16));
 		int minY = (int) ((getOwner().collisionbox.getMinY() / 16));
@@ -444,19 +476,60 @@ public class EntityController implements Cloneable {
 		int minYM = (int) (((getOwner().collisionbox.getMinY() - getPPS()) / 16));
 		int maxYM = (int) (((getOwner().collisionbox.getMaxY() + getPPS()) / 16));
 		
-		if (true) {//((minX >= 0 && (maxX < m.getWidthInTiles())) && (minY >= 0 && maxY < m.getHeightInTiles()))) {
-			//UP
+		int cXML = (int) ((getOwner().collisionbox.getCenterX()-getPPS()) / 16);
+		int cYMU = (int) ((getOwner().collisionbox.getCenterY()-getPPS()) / 16);
+		int cXMR = (int) ((getOwner().collisionbox.getCenterX()+getPPS()) / 16);
+		int cYMD = (int) ((getOwner().collisionbox.getCenterY()+getPPS()) / 16);*/
+		
+		if (obeysCollision) {//((minX >= 0 && (maxX < m.getWidthInTiles())) && (minY >= 0 && maxY < m.getHeightInTiles()))) {
+			int xL = (int) ((getOwner().collisionbox.getMinX()-getPPS()) / 16);
+			int yU = (int) ((getOwner().collisionbox.getMinY()-getPPS()) / 16);
+			int xR = (int) ((getOwner().collisionbox.getMaxX()+getPPS()) / 16);
+			int yD = (int) ((getOwner().collisionbox.getMaxY()+getPPS()) / 16);
+			for (int e = 0; e < getOwner().collisionbox.getHeight(); e++) {
+				for (int i = 0; i < getOwner().collisionbox.getWidth(); i++) {
+					int x = (int) ((getOwner().collisionbox.getMinX()+i) / 16);
+					int y = (int) ((getOwner().collisionbox.getMinY()+e) / 16);
+					
+					if (yU >= 0 && m.blocked(x, yU)) {
+						UP = false;
+					}
+					if (yD >= 0 && m.blocked(x, yD)) {
+						DOWN = false;
+					}
+					if (xL >= 0 && m.blocked(xL, y)) {
+						LEFT = false;
+					}
+					if (xR >= 0 && m.blocked(xR, y)) {
+						RIGHT = false;
+					}
+				}
+			}
+			/*//UP
 			if (m.blocked(null, maxX, minYM) == true) {
 				UP = false;
 			} 
 			if (m.blocked(null, minX, minYM) == true) {
 				UP = false;
 			}
+			if (m.blocked(null, cX, minYM) == true) {
+				UP = false;
+			}
+			if (m.blocked(null, cX, cYMU) == true) {
+				UP = false;
+			}
+			
 			// DOWN
 			if (m.blocked(null, maxX, maxYM) == true) {
 				DOWN = false;
 			}
 			if (m.blocked(null, minX, maxYM) == true) {
+				DOWN = false;
+			}
+			if (m.blocked(null, cX, maxYM) == true) {
+				DOWN = false;
+			}
+			if (m.blocked(null, cX, cYMD) == true) {
 				DOWN = false;
 			}
 			
@@ -467,6 +540,12 @@ public class EntityController implements Cloneable {
 			if (m.blocked(null, minXM, minY) == true) {
 				LEFT = false;
 			}
+			if (m.blocked(null, minXM, cY) == true) {
+				LEFT = false;
+			}
+			if (m.blocked(null, cXML, cY) == true) {
+				LEFT = false;
+			}
 
 			// RIGHT
 			if (m.blocked(null, maxXM, maxY) == true) {
@@ -475,6 +554,13 @@ public class EntityController implements Cloneable {
 			if (m.blocked(null, maxXM, minY) == true) {
 				RIGHT = false;
 			}
+			if (m.blocked(null, maxXM, cY) == true) {
+				RIGHT = false;
+			}
+			if (m.blocked(null, cXMR, cY) == true) {
+				RIGHT = false;
+			}*/
+			
 		}
 		/*
 		 * if (UP == false && dst.y < src.y) dst.y = src.y; if (DOWN == false && dst.y >

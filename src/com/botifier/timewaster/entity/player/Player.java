@@ -18,12 +18,22 @@ import com.botifier.timewaster.states.OverworldState;
 import com.botifier.timewaster.statuseffect.effects.InvulnerabilityEffect;
 //import com.botifier.timewaster.entity.ShotgunPattern;
 import com.botifier.timewaster.util.Entity;
+import com.botifier.timewaster.util.EquipmentInventory;
+import com.botifier.timewaster.util.Inventory;
+import com.botifier.timewaster.util.Item.SlotType;
 import com.botifier.timewaster.util.Math2;
 import com.botifier.timewaster.util.Team;
 import com.botifier.timewaster.util.bulletpatterns.*;
+import com.botifier.timewaster.util.items.AdminRing;
+import com.botifier.timewaster.util.items.AdminRock;
+import com.botifier.timewaster.util.items.DefenseTestSword;
+import com.botifier.timewaster.util.managers.StatusEffectManager;
 import com.botifier.timewaster.util.movements.LocalPlayerControl;
 
 public class Player extends Entity {
+	//Inventory
+	public EquipmentInventory ei;
+	public Inventory inv;
 	//Walk animation
 	Animation walk;
 	//Shot sound
@@ -41,7 +51,7 @@ public class Player extends Entity {
 	//Period of safety
 	public long invulPeriod = 0;
 	//Current bullet pattern
-	BulletPattern p;
+	public BulletPattern p;
 	//Line
 	Line l = new Line(0,0);
 	//Targeted location
@@ -60,11 +70,36 @@ public class Player extends Entity {
 		team = Team.ALLY;
 		overrideMove = true;
 		setMaxHealth(620, true);
-		getStats().setAttack(1000);
+		getStats().setAttack(60);
+		getStats().setDexterity(40);
 		getStats().setDefense(15);
 		getStats().setVitality(30);
 		getStats().setSpeed(50);
+		/*getStats().setVitMod(9000000000000000f);
+		getStats().setDefMod(1000000000000000f);
+		getStats().setHealthMod(1000f);
+		getStats().setDexMod(100000f);
+		getStats().setAtkMod(1000f);*/
+		
 		spawncap = 4;
+		
+
+		inv = new Inventory(this, 8);
+		
+		ei = new EquipmentInventory(this, 4);
+		ei.setSlotType(SlotType.EQUIP_WEAPON, 0);
+		ei.setSlotType(SlotType.EQUIP_ABILITY, 1);
+		ei.setSlotType(SlotType.EQUIP_ARMOR, 2);
+		ei.setSlotType(SlotType.EQUIP_RING, 3);
+
+		sem = new StatusEffectManager(this);
+		//p = new ShotgunPattern();
+		//p = new StabPattern();
+		//p = new SpinPattern();
+		//p = new RockShatterPattern();
+		//p = new ExplodePattern();
+		//p = new RockThrowPattern();
+		//p = new GuidedBulletPattern();
 		//p = new WigglyThingPattern();
 		//p = new SpherePattern();
 		//p = new BeeHivePattern();
@@ -100,6 +135,9 @@ public class Player extends Entity {
 			
 			if (i.isKeyPressed(Input.KEY_I))
 				autofire = !autofire;
+			
+			if (i.isKeyPressed(Input.KEY_E))
+				ei.purge();
 			
 			//Lob functionality
 			if (lob == true || (p != null && p.lob)) {
@@ -167,7 +205,7 @@ public class Player extends Entity {
 						}
 						//Reset line
 						l.set(0,0,0,0);
-						//Play shot sound
+						//Play shot sound 
 						if (s != null)
 							s.play(1, 0.5f);
 						cooldown = 60/SPS;
@@ -175,13 +213,13 @@ public class Player extends Entity {
 				}
 			} else {
 				//Fire normal shot
-				if (autofire || i.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && build == false) {
+				if (autofire || ((i.isMousePressed(Input.MOUSE_LEFT_BUTTON) || i.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) && MainGame.getGUI().getFocused() == null) && build == false) {
 					if (cooldown <= 0) {
 						Vector2f mouse = new Vector2f(i.getMouseX(), i.getMouseY());
 						angle = Math2.calcAngle(getController().getLoc(), mouse);
 						if (p == null) {
 							//Default 
-							shootBullet(angle, true);
+							shootBullet(angle);
 						} else {
 							//Vary based on shot pattern
 							if (p.lob == true) {
@@ -191,6 +229,8 @@ public class Player extends Entity {
 							}else {
 								p.fire(this, getLocation().x, getLocation().y, angle);
 							}
+
+							cooldown = 60/SPS;
 						}
 						//Change the direction of the player
 						if ((angle < Math.PI && angle > Math.PI/2) || (angle > -Math.PI && angle < -Math.PI/2)) {
@@ -201,7 +241,6 @@ public class Player extends Entity {
 						//Play shot sound
 						if (s != null)
 							s.play(1, 0.75f);
-						cooldown = 60/SPS;
 					}
 				}
 			}

@@ -54,10 +54,10 @@ public class SnakeHead extends Enemy {
 			shotdelay -= delta;
 		float angle = Math2.calcAngle(getLocation(), ((CircleBehavior)behaviors.get(0)).getCirclePos());
 		if (cooldown <= 0 && shotdelay <=0) {
-			Bullet bul = Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, angle, 3000, 75, 0,this,false,true,true,false,false);
-			bul.setImage(MainGame.getImage("Shiny"));
+			Bullet bul = Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, angle, 3000, 75, 0,this,false,true,false,false,false);
+			bul.setImage(MainGame.getImage("smallrock"));
 			b.add(bul);
-			cooldown = (int)(60/(4f + 6.5f*((getDexterity())/75f)));
+			cooldown = (int)(1000/(4f + 6.5f*((getDexterity())/75f)));
 		}
 		//CircleBehavior cb = (CircleBehavior)behaviors.get(0);
 		//if (cls != null && cls.getController().isMoving())

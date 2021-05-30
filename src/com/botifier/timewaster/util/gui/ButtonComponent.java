@@ -36,13 +36,13 @@ public class ButtonComponent extends Component {
 		if (symbol == null)
 			t.draw(g);
 		else {
-			g.drawImage(symbol, t.getX()+r.getWidth()/2-symbol.getWidth()/2, t.getY()+r.getHeight()/2-symbol.getHeight()/2);
+			g.drawImage(symbol, t.getX()-symbol.getWidth()/2, t.getY()-symbol.getHeight()/2);
 		}
 	}
 	
 	@Override
 	public void update(int delta) {
-		Input i = MainGame.mm.getContainer().getInput();
+		Input i = MainGame.mm.getInput();
 		if (isVisible() && r.contains(i.getAbsoluteMouseX(), i.getAbsoluteMouseY())) {
 			r.setColor(hover);
 			if (i.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
@@ -50,8 +50,8 @@ public class ButtonComponent extends Component {
 					pressedButton = !pressedButton;
 				else
 					pressedButton = true;
-				action.run();
-				i.clearMousePressedRecord();
+				if (action != null)
+					action.run();
 			} else if (toggle == false) {
 				pressedButton = false;
 			}

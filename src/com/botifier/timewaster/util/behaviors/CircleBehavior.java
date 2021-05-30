@@ -27,6 +27,8 @@ public class CircleBehavior extends Behavior {
 
 	@Override
 	public void run() {
+		if (radius < 0)
+			radius = 0;
 		if (circlePos != null) {
 			if ( theta >= Math.PI*2)
 				theta = 0;
@@ -77,6 +79,10 @@ public class CircleBehavior extends Behavior {
 	
 	public Vector2f getCirclePos() {
 		return circlePos.copy();
+	}
+	
+	public float getRadius() {
+		return radius;
 	}
 	
 	public double getTheta() {

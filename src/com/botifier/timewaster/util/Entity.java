@@ -22,11 +22,11 @@ public class Entity implements Comparable<Entity> {
 	UUID uuid;
 	Random r = new Random();
 	Color c = Color.black;
-	protected long cooldown = 0;
+	protected float cooldown = 0;
 	protected int spawncap = 3;
 	private String name;
 	private EntityController controller;
-	private StatusEffectManager sem;
+	protected StatusEffectManager sem;
 	private Stats stats;
 	public ArrayList<Entity> b = new ArrayList<Entity>();
 	public LinkedList<Entity> followers = new LinkedList<Entity>();
@@ -61,6 +61,7 @@ public class Entity implements Comparable<Entity> {
 	protected boolean invincible = false;
 	protected boolean overrideMove = false;
 	protected boolean linger = true;
+	protected boolean firing = false;
 	private boolean initialized = false;
 	
 	
@@ -131,7 +132,7 @@ public class Entity implements Comparable<Entity> {
 			influence = (24*((image.getWidth()+image.getHeight())/2))*iModifier*size;
 		}
 		stats = new Stats(this);
-		sem = new StatusEffectManager(this);
+		//sem = new StatusEffectManager(this);
 		initialized = true;
 	}
 	
@@ -166,6 +167,11 @@ public class Entity implements Comparable<Entity> {
 	
 	public void update(int delta) throws SlickException {
 		angle = getController().getAngle();
+		angle = (float) (angle%Math.PI*2);
+		angle = (float) ((angle + Math.PI*2) % Math.PI*2);
+		if (angle > Math.PI)
+			angle -= Math.PI*2;
+		
 		if (spawns.size() > 0 && spawns.size() > spawncap) {
 			spawns.get(0).onDeath();
 		}
@@ -184,7 +190,8 @@ public class Entity implements Comparable<Entity> {
 			if (size != lSize) {
 				init();
 				lSize = size;
-			} 
+			}
+			
 			if (!overrideMove && controller != null)
 				controller.move(delta);
 			updateHitboxes();
@@ -229,8 +236,9 @@ public class Entity implements Comparable<Entity> {
 					e.forceUpdate(delta);
 				}
 			}
-			sem.update(delta);
-			cooldown--;
+			if (sem != null)
+				sem.update(delta);
+			cooldown-=delta;
 		} else {
 			return;
 		}
@@ -247,10 +255,14 @@ public class Entity implements Comparable<Entity> {
 			((Rectangle)hitbox).setWidth(wOverride);
 		if ( hitbox instanceof Rectangle && hOverride >= 0 && hitbox.getHeight() != hOverride)
 			((Rectangle)hitbox).setHeight(hOverride);
-		collisionbox.setCenterX(getLocation().getX());
-		collisionbox.setY(getLocation().getY()-posMod.y-(collisionbox.getHeight()));
-		hitbox.setCenterX(getLocation().getX());
-		hitbox.setY(getLocation().getY()-posMod.y-(hitbox.getHeight()));
+		if (collisionbox != null) {
+			collisionbox.setCenterX(getLocation().getX());
+			collisionbox.setY(getLocation().getY()-posMod.y-(collisionbox.getHeight()));	
+		}
+		if (hitbox != null) {
+			hitbox.setCenterX(getLocation().getX());
+			hitbox.setY(getLocation().getY()-posMod.y-(hitbox.getHeight()));	
+		}
 	}
 	
 	public void onDeath() throws SlickException {
@@ -277,11 +289,13 @@ public class Entity implements Comparable<Entity> {
 	public void onHitByBullet(Bullet b) {
 		if (active == false)
 			return;
+		if (b == null)
+			return;
 		Entity origin = b.getOrigin();
 		if (origin.team == this.team || origin == this || invincible == true)
 			return;
 		int damage = 0;
-		if (b.effect != null)
+		if (sem != null && b.effect != null)
 			sem.addEffect(b.effect);
 		if (b.scalesWithAtk()) {
 			if (b.basedamage[0] >= b.basedamage[1]) {
@@ -302,22 +316,29 @@ public class Entity implements Comparable<Entity> {
 			b.getOrigin().onAttackHit(b, damage);
 			b.onHit();
 		}
-		onHit(damage, b.getOrigin(), true);
+		onHit(damage, b.getOrigin(), b.ignoresArmor);
 	}
 	
-	public void shootBullet(float angle, boolean force) throws SlickException {
+	public boolean shootBullet(float angle, boolean force) throws SlickException {
+		if (firing == false) {
+			firing = true;	
+		}
 		if (cooldown <= 0 || force) {
 			b.add(new Bullet("Bob", getController().getLoc().x, getController().getLoc().y, 200, angle, 350, 75, 90,this));
-			cooldown = (int)(60/(1.5f + 6.5f*((getDexterity())/75f)));
+			float SPS = 1.5f + 6.5f*((getDexterity())/75f);
+			cooldown = 1000/SPS;
+			firing = false;
+			return true;
 		}
+		return false;
 	}
 	
 	public void addBullet(Entity e) {
 		b.add(e);
 	}
 	
-	public void shootBullet(float angle) throws SlickException {
-		shootBullet(angle,false);
+	public boolean shootBullet(float angle) throws SlickException {
+		return shootBullet(angle,false);
 	}
 	
 	public Vector2f getPositionRelativeTo(Vector2f v) {

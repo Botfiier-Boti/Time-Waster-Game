@@ -34,6 +34,7 @@ public class TileMap  {
 	Vector2f origin = new Vector2f(0,0);
 	String walkable = "";
 	char[][] tiles;
+	public Rectangle[][] tileCol;
 	int width = 0;
 	int height = 0;
 	public Polygon big = new Polygon();
@@ -41,6 +42,7 @@ public class TileMap  {
 		this.tiles = tiles;
 		this.width = tiles.length;
 		this.height = tiles[0].length;
+		this.tileCol = new Rectangle[height][width];
 	}
 	
 	public TileMap(String s) throws IOException {
@@ -57,7 +59,7 @@ public class TileMap  {
 	public boolean blocked( int tx, int ty) {
 		int nx = (int) (tx - origin.x);
 		int ny = (int) (ty - origin.y);
-		if ((nx > -1) && (ny >-1) && (ny < tiles.length) && (nx < tiles[ny].length)) {
+		if ((nx >= 0) && (ny >= 0) && (ny < tiles.length) && (nx < tiles[ny].length)) {
 			char c = tiles[ny][nx];
 			if (walkable.contains(c+"") == false) {
 				return true;
@@ -70,13 +72,11 @@ public class TileMap  {
 		if (r == null)
 			return blocked(tx,ty);
 		if (tx > -1 && ty >-1 && ty < tiles.length && tx < tiles[ty].length ) {
-			char c = tiles[ty][tx];
-			if ( walkable.contains(c+"") == false) {
-				Rectangle b = new Rectangle((tx)*16,(ty)*16,16,16);
-				//this.r.add(b);
+
+			Rectangle b = tileCol[ty][tx];
+			if (b != null) {
 				if (b.intersects(r))
 					return true;
-				
 			}
 		}
 		return false;
@@ -123,6 +123,27 @@ public class TileMap  {
 	
 	public void update(GameContainer gc, int delta) throws SlickException {
 		handleEntities(gc, delta);
+		/*Camera c = MainGame.getCamera();
+
+		for (int y = 0; y < getHeightInTiles(); y++) {
+			for (int x = 0; x < getWidthInTiles(); x++) {
+				char tile = tiles[y][x];
+				if (walkable.contains(tile+""))
+					continue;
+				Rectangle r = tileCol[y][x];
+				float dist = c.getCenter().distance(new Vector2f((x * 16)+8+origin.x*16, (y * 16)+8+origin.x*16));
+				if (dist > MainGame.getViewDistance()) {
+					if (r != null) 
+						r = null;
+					continue;
+				} else {
+					if (r == null) {
+						tileCol[y][x] = new Rectangle((x*16),(y*16),16,16);
+					}
+				}
+			}
+		}*/
+		
 	}
 	
 	public void handleEntities(GameContainer gc, int delta) throws SlickException {
@@ -193,6 +214,9 @@ public class TileMap  {
 						g.drawRect(x*16+origin.x*16, y*16+origin.y*16, 16, 16);
 					}
 					g.setColor(Color.white);
+					/*if (y < height && x < width && tileCol[y][x] != null) {
+						g.draw(tileCol[y][x]);
+					}*/
 					/*switch (tile) {
 					case '#':
 						g.drawImage(MainGame.getImage("BrickWall"), x * 16, y * 16);
@@ -288,6 +312,7 @@ public class TileMap  {
 		String line = "";
 		while ((line = br.readLine()) != null) {
 			line = line.replaceAll("([ :])", "");
+			line.toLowerCase();
 			if (line.startsWith("width")) {
 				line = line.replaceFirst("width", "");
 				if (Math2.isInteger(line)) {
@@ -329,37 +354,50 @@ public class TileMap  {
 				line = line.replaceFirst("addentity", "");
 				String[]  s = line.split(",");
 				if (s != null && s.length > 2) {
-					Object[] args = new Object[s.length-1];
 					String eName = s[0];
-					if (EntityManager.isAlias(eName)) {
-						if (args.length == EntityManager.getEntityInstArgs(eName).length) {
-							for (int i = 1; i < s.length; i++) {
-								String st = s[i];
-								if (Math2.isInteger(st)) {
-									args[i-1] = Integer.parseInt(st);
-								} else if (Math2.isLong(st)) {
-									args[i-1] = Long.parseLong(st);
-								} else if (Math2.isFloat(st)) {
-									args[i-1] = Float.parseFloat(st);
-								} else if (st.equalsIgnoreCase("true")) {
-									args[i-1] = true;
-								} else if (st.equalsIgnoreCase("false")) {
-									args[i-1] = false;
-								} else if (st.equalsIgnoreCase("null")) {
-									args[i-1] = null;
-								} else {
-									args[i-1] = st;
+					int iterations = 1;
+					int ignore = 1;
+					if (Math2.isInteger(s[0])) {
+						eName = s[1];
+						iterations = Integer.valueOf(s[0]);
+						ignore = 2;
+					}
+					Object[] args = new Object[s.length-ignore];
+					try {
+						if (EntityManager.isAlias(eName) || Class.forName(eName) != null) {
+							if (args.length == EntityManager.getEntityInstArgs(eName).length) {
+								for (int i = ignore; i < s.length; i++) {
+									String st = s[i];
+									if (Math2.isInteger(st)) {
+										args[i-ignore] = Integer.parseInt(st);
+									} else if (Math2.isLong(st)) {
+										args[i-1] = Long.parseLong(st);
+									} else if (Math2.isFloat(st)) {
+										args[i-ignore] = Float.parseFloat(st);
+									} else if (st.equalsIgnoreCase("true")) {
+										args[i-ignore] = true;
+									} else if (st.equalsIgnoreCase("false")) {
+										args[i-ignore] = false;
+									} else if (st.equalsIgnoreCase("null")) {
+										args[i-1] = null;
+									} else {
+										args[i-ignore] = st;
+									}
 								}
+								for (int i = 0; i < iterations; i++) {
+									Entity e = EntityManager.createEntityOfType(eName, args);
+									eM.addEntity(e);
+									Entity e2 = EntityManager.createEntityOfType(eName, args);
+									initialEntities.add(e2);
+								}
+								System.out.println("Spawned Entity "+eName+".");
+							} else {
+								System.out.println("Wrong number of arguments for "+eName);
 							}
-							Entity e = EntityManager.createEntityOfType(eName, args);
-							eM.addEntity(e);
-							Entity e2 = EntityManager.createEntityOfType(eName, args);
-							initialEntities.add(e2);
-							System.out.println("Spawned Entity "+eName+".");
 						} else {
-							System.out.println("Wrong number of arguments for "+eName);
+							System.out.println("No such entity defined: "+eName);
 						}
-					} else {
+					} catch (NumberFormatException | ClassNotFoundException e) {
 						System.out.println("No such entity defined: "+eName);
 					}
 					
@@ -398,6 +436,7 @@ public class TileMap  {
 				continue;
 			}
 		}
+		this.tileCol = new Rectangle[height][width];
 		System.out.println("Successfully loaded map.");
 	}
 	

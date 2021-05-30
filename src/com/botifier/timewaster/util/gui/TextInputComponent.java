@@ -36,7 +36,7 @@ public class TextInputComponent extends InputComponent {
 		r.draw(g);
 		r2.draw(g);
 		t.draw(g);
-		if (cursor == true && cursorPos > -1 && cursorPos < t.getText().length()+1)
+		if (isFocused() && cursor == true && cursorPos > -1 && cursorPos < t.getText().length()+1)
 			cur.draw(g);
 	}
 

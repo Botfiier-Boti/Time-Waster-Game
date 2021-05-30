@@ -1,5 +1,6 @@
 package com.botifier.timewaster.util;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.newdawn.slick.Color;
@@ -22,6 +23,8 @@ public class GUI {
 		for (int i = 0; i < components.size(); i++) {
 			Component c = components.get(i);
 			if (c == null)
+				continue;
+			if (c.isEnabled() == false)
 				continue;
 			c.update(delta);
 		}
@@ -86,6 +89,16 @@ public class GUI {
 				return true;
 		}
 		return false;
+	}
+	
+	public ArrayList<Component> getComponentsOfType(Class<?> c) {
+		ArrayList<Component> cl = new ArrayList<Component>();
+		for (int i = components.size()-1; i > -1; i--) {
+			Component co = components.get(i);
+			if (co.getClass() == c)
+				cl.add(co);
+		}
+		return cl;
 	}
 	
 	public Component getComponent(int i) {

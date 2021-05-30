@@ -8,7 +8,7 @@ import com.botifier.timewaster.util.Entity;
 public class ExplodePattern extends BulletPattern {
 
 	public ExplodePattern() {
-		fireSpeed = 1f;
+		fireSpeed = 0.1f;
 		bulletSpeed = 60f;
 		duration = 7000;
 		shots = 12;
@@ -23,7 +23,7 @@ public class ExplodePattern extends BulletPattern {
 	@Override
 	public void fire(Entity owner, float x, float y, float angle, Entity target) throws SlickException {
 		for (int i = 0; i < shots; i++) {
-			createBullet(owner, owner.getLocation().getX(), owner.getLocation().getY(), 0, i);	
+			createBullet(owner, owner.getLocation().getX(), owner.getLocation().getY(), angle, i);	
 		}
 	}
 

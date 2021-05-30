@@ -15,6 +15,7 @@ public class BulletController extends EntityController {
 	boolean pierceObstacles = false;
 	boolean pierceDefense = false;
 	boolean boomerangs = false;
+	private Vector2f nLoc = new Vector2f(0,0);
 	private boolean homing = false;
 	public boolean inf = false;
 	public boolean wavy = false;
@@ -103,11 +104,11 @@ public class BulletController extends EntityController {
 			}
 			visualAngle = Math2.calcAngle(getLoc(), new Vector2f(getLoc().x+x,getLoc().y+y));
 			if (distTr > momentumDelay) {
-				Vector2f nLoc = new Vector2f(x, y);
-				for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
-					Entity en = MainGame.getEntities().get(i);
-					if (en == null || getOrigin() == null  || en instanceof Bullet || en.isInvincible()
-							|| en == getOrigin() || en.team == getOrigin().team || en.invulnerable == true || en.active == false || en.getLocation().distance(getLoc()) < PPS || enemiesHit.contains(en))
+				nLoc.set(x, y);
+				ArrayList<Entity> e = MainGame.getEntityManager().getEntities();//.getAllNearbyEnemies(getOwner(), PPS*32);
+				for (int i = e.size()-1; i > -1; i--) {
+					Entity en = e.get(i);
+					if (en == null || en instanceof Bullet || getOrigin() == null || getOrigin().team == en.team || en.active == false || en.destroy == true || en.invulnerable == true || en.isInvincible() || (pierceEnemies == true && enemiesHit.contains(en)) || en.getLocation().distance(getOwner().getLocation()) > PPS*32) 
 						continue;
 					if (en.hitbox.intersects(getOwner().hitbox)) {
 						en.onHitByBullet((Bullet)getOwner());
@@ -124,7 +125,7 @@ public class BulletController extends EntityController {
 				}
 				if (pierceObstacles == false) {
 					Vector2f cLoc = src;
-					if (MainGame.getCurrentMap().blocked((int)cLoc.x/16, (int)cLoc.y/16)) {
+					if (cLoc.x/16 >= 0 && cLoc.y/16 >= 0 &&MainGame.getCurrentMap().blocked((int)(cLoc.x/16), (int)(cLoc.y/16))) {
 						distTr = 0;
 						dst = null;
 						moving = false;
@@ -142,6 +143,9 @@ public class BulletController extends EntityController {
 				if (pierceEnemies == true)
 					enemiesHit.clear();
 				this.angle = (float) (angle-Math.PI);
+				if (wavy) {
+					amplitude = -amplitude;
+				}
 				homing = false;
 				boomerangs = false;
 			}

@@ -32,6 +32,9 @@ public class StabPattern extends BulletPattern {
 				if (e % 2 == 1) {
 					b.getController().frequency = -b.getController().frequency;
 				}
+				b.getController().wavy = wavy;
+				b.getController().frequency = frequency;
+				b.getController().amplitude = amplitude;
 				b.ignoresArmor = armorPierce;
 				owner.b.add(b);
 			}

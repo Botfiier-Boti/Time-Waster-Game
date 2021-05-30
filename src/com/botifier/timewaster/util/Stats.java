@@ -55,7 +55,17 @@ public class Stats {
 			d = damage;
 		if (d > 0) {
 			try {
-				MainGame.spawnTempText("-"+d, getOwner().hitbox.getCenterX(), getOwner().hitbox.getMinY(), Color.red);
+				Color c = Color.red;
+				if (ignoresDefense)
+					 c = Color.orange;
+				MainGame.spawnTempText("-"+d, getOwner().hitbox.getCenterX(), getOwner().hitbox.getMinY(), c);
+			} catch (SlickException e) {
+				e.printStackTrace();
+			}
+		} else if (d < 0) {
+			try {
+				Color c = Color.green;
+				MainGame.spawnTempText("+"+Math.abs(d), getOwner().hitbox.getCenterX(), getOwner().hitbox.getMinY(), c);
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}
@@ -139,6 +149,15 @@ public class Stats {
 		this.spdMod = Math2.round(spdMod,2);
 		if (this.spdMod < -spd+1)
 			this.spdMod = -spd+1;
+	}
+	
+	public void setAllMods(float healthMod, float defMod, float atkMod, float vitMod, float dexMod, float spdMod) {
+		setHealthMod(healthMod);
+		setDefMod(defMod);
+		setAtkMod(atkMod);
+		setVitMod(vitMod);
+		setDexMod(dexMod);
+		setSpdMod(spdMod);
 	}
 	
 	public float getMaxHealth() {

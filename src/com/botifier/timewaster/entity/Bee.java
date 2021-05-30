@@ -28,7 +28,6 @@ public class Bee extends Enemy {
 		setMaxHealth(250, true);
 		getStats().setDefense(20000);
 		getStats().setSpeed((float) (20+Math.random()*50));
-		fireSpeed = 1f;
 		linger = false;
 		behaviors.add(new OrbitBehavior(this));
 		((OrbitBehavior)behaviors.get(0)).setRadius(1);
@@ -66,7 +65,7 @@ public class Bee extends Enemy {
 				try {
 					float angle = Math2.calcAngle(getLocation(),cls.getLocation());
 					gb.fire(this, getLocation().getX(),  getLocation().getY(), angle, cls);
-					cooldown = (long)(60-60/3.5f*fireSpeed*Math.random());
+					cooldown = (long)(60-60/3.5f*1*Math.random());
 					attacking = true;
 					return;
 				} catch (SlickException e) {

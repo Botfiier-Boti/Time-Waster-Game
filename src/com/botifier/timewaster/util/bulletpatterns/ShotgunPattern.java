@@ -6,19 +6,20 @@ import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.util.Entity;
 
 public class ShotgunPattern extends BulletPattern {
+	
 	public ShotgunPattern() {
 		fireSpeed = 1f;
 		bulletSpeed = 150f;
 		duration = 500;
 		shots = 5;
-		spread=6.5f;
+		spread= 6.5f;
 		mindamage = 55;
 		maxdamage = 55;
 		enemyPierce = true;
 		obstaclePierce = false;
 		boomerang = false;
 		atkScaling = false;
-		hasShadow = true;
+		hasShadow = false;
 		override = MainGame.getImage("Boomerang");
 	}
 	
