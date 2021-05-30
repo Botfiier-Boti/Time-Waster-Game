@@ -268,6 +268,7 @@ public class Enemy extends Entity {
 		return false;
 	}
 	
+	public void playAttackAnimation(float speed) {
 		if (attack == null)
 			return;
 		attacking = true;
