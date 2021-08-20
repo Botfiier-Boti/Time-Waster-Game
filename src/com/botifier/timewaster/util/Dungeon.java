@@ -11,6 +11,12 @@ import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.main.MainGame;
 
+/**
+ * Old dungeon test. 
+ * Unused.
+ * @author Botifier
+ *
+ */
 public class Dungeon {
 	public ArrayList<Room> hm = new ArrayList<Room>();
 	public char[][] tiles;

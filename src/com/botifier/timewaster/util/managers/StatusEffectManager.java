@@ -109,6 +109,16 @@ public class StatusEffectManager {
 		}
 	}
 	
+	public void clearEffects() {
+		for (int i = effects.size()-1; i >= 0; i--) {
+			StatusEffect e = effects.get(i);
+			if (e == null)
+				continue;
+			e.onEnd();
+			effects.remove(e);
+		}
+	}
+	
 	public boolean isImmune(Class<? extends StatusEffect> immune) {
 		if (immunities.contains(immune))
 			return true;

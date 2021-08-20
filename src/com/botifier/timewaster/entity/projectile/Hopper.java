@@ -39,7 +39,7 @@ public class Hopper extends LobbedProjectile {
 		next.y += Math.sin(getController().getAngle())*(30-jumps);
 		Hopper h = new Hopper(getLocation().x,getLocation().y,next,getOwner(), maxHeight*0.75f, 1000-jumps*100);
 		h.jumps = jumps+1;
-		h.rotate = rotate;
+		h.setRotation(getRotation());
 		if (jumps < MAX_JUMPS-1)
 			MainGame.getEntityManager().addBullet(h);
 		Circle c = new Circle(getLocation().x,getLocation().y, 5);

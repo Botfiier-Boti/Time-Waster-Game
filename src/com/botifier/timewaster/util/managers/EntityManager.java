@@ -274,7 +274,7 @@ public class EntityManager {
 		for (int i = entities.size()-1; i > -1; i--) {
 			Entity e2 = entities.get(i);
 			float dist = e2.getLocation().distance(e.getLocation());
-			if (dist > max)
+			if (dist > max || e2.targetable == false )
 				continue;
 			if ((i-1 >= 0 && dist > entities.get(i-1).getLocation().distance(e.getLocation())))
 				return e2;
@@ -290,21 +290,29 @@ public class EntityManager {
 			for (int i = entities.size() - 1; i > -1; i--) {
 				Entity en = entities.get(i);
 				if (en instanceof Bullet || en.isInvincible() || en == e || en.team == e.team || en.invulnerable == true
-						|| en.active == false || en.visible == false
+						|| en.targetable == false || en.active == false || en.visible == false
 						|| e.getLocation().distance(en.getLocation()) > max || (cls != null && e.getLocation().distance(en.getLocation()) > e.getLocation().distance(cls.getLocation())))
 					continue;
 				cls = en;
 			}
 			return cls;
 		}
+		boolean full = false;
 		for (int i = entities.size() - 1; i > -1; i--) {
 			Entity e2 = entities.get(i);
 			float dist = e2.getLocation().distance(e.getLocation());
-			if (dist > max || e2.team == e.team || e2 == e)
+			if (dist > max || e2.team == e.team || e2 == e || e2.targetable == false || e2.invulnerable == true || e2.visible == false )
 				continue;
-			if ((i-1 >= 0 && dist > entities.get(i-1).getLocation().distance(e.getLocation())))
+			if (i-1 < -1 && full == false) {
+				i = entities.size()-1;
+				full = true;
+				continue;
+			}
+			if ((i-1 >= 0 && (dist < entities.get(i-1).getLocation().distance(e.getLocation()) || (entities.get(i-1).targetable == false || entities.get(i-1).visible == false || entities.get(i-1).active == false || entities.get(i-1).invulnerable == true || entities.get(i-1).team == e.team ))))
 				return e2;
-			if (i+1 < entities.size() && dist > entities.get(i+1).getLocation().distance(e.getLocation()))
+			if (i+1 < entities.size() && (dist < entities.get(i+1).getLocation().distance(e.getLocation()) || (entities.get(i+1).targetable == false || entities.get(i+1).visible == false || entities.get(i+1).active == false || entities.get(i+1).invulnerable == true || entities.get(i+1).team == e.team)))
+				return e2;
+			if (i-1 < 0 || i+1 >= entities.size())
 				return e2;
 		}
 		return null;
@@ -315,7 +323,7 @@ public class EntityManager {
 			Entity e2 = entities.get(i);
 			float dist = e2.getLocation().distance(e.getLocation());
 			System.out.println(dist);
-			if (dist > max || e2.team != e.team)
+			if (dist > max || e2.team != e.team|| e2.targetable == false )
 				continue;
 			if ((i-1 >= 0 && dist > entities.get(i-1).getLocation().distance(e.getLocation())))
 				return e2;

@@ -37,11 +37,11 @@ public class SpearBeing extends Enemy {
 	public void update(int delta) throws SlickException {
 		super.update(delta);
 		if (((DashBehavior)behaviors.get(0)).isDashing() == false) {
-			getController().wander(false, 0.15f);
 			if (shot == false) {
 				shootBullet(angle);
 				shot = true;
 			}
+			getController().wander(false, 0.15f);
 		} else {
 		   shot = false;
 		}

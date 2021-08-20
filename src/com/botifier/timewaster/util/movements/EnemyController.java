@@ -11,9 +11,10 @@ import com.botifier.timewaster.util.Entity;
 public class EnemyController extends EntityController {
 	long paitence = 1000;
 	Random r = new Random();
+	public boolean outside = true;
 	private float wanderMod = 1;
-	long wanderCooldown = 0;
-	long cooldown = 0;
+	public long wanderCooldown = 0;
+	public long cooldown = 0;
 	public Circle wanderArea = null;
 	
 	public EnemyController(float x, float y, float wanderMod, long wanderCooldown) {
@@ -28,10 +29,17 @@ public class EnemyController extends EntityController {
 		this.wanderMod = wanderMod;
 		this.wanderCooldown = wanderCooldown;
 	}
+	
+	@Override
+	public void move(int delta) {
+		super.move(delta);
+		if (cooldown > 0)
+			cooldown--;
+	}
 
-	public void wander(boolean force, float rangeMult) {
+	public boolean wander(boolean force, float rangeMult) {
 		if (isMoving() == true)
-			return;
+			return false;
 		fleeing = false;
 		Entity e = owner;
 		float rad = 0;
@@ -49,20 +57,23 @@ public class EnemyController extends EntityController {
 		if (force) {
 			dst = null;
 			setDestination(nx, ny); 
-			return;
+			return true;
 		} else if (cooldown <= 0) {
 			if (nx > src.getX() || nx < src.getX() || ny > src.getY() || ny < src.getY()) {
 				//Vector2f v = new Vector2f(nx, ny);
-				if (MainGame.getCurrentMap().blocked(nx/16, ny/16) == false) {
+				if ((outside == false && (nx/16 > MainGame.getCurrentMap().getWidthInTiles()-1 || ny/16 > MainGame.getCurrentMap().getHeightInTiles()-1 || nx/16 < 0 || ny/16 < 0))) {
+					return false;
+				} else if (MainGame.getCurrentMap().blocked(nx/16, ny/16) == false) {
 					dst = null;
 					setDestination(nx, ny); 
 					cooldown = (long) ((Math.random()*(wanderCooldown*0.75))+wanderCooldown*0.5);
+					return true;
 				} else {
-					wander(force, rangeMult);
+					return wander(force, rangeMult);
 				}
 			}
-		}else if (cooldown > 0)
-			cooldown--;
+		}
+		return false;
 		
 	}
 	

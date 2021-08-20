@@ -21,7 +21,8 @@ public class BulletController extends EntityController {
 	public boolean wavy = false;
 	public float PPS;
 	public float speed;
-	public float homingThreshold = 0.65f;
+	public float angleMod = 0f;
+	public float homingThreshold = 0.85f;
 	public float acceleration = 0f;
 	public float deceleration = 0f;
 	public float waveIterator = 1/8f;
@@ -73,32 +74,38 @@ public class BulletController extends EntityController {
 		if (moving || inf) {
 			if (isHoming() && distTr < dist*homingThreshold) {
 				if (dst != null) {
-					if (getLoc().distance(dst) < PPS)
+					float dAngle = Math2.calcAngle(getLoc(), dst);	
+					angle = Math2.lerpAngle(angle, dAngle, ((float)-Math.PI/360*1f*delta));
+					
+					/*if (getLoc().distance(dst) < PPS)
 						PPS = 0;
 					else  {
 						float dAngle = Math2.calcAngle(getLoc(), dst);	
 						angle = dAngle;
-					}
-				}
-				else if (isHoming() && target != null) {
-					if (getLoc().distance(target.getLocation()) < PPS)
+					}*/
+				} else if (target != null) {
+					float dAngle = Math2.calcAngle(getLoc(), target.getLocation());	
+					angle = Math2.lerpAngle(angle, dAngle, ((float)-Math.PI/360*1f*delta));
+					/*if (getLoc().distance(target.getLocation()) < PPS)
 						PPS = 0;
 					else  {
 						float dAngle = Math2.calcAngle(getLoc(), target.getLocation());	
 						angle = dAngle;
-					}
+					}*/
+				} else {
+					target = MainGame.getEntityManager().findClosestEnemy(getOwner(), 1000);
 				}
 			}
-			float x = (float)Math.cos(angle)*(PPS);
-			float y = (float)Math.sin(angle)*(PPS);
+			float x = (float)Math.cos(angle+angleMod)*(PPS*delta/18);
+			float y = (float)Math.sin(angle+angleMod)*(PPS*delta/18);
 
 			if (wavy) {
-				float beta = (float) (angle + Math.PI/2);
+				float beta = (float) (angle+angleMod + Math.PI/2);
 				wavePos = (double) (amplitude*Math.cos(wp2/frequency));
 				float xMod = (float) ((Math.cos(beta)*wavePos));
 				float yMod = (float) ((Math.sin(beta)*wavePos));
-				x += xMod*(getOwner().shot % 2 == 0 ? 1 : -1);;
-				y += yMod*(getOwner().shot % 2 == 0 ? 1 : -1);
+				x += xMod*(getOwner().getShotIterator() % 2 == 0 ? 1 : -1);;
+				y += yMod*(getOwner().getShotIterator() % 2 == 0 ? 1 : -1);
 				wp2 += waveIterator;
 				
 			}
@@ -106,9 +113,21 @@ public class BulletController extends EntityController {
 			if (distTr > momentumDelay) {
 				nLoc.set(x, y);
 				ArrayList<Entity> e = MainGame.getEntityManager().getEntities();//.getAllNearbyEnemies(getOwner(), PPS*32);
+				if (pierceEnemies == false ) {
+					Entity en = MainGame.getEntityManager().findClosestEnemy(getOwner(), PPS*32);
+					if (en != null) {
+						if (en.hitbox.intersects(getOwner().hitbox)) {
+							en.onHitByBullet((Bullet)getOwner());
+							distTr = 0;
+							dst = null;
+							moving = false;
+							return;
+						}
+					}
+				}
 				for (int i = e.size()-1; i > -1; i--) {
 					Entity en = e.get(i);
-					if (en == null || en instanceof Bullet || getOrigin() == null || getOrigin().team == en.team || en.active == false || en.destroy == true || en.invulnerable == true || en.isInvincible() || (pierceEnemies == true && enemiesHit.contains(en)) || en.getLocation().distance(getOwner().getLocation()) > PPS*32) 
+					if (en == null || en instanceof Bullet|| en.targetable == false || getOrigin() == null || getOrigin().team == en.team  || en.active == false || en.destroy == true || en.invulnerable == true || en.isInvincible() || (pierceEnemies == true && enemiesHit.contains(en)) || en.getLocation().distance(getOwner().getLocation()) > PPS*128) 
 						continue;
 					if (en.hitbox.intersects(getOwner().hitbox)) {
 						en.onHitByBullet((Bullet)getOwner());
@@ -137,18 +156,19 @@ public class BulletController extends EntityController {
 					speed+=acceleration;
 					speed-=deceleration;	
 				}
+				if (boomerangs && distTr > bpoint+momentumDelay/2) {
+					if (pierceEnemies == true)
+						enemiesHit.clear();
+					this.angle = (float) (angle-Math.PI);
+					//this.angleMod = (float) (-angleMod);
+					if (wavy) {
+						amplitude = -amplitude;
+					}
+					homing = false;
+					boomerangs = false;
+				}
 			}
 			distTr +=delta;
-			if (boomerangs && distTr > bpoint) {
-				if (pierceEnemies == true)
-					enemiesHit.clear();
-				this.angle = (float) (angle-Math.PI);
-				if (wavy) {
-					amplitude = -amplitude;
-				}
-				homing = false;
-				boomerangs = false;
-			}
 			if (distTr >= dist && inf == false) {
 				distTr = 0;
 				dst = null;

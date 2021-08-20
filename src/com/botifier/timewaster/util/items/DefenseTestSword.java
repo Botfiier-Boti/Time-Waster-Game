@@ -8,6 +8,7 @@ public class DefenseTestSword extends WeaponItem {
 
 	public DefenseTestSword() {
 		super(2, "Defense Test Sword", MainGame.getImage("GenericSword"), 200, 0, 0, 0, 0, 0, new DefenseTestPattern());
+		setLore("A sword used by inspectors in order\nto ensure safety standards.");
 	}
 
 }

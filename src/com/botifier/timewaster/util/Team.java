@@ -1,6 +1,11 @@
 package com.botifier.timewaster.util;
 
+/**
+ * Team Enumerator
+ * @author Botifier
+ *
+ */
 public enum Team {
-	ALLY,
-	ENEMY;
+	ALLY, //Allied team
+	ENEMY; //Enemy team
 }

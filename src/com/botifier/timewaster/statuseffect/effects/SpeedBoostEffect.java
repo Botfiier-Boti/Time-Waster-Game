@@ -8,6 +8,7 @@ public class SpeedBoostEffect extends StatusEffect {
 	public SpeedBoostEffect(long duration, int modifier) {
 		super("Speed Boost", duration, StatusEffectType.InstantEffect);
 		this.modifier = modifier;
+		this.maxstacks = 1;
 	}
 
 	@Override

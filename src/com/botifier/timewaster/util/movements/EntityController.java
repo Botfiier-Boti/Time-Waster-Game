@@ -11,7 +11,12 @@ import com.botifier.timewaster.util.Entity;
 import com.botifier.timewaster.util.Math2;
 import com.botifier.timewaster.util.TileMap;
 
+//Based on information I could find on boids.
+
 public class EntityController implements Cloneable {
+	private final int ARRIVERADIUS = 1;
+	private final int TIMEDIVISOR = 12;
+	
 	public LinkedList<Vector2f> path = new LinkedList<Vector2f>();
 	public Vector2f dst;
 	public Vector2f lDst;
@@ -32,6 +37,7 @@ public class EntityController implements Cloneable {
 	protected float distance;
 	protected boolean UP = true, DOWN = true, LEFT = true, RIGHT = true;
 	protected boolean fleeing = false;
+	protected Vector2f hold;
 
 	public EntityController(float x, float y) {
 		src = new Vector2f(x, y);
@@ -44,11 +50,10 @@ public class EntityController implements Cloneable {
 	}
 
 	public void arrive() {
-		int arriveRadius = 1;
 		desired.sub(dst.copy().sub(src));
 		distance = desired.length();
 		if (distance > 0) {
-			float spd = getPPS() * (distance / arriveRadius);
+			float spd = getPPS() * (distance / ARRIVERADIUS);
 			spd = Math.min(spd, getPPS());
 			desired.scale(spd / distance);
 			steer.sub(desired.copy().sub(velocity));
@@ -76,11 +81,10 @@ public class EntityController implements Cloneable {
 	}
 
 	public void fleeArrive() {
-		int arriveRadius = 10;
 		desired.sub(src.copy().sub(dst));
 		distance = desired.length();
 		if (distance > 0) {
-			float spd = getPPS() * (distance / arriveRadius);
+			float spd = getPPS() * (distance / ARRIVERADIUS);
 			spd = Math.min(spd, getPPS());
 			desired.scale(spd / distance);
 			steer.sub(desired.copy().sub(velocity));
@@ -132,7 +136,7 @@ public class EntityController implements Cloneable {
 	}
 
 	public void move(int delta) {
-		boolean eC = false, mC = false;
+		//boolean eC = false, mC = false;
 		UP = true;
 		DOWN = true;
 		LEFT = true;
@@ -156,7 +160,7 @@ public class EntityController implements Cloneable {
 		if (dst == null)
 			return;
 		velocity.add(steer);
-		Vector2f temp = Math2.truncate(velocity, getPPS());
+		hold = Math2.truncate(velocity, getPPS());
 		visualAngle = angle;
 		angle = Math2.calcAngle(src, dst);
 		lDst = src.copy();
@@ -168,73 +172,70 @@ public class EntityController implements Cloneable {
 			if (path.size() > 0)
 				path.clear();
 		}
-		if (obeysCollision) {
-			testMove();
-			//eC = testMapCollision();//src.copy().add(temp));
-			// mC = testEntityCollision(dst);
-			if (eC || mC) {
-				// return;
-			}
-		}
-		if (UP == false && temp.y < 0) {
-			temp.y = 0;
+
+		testMove();
+		
+		if (UP == false && hold.y < 0) {
+			hold.y = 0;
 		}
 
-		if (DOWN == false && temp.y > 0) {
-			temp.y = 0;
+		if (DOWN == false && hold.y > 0) {
+			hold.y = 0;
 		}
 
-		if (LEFT == false && temp.x < 0) {
-			temp.x = 0;
+		if (LEFT == false && hold.x < 0) {
+			hold.x = 0;
 		}
 
-		if (RIGHT == false && temp.x > 0) {
-			temp.x = 0;
+		if (RIGHT == false && hold.x > 0) {
+			hold.x = 0;
 		}
 
 		if (src.distance(dst) < getPPS()) {
 			if (obeysCollision) {
 				if (UP && DOWN && LEFT && RIGHT) {
-					temp.x = 0;
-					temp.y = 0;
+					hold.x = 0;
+					hold.y = 0;
 					src = dst;
 					// dst = null;
 					moving = false;
 				} else {
-					temp.x = 0;
-					temp.y = 0;
+					hold.x = 0;
+					hold.y = 0;
 					// dst = null;
 					moving = false;
 				}
 			} else {
-				temp.x = 0;
-				temp.y = 0;
+				hold.x = 0;
+				hold.y = 0;
 				src = dst;
 				dst = null;
 				moving = false;
 			}
 		}
-		if (dst != null) {
+		/*if (dst != null) {
 			if (dst.x > src.x && RIGHT == false) {
 				dst.x = src.x;
-				temp.x = 0;
+				hold.x = 0;
 			}
 			if (dst.x < src.x && LEFT == false) {
 				dst.x = src.x;
-				temp.x = 0;
+				hold.x = 0;
 			}
 			if (dst.y > src.y && DOWN == false) {
 				dst.y = src.y;
-				temp.y = 0;
+				hold.y = 0;
 			}
 			if (dst.y < src.y && UP == false) {
 				dst.y = src.y;
-				temp.y = 0;
+				hold.y = 0;
 			}
-		}
+		}*/
+		hold.x = hold.x*(delta/TIMEDIVISOR);
+		hold.y = hold.y*(delta/TIMEDIVISOR);
 		if (moving)
-			src.add(temp);
-		lastMove = temp;
+			src.add(hold);
+		lastMove = hold;
 		// make the object "snap" to the destination if it's close enough (to avoid
 		// vibrating)
 		if (dst != null && Math.round(src.getX()) == Math.round(dst.getX())) {
@@ -245,6 +246,7 @@ public class EntityController implements Cloneable {
 		}
 		velocity.scale(0);
 		steer.scale(0);
+		hold.scale(0);
 		// testBox = null;
 		//eC = testMapCollision(src.copy().add(Math2.truncate(velocity, getPPS())));
 		if (dst != null && src.distance(dst) < getPPS()) {
@@ -268,7 +270,7 @@ public class EntityController implements Cloneable {
 			if (count > 10)
 				break;
 			if (e == getOwner() || e.getController().isMoving() == false || e.team != getOwner().team
-					|| e.active == false || e.visible == false || e.destroy == true
+					|| e.targetable == false || e.getController().allyCollision == false || e.active == false || e.visible == false || e.destroy == true
 					|| e.getController().obeysCollision == false
 					|| (getLoc().distance(e.getLocation()) >= seperateRadius
 							&& e.getLocation().distance(getLoc()) >= e.collisionbox.getWidth() / 4)) {
@@ -461,6 +463,24 @@ public class EntityController implements Cloneable {
 		return blocked;
 	}*/
 
+	public Vector2f modifyMove(Vector2f move) {
+		Vector2f newMove = move.copy();
+		if (obeysCollision) {
+			int x =  (int)(src.x / 16);
+			int y =  (int)(src.y / 16);
+			
+			if (MainGame.getCurrentMap().blocked(x, y)) {
+				if (Math2.overlaps(getOwner().collisionbox, new Rectangle(x*16, y*16, 16, 16), move)) {
+					newMove.x=0;
+					newMove.y=0;
+					System.out.println("e");
+				}
+			}
+		}
+		return newMove;
+	}
+	
+	//Collision with the tilemap.
 	public void testMove() {
 		TileMap m = MainGame.getCurrentMap();
 
@@ -488,23 +508,26 @@ public class EntityController implements Cloneable {
 			int yD = (int) ((getOwner().collisionbox.getMaxY()+getPPS()) / 16);
 			for (int e = 0; e < getOwner().collisionbox.getHeight(); e++) {
 				for (int i = 0; i < getOwner().collisionbox.getWidth(); i++) {
+					if ((i > 0 && i < getOwner().collisionbox.getWidth()-1)&& e != 0 && e != getOwner().collisionbox.getHeight()-1)
+						continue;
 					int x = (int) ((getOwner().collisionbox.getMinX()+i) / 16);
 					int y = (int) ((getOwner().collisionbox.getMinY()+e) / 16);
 					
-					if (yU >= 0 && m.blocked(x, yU)) {
+					if (UP == true && yU >= 0 && m.blocked(x, yU)) {
 						UP = false;
 					}
-					if (yD >= 0 && m.blocked(x, yD)) {
+					if (DOWN == true && yD >= 0 && m.blocked(x, yD)) {
 						DOWN = false;
 					}
-					if (xL >= 0 && m.blocked(xL, y)) {
+					if (LEFT == true && xL >= 0 && m.blocked(xL, y)) {
 						LEFT = false;
 					}
-					if (xR >= 0 && m.blocked(xR, y)) {
+					if (RIGHT == true && xR >= 0 && m.blocked(xR, y)) {
 						RIGHT = false;
 					}
 				}
 			}
+			
 			/*//UP
 			if (m.blocked(null, maxX, minYM) == true) {
 				UP = false;

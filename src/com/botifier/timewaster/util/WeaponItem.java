@@ -32,5 +32,20 @@ public class WeaponItem extends EquippableItem {
 			owner = null;
 		}
 	}
+	
+	@Override
+	public String getStatText() {
+		return p.shots+(p.shots != 1 ? " Shots" : " Shot")+"\n"
+				+(p.mindamage < p.maxdamage ? p.mindamage+"-"+p.maxdamage : p.mindamage)+" Damage\n"
+				+(p.getFireSpeed() != 1 ? p.getFireSpeed()+" ROF\n" : "")
+				+(p.armorPierce == true ? "Ignores Defenses\n" : "")
+				+(p.obstaclePierce == true ? "Ignores Obstacles\n" : "")
+				+(p.enemyPierce == true ? "Pierces Enemies\n" : "")
+				+(p.boomerang == true ? "Boomerangs\n" : "")
+				+(p.homing == true ? "Homing\n" : "")
+				+(p.targeted == true ? "Targeted\n" : "")
+				+(p.atkScaling == false ? "Set Damage\n" : "")
+				+super.getStatText();
+	}
 
 }

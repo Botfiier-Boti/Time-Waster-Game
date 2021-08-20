@@ -21,17 +21,28 @@ public class Bee extends Enemy {
 	//Shot cooldown
 	long cooldown = 0;
 
+	//Bee constructor
 	public Bee(float x, float y) {
 		super("Bee", MainGame.getImage("Bee"), new EnemyController(x,y, 0.5f, 0), null, null);
 		s = MainGame.getSound("yalikejazz");
+		//Changes the "influence" modifier to 0.1f
 		iModifier = 0.1f;
+		//Changes max health to 250 and sets current health to that amount.
 		setMaxHealth(250, true);
+		//Gives the bee an insane amount of defense
 		getStats().setDefense(20000);
+		//Randomizes the bee's movement speed
 		getStats().setSpeed((float) (20+Math.random()*50));
+		//Make the bee ignore collision with entities on the same team.
+		getController().allyCollision = false;
+		//Prevent the bee from lingering without an owner
 		linger = false;
+		//Adds the "Orbit" Behavior the bee and makes it orbit at a radius of 1
 		behaviors.add(new OrbitBehavior(this));
 		((OrbitBehavior)behaviors.get(0)).setRadius(1);
+		//Sets the Bullet Pattern to the GuidedBullet Pattern
 		gb = new GuidedBulletPattern();
+		//Sets the behavior to the "Orbit Behavior"
 		currentBehavior = 0;
 	}
 	
@@ -80,6 +91,7 @@ public class Bee extends Enemy {
 		cooldown--;
 	}
 	
+	//Unused
 	@Override
 	public void onHitByBullet(Bullet b) {
 		super.onHitByBullet(b);

@@ -13,9 +13,10 @@ public class SpherePattern extends BulletPattern {
 		duration = 600;
 		shots = 8;
 		spread = (float) (360/shots);
-		mindamage = 45; 
+		mindamage = 15; 
 		atkScaling = false;
 		armorPierce = true;
+		enemyPierce = true;
 		boomerang = true;
 	}
 

@@ -22,6 +22,7 @@ public class BeeSwarm extends Enemy{
 		healthbarVisible = false;
 		getStats().setSpeed(50);
 		o = owner;
+		getController().allyCollision = false;
 		//Destroy if owner is invalid
 		if (o == null) {
 			destroy = true;

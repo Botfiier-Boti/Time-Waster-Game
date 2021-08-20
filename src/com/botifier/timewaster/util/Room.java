@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Vector2f;
 
+/**
+ * Unused room class
+ * @author Botifier
+ *
+ */
 public class Room {
 	ArrayList<Entity> p = new ArrayList<Entity>();
 	public int size;

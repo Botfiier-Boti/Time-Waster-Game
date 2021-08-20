@@ -30,19 +30,23 @@ public class TileMap  {
 	public EntityManager eM;
 	HashMap<Character, String> tileTypes = new HashMap<Character, String>();
 	ArrayList<Entity> initialEntities = new ArrayList<Entity>();
+	ArrayList<char[][]> layers = new ArrayList<char[][]>();
 	Vector2f spawnTile = new Vector2f(2,2);
 	Vector2f origin = new Vector2f(0,0);
 	String walkable = "";
 	char[][] tiles;
+	char[][] tilesOverlay;
 	public Rectangle[][] tileCol;
 	int width = 0;
 	int height = 0;
 	public Polygon big = new Polygon();
+	
 	public TileMap(char[][] tiles) {
 		this.tiles = tiles;
 		this.width = tiles.length;
 		this.height = tiles[0].length;
 		this.tileCol = new Rectangle[height][width];
+		this.tilesOverlay = new char[height][width];
 	}
 	
 	public TileMap(String s) throws IOException {
@@ -109,6 +113,18 @@ public class TileMap  {
 		tiles[y][x] = tile;
 	}
 	
+	public void setTile(int x, int y, char tile, int layer) {
+		if (x < 0)
+			return;
+		if (x > width-1)
+			return;
+		if (y < 0)
+			return;
+		if (y > height-1)
+			return;
+		getLayers().get(layer)[y][x] = tile;
+	}
+	
 	public char getTile(int x, int y) {
 		if (x < 0)
 			return ' ';
@@ -119,6 +135,18 @@ public class TileMap  {
 		if (y > height-1)
 			return ' ';
 		return tiles[y][x];
+	}
+	
+	public char getTile(int x, int y, int layer) {
+		if (x < 0)
+			return ' ';
+		if (x > width-1)
+			return ' ';
+		if (y < 0)
+			return ' ';
+		if (y > height-1)
+			return ' ';
+		return getLayers().get(layer)[y][x];
 	}
 	
 	public void update(GameContainer gc, int delta) throws SlickException {
@@ -167,7 +195,38 @@ public class TileMap  {
 		Camera c = MainGame.getCamera();
 		for (int y = 0; y < getHeightInTiles(); y++) {
 			for (int x = 0; x < getWidthInTiles(); x++) {
-				char tile = tiles[y][x];
+				for (char[][] layer : getLayers()) {
+					char tile = layer[y][x];
+					float dist = c.getCenter().distance(new Vector2f((x * 16)+8+origin.x*16, (y * 16)+8+origin.x*16));
+					if (dist > MainGame.getViewDistance() && dist < MainGame.getViewDistance()*2 && vision == true) {
+						if (tileTypes.containsKey(tile)) {
+							Image e = MainGame.getImage(tileTypes.get(tile));
+							if (e != null) {
+								g.drawImage(e, x * 16+origin.x*16, y * 16+origin.y*16, new Color(255, 255, 255,0.5f));
+							}
+						} else if (tile == ' '){
+							continue;
+						} else {
+							g.setColor(Color.darkGray);
+							g.fillRect(x * 16+origin.x*16, y * 16+origin.y*16, 16, 16);
+						}
+						g.setColor(Color.white);
+					} else if (dist <= MainGame.getViewDistance()){
+						if (tileTypes.containsKey(tile)) {
+							Image i = MainGame.getImage(tileTypes.get(tile));
+							if (i != null)
+								g.drawImage(i, x * 16+origin.x*16, y * 16+origin.y*16);
+						}/* else if (tile != ' ') {
+							g.setColor(Color.darkGray);
+							g.fillRect(x * 16+origin.x*16, y * 16+origin.y*16, 16, 16);
+							g.setColor(Color.black);
+							g.drawRect(x*16+origin.x*16, y*16+origin.y*16, 16, 16);
+						}*/	
+						g.setColor(Color.white);
+					}
+				}
+				/*char tile = tiles[y][x];
+				char tileOverlay = tilesOverlay[y][x];
 				float dist = c.getCenter().distance(new Vector2f((x * 16)+8+origin.x*16, (y * 16)+8+origin.x*16));
 				if (dist > MainGame.getViewDistance() && dist < MainGame.getViewDistance()*2 && vision == true) {
 					if (tileTypes.containsKey(tile)) {
@@ -199,19 +258,23 @@ public class TileMap  {
 						g.fillRect(x * 16, y * 16, 16, 16);
 						break;
 					}
-					g.setColor(Color.white);*/
+					g.setColor(Color.white);
 				} else if (dist <= MainGame.getViewDistance()){
 					if (tileTypes.containsKey(tile)) {
 						Image i = MainGame.getImage(tileTypes.get(tile));
 						if (i != null)
 							g.drawImage(i, x * 16+origin.x*16, y * 16+origin.y*16);
-					} else if (tile == ' ') {
-						continue;
-					}else {
+					} else if (tile != ' ') {
 						g.setColor(Color.darkGray);
 						g.fillRect(x * 16+origin.x*16, y * 16+origin.y*16, 16, 16);
 						g.setColor(Color.black);
 						g.drawRect(x*16+origin.x*16, y*16+origin.y*16, 16, 16);
+					}
+					if (tileTypes.containsKey(tileOverlay)) {
+						Image e = MainGame.getImage(tileTypes.get(tileOverlay));
+						if (e != null) {
+							g.drawImage(e, x * 16+origin.x*16, y * 16+origin.y*16);
+						}
 					}
 					g.setColor(Color.white);
 					/*if (y < height && x < width && tileCol[y][x] != null) {
@@ -237,8 +300,6 @@ public class TileMap  {
 						g.drawRect(x*16, y*16, 16, 16);
 						break;
 					}*/
-				}
-
 			}
 		}
 	}
@@ -266,10 +327,10 @@ public class TileMap  {
 		System.out.println("Writing entities...");
 		for (Entity e : initialEntities) {
 			String name = e.getClass().getName();
-			if (EntityManager.isAlias(e.getClass().getName()) == true); 
+			if (EntityManager.isAlias(e.getClass().getName()) == true)
 				name = EntityManager.getAlias(e.getClass());
 			String param = e.getParameters();
-			bw.write("addentity "+name+", "+param+"\n");
+			bw.write("addentity 1, "+name+", "+param+"\n");
 			System.out.println("Wrote entity: \""+name+"\" with parameters: "+param);
 		}
 		System.out.println("Writing map layout...");
@@ -281,6 +342,18 @@ public class TileMap  {
 			bw.newLine();
 		}
 		bw.write("endmap\n");
+		System.out.println("Writing layer map layout(s)...");
+		for (int i = 1; i < getLayers().size(); i++) {
+			char[][] layer = getLayers().get(i);
+			bw.write("startlayer\n");
+			for (int y = 0; y < getHeightInTiles(); y++) {
+				for (int x = 0; x < getWidthInTiles(); x++) {
+					bw.write(layer[y][x]);
+				}
+				bw.newLine();
+			}
+			bw.write("endlayer\n");
+		}
 		bw.close();
 		System.out.println("Successfully saved map!");
 	}
@@ -306,6 +379,7 @@ public class TileMap  {
 				e.printStackTrace();
 			}
 		}
+		getLayers().clear();
 		tileTypes.clear();
 		initialEntities.clear();
 		System.out.println("Reading mapfile...");
@@ -313,6 +387,8 @@ public class TileMap  {
 		while ((line = br.readLine()) != null) {
 			line = line.replaceAll("([ :])", "");
 			line.toLowerCase();
+			if (line.startsWith("//"))
+				continue;
 			if (line.startsWith("width")) {
 				line = line.replaceFirst("width", "");
 				if (Math2.isInteger(line)) {
@@ -338,17 +414,17 @@ public class TileMap  {
 			} else if (line.startsWith("define")) {
 				line = line.replaceFirst("define", "");
 				char letter = line.charAt(0);
-				line = line.replaceFirst(letter+"", "");
+				line = line.substring(1);
 				tileTypes.put(letter, line);
-				System.out.println("Added tile identifier: "+letter);
+				System.out.println("Added tile identifier: "+letter + " using "+line);
 				continue;
 			} else if (line.startsWith("dwalkable")) {
 				line = line.replaceFirst("dwalkable", "");
 				char letter = line.charAt(0);
-				line = line.replaceFirst(letter+"", "");
+				line = line.substring(1);
 				tileTypes.put(letter, line);
 				walkable = walkable + letter;
-				System.out.println("Added walkable tile identifier: "+letter);
+				System.out.println("Added walkable tile identifier: "+letter+" using "+line);
 				continue;
 			} else if (line.startsWith("addentity")) {
 				line = line.replaceFirst("addentity", "");
@@ -422,12 +498,28 @@ public class TileMap  {
 				System.out.println("Set spawn tile to: ("+(int)spawnTile.x+","+(int)spawnTile.y+")");
 			} else if (line.startsWith("startmap")) {
 				this.tiles = new char[height][width];
+				getLayers().add(0, tiles);
 				int lineNo = 0;
 				System.out.println("Reading map...");
 				while ((line = br.readLine()) != "endmap" && (line != null) && lineNo < height) {
 					for (int i = 0; i < width; i++) {
 						if (i < line.length()) {
 							tiles[lineNo][i] = line.charAt(i);
+						}
+					}
+					lineNo++;
+				}
+				System.out.println("Done!");
+				continue;
+			}else if (line.startsWith("startlayer")) {
+				this.tilesOverlay = new char[height][width];
+				int lineNo = 0;
+				getLayers().add(tilesOverlay);
+				System.out.println("Reading layer map...");
+				while ((line = br.readLine()) != "endlayer" && (line != null) && lineNo < height) {
+					for (int i = 0; i < width; i++) {
+						if (i < line.length()) {
+							tilesOverlay[lineNo][i] = line.charAt(i);
 						}
 					}
 					lineNo++;
@@ -531,6 +623,10 @@ public class TileMap  {
 	
 	public Vector2f getCenter() {
 		return new Vector2f(((width/2)*16+origin.x*16)+8, ((height/2)*16+origin.y*16)+8);
+	}
+
+	public ArrayList<char[][]> getLayers() {
+		return layers;
 	}
 
 }

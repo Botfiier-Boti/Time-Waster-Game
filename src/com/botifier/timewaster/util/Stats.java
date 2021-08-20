@@ -147,8 +147,6 @@ public class Stats {
 
 	public void setSpdMod(float spdMod) {
 		this.spdMod = Math2.round(spdMod,2);
-		if (this.spdMod < -spd+1)
-			this.spdMod = -spd+1;
 	}
 	
 	public void setAllMods(float healthMod, float defMod, float atkMod, float vitMod, float dexMod, float spdMod) {
@@ -209,7 +207,7 @@ public class Stats {
 	}
 	
 	public float getPPS() {
-		return 0.6f + 1.5f*((spd+spdMod)/75f);
+		return Math2.round(0.6f + 1.5f*((spd+spdMod)/75f), 1);
 	}
 	
 	public Entity getOwner() {

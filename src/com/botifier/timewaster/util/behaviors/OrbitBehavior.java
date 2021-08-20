@@ -31,11 +31,12 @@ public class OrbitBehavior extends Behavior {
 			float nx = (int) ((rad*8) * Math.cos(theta));
 			float ny = (int) ((rad*8) * Math.sin(theta));			
 			if (teleport == false) {
-				getOwner().getController().dash(loc.x+nx, loc.y+ny);
-				if (getOwner().getPositionRelativeTo(loc).distance(new Vector2f(nx,ny)) < getOwner().getController().getPPS()) {
+				if (getOwner().getPositionRelativeTo(loc).distance(new Vector2f(nx,ny)) <= getOwner().getController().getPPS()) {
 					if (auto)
 						theta += sliceE;
 					time = 0;
+				} else {
+					getOwner().getController().dash(loc.x+nx, loc.y+ny);
 				}
 				time++;
 			} else {

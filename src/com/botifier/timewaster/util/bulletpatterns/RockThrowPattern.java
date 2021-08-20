@@ -12,6 +12,9 @@ public class RockThrowPattern extends BulletPattern {
 
 	public RockThrowPattern() {
 		fireSpeed = 0.20f;
+		shots = 4;
+		mindamage = 75;
+		atkScaling = false;
 		//lob = true;
 	}
 

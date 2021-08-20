@@ -4,7 +4,7 @@ import org.newdawn.slick.Image;
 
 public abstract class StackableItem extends Item {
 	private int maxStacks = 3;
-	private int currentAmount = 1;
+	protected int currentAmount = 1;
 
 	public StackableItem(int id, String name, SlotType slotType, Image image, int maxStacks) {
 		super(id, name, slotType, image);

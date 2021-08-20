@@ -14,7 +14,7 @@ public class Beehive extends LobbedProjectile{
 	public Beehive(float x, float y, Vector2f dst, Entity o) {
 		super("Beehive", MainGame.getImage("beehive"), new LobbedController(x,y,2000,dst,o), dst, o, 50);
 		if (dst.x < x)
-			rotate = -rotate;
+			setRotation(-getRotation());
 	}
 	
 	@Override

@@ -35,16 +35,17 @@ public class LocalPlayerControl extends EntityController {
 			//testMove(nx,ny);
 		//}
 		if (UP)
-			ny -= getOwner().getStats().getPPS()*8;
+			ny -= getOwner().collisionbox.getWidth()+getOwner().getController().getPPS();
 		if (DOWN)
-			ny += getOwner().getStats().getPPS()*8;
+			ny += getOwner().collisionbox.getWidth()+getOwner().getController().getPPS();
 		if (LEFT)
-			nx -= getOwner().getStats().getPPS()*8;
+			nx -= getOwner().collisionbox.getWidth()+getOwner().getController().getPPS();
 		if (RIGHT)
-			nx += getOwner().getStats().getPPS()*8;
+			nx += getOwner().collisionbox.getWidth()+getOwner().getController().getPPS();
 		if (nx > src.getX() || nx < src.getX() || ny > src.getY() || ny < src.getY()) {
-			setDestination(nx, ny); 
+			setDestination(nx, ny);
 		} else {
+			moving = false;
 			dst = null;
 		}
 	}

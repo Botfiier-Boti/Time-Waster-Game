@@ -1,7 +1,10 @@
 package com.botifier.timewaster.entity.player;
 
 
+//import java.awt.Color;
+
 import org.newdawn.slick.Animation;
+//import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -24,14 +27,11 @@ import com.botifier.timewaster.util.Item.SlotType;
 import com.botifier.timewaster.util.Math2;
 import com.botifier.timewaster.util.Team;
 import com.botifier.timewaster.util.bulletpatterns.*;
-import com.botifier.timewaster.util.items.AdminRing;
-import com.botifier.timewaster.util.items.AdminRock;
-import com.botifier.timewaster.util.items.DefenseTestSword;
 import com.botifier.timewaster.util.managers.StatusEffectManager;
 import com.botifier.timewaster.util.movements.LocalPlayerControl;
 
 public class Player extends Entity {
-	//Inventory
+	//Inventories
 	public EquipmentInventory ei;
 	public Inventory inv;
 	//Walk animation
@@ -74,7 +74,7 @@ public class Player extends Entity {
 		getStats().setDexterity(40);
 		getStats().setDefense(15);
 		getStats().setVitality(30);
-		getStats().setSpeed(50);
+		getStats().setSpeed(105);
 		/*getStats().setVitMod(9000000000000000f);
 		getStats().setDefMod(1000000000000000f);
 		getStats().setHealthMod(1000f);
@@ -85,6 +85,8 @@ public class Player extends Entity {
 		
 
 		inv = new Inventory(this, 8);
+		if (MainGame.debug)
+			inv = new Inventory(this, 16);
 		
 		ei = new EquipmentInventory(this, 4);
 		ei.setSlotType(SlotType.EQUIP_WEAPON, 0);
@@ -93,6 +95,10 @@ public class Player extends Entity {
 		ei.setSlotType(SlotType.EQUIP_RING, 3);
 
 		sem = new StatusEffectManager(this);
+		/*followers.add(new MouseFollower(0, 0, 90, this));
+		followers.add(new MouseFollower(0, 0, -90, this));
+		followers.add(new MouseFollower(0, 0, 0, this));
+		followers.add(new MouseFollower(0, 0, 180, this));*/
 		//p = new ShotgunPattern();
 		//p = new StabPattern();
 		//p = new SpinPattern();
@@ -262,6 +268,7 @@ public class Player extends Entity {
 			Image i = walk.getCurrentFrame().getScaledCopy(size).getFlippedCopy(dir, flip);
 			i.setCenterOfRotation(i.getWidth()/2, i.getHeight()/2);
 			i.setRotation(rotation);
+			//i.drawFlash(iLoc.getX()-1-i.getWidth()/2, iLoc.getY()-1-i.getHeight(), i.getWidth()+2f, i.getHeight()+2f, Color.black);
 			g.drawImage(i, iLoc.getX()-i.getWidth()/2, iLoc.getY()-i.getHeight());
 		} else {
 			//Draw idle image
@@ -271,6 +278,7 @@ public class Player extends Entity {
 			Image i = image.getScaledCopy(size).getFlippedCopy(dir, flip);
 			i.setCenterOfRotation(i.getWidth()/2, i.getHeight()/2);
 			i.setRotation(rotation);
+			//i.drawFlash(iLoc.getX()-1-i.getWidth()/2, iLoc.getY()-1-i.getHeight(), i.getWidth()+2f, i.getHeight()+2f, Color.black);
 			g.drawImage(i, iLoc.getX()-i.getWidth()/2, iLoc.getY()-i.getHeight());
 		}
 		if (started) {
@@ -286,6 +294,15 @@ public class Player extends Entity {
 			if (getController().dst != null) {
 				g.drawLine(getLocation().getX(), getLocation().getY(), getController().dst.getX(), getController().dst.getY());
 			}
+			g.drawRect(((int)getLocation().getX()/16)*16, ((int)getLocation().getY()/16)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16+1)*16, ((int)getLocation().getY()/16)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16-1)*16, ((int)getLocation().getY()/16)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16)*16, ((int)getLocation().getY()/16+1)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16)*16, ((int)getLocation().getY()/16-1)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16+1)*16, ((int)getLocation().getY()/16+1)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16-1)*16, ((int)getLocation().getY()/16+1)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16+1)*16, ((int)getLocation().getY()/16-1)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16-1)*16, ((int)getLocation().getY()/16-1)*16, 16, 16);
 		}
 	}
 	

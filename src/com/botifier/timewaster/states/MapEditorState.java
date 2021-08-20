@@ -24,7 +24,6 @@ import com.botifier.timewaster.util.TileMap;
 import com.botifier.timewaster.util.gui.ButtonComponent;
 import com.botifier.timewaster.util.gui.DropDownComponent;
 import com.botifier.timewaster.util.gui.PopInputComponent;
-import com.botifier.timewaster.util.gui.PopupComponent;
 import com.botifier.timewaster.util.gui.RectangleComponent;
 import com.botifier.timewaster.util.gui.TextComponent;
 import com.botifier.timewaster.util.gui.TextInputComponent;
@@ -42,10 +41,12 @@ public class MapEditorState extends BasicGameState {
 	boolean acceptingInput = true;
 	boolean canDraw = true;
 	int mode = 0;
+	int layer = 0;
 	DropDownComponent text;
 	TextComponent cTile;
 	TextInputComponent mapWidth;
 	TextInputComponent mapHeight;
+	TextInputComponent tLayer;
 	GUI g;
 	File toLoad = null;
 	TileMap m;
@@ -164,8 +165,8 @@ public class MapEditorState extends BasicGameState {
 		g.addComponent(new ButtonComponent(g, "Reset Camera", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
 			@Override
 			public void run() {
-				c.center = m.getCenter();
-				c.zoom = 1;
+				c.setCenter(m.getCenter());
+				c.setZoom(1);
 			}
 		},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.25f+210, (gc.getWidth() / 4) - 20, 20, true));
 		g.addComponent(new ButtonComponent(g, "Change Width", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
@@ -187,6 +188,16 @@ public class MapEditorState extends BasicGameState {
 				pic.setMaxLength(3);
 			}
 		},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.25f+270, (gc.getWidth() / 4) - 20, 20, true));
+	
+		g.addComponent(new ButtonComponent(g, "Change Layer", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
+			@Override
+			public void run() {
+				if (g.hasComponentType(PopInputComponent.class) || g.hasComponentType(TileBuilderComponent.class))
+					return;
+				PopInputComponent pic = PopInputComponent.createPopup(g, Color.gray, "Change Layer", layer+"", tLayer, 200f, 200f, 200f, 80f, true, PopInputComponent.ALL_NUMERIC);
+				pic.setMaxLength(2);
+			}
+		},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.25f+300, (gc.getWidth() / 4) - 20, 20, true));
 		
 		g.addComponent(new ButtonComponent(g, "Test Map", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
 			@Override
@@ -200,8 +211,7 @@ public class MapEditorState extends BasicGameState {
 					e.printStackTrace();
 				}
 			} 
-		},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.25f+300, (gc.getWidth() / 4) - 20, 20, true));
-		
+		},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.25f+330, (gc.getWidth() / 4) - 20, 20, true));
 		text = new DropDownComponent(g, Color.gray, (int)(gc.getWidth() * 0.75)+10, gc.getHeight() * 0.25f-30, (gc.getWidth() / 4) - 20, 20, true) {
 			@Override
 			public void onChange() {
@@ -214,12 +224,14 @@ public class MapEditorState extends BasicGameState {
 		
 		mapWidth = new TextInputComponent(g, null, 0, 0, 0, 0, m.getWidthInTiles()+"", false);
 		mapHeight = new TextInputComponent(g, null, 0, 0, 0, 0, m.getHeightInTiles()+"", false);
+		tLayer = new TextInputComponent(g, null, 0, 0, 0, 0, layer+"", false);
 		mapWidth.setCanEdit(false);
 		mapHeight.setCanEdit(false);
+		tLayer.setCanEdit(false);
 		
 		c = new Camera(gc.getWidth()-(gc.getWidth()*0.25f), gc.getHeight());
-		c.center = m.getCenter();
-		c.zoom = 1;
+		c.setCenter(m.getCenter());
+		c.setZoom(1);
 	}
 
 	@Override
@@ -276,9 +288,10 @@ public class MapEditorState extends BasicGameState {
 				e.printStackTrace();
 			}
 		}
-		c.centerE = null;
+		c.setCenterEntity(null);
 		mapWidth.update(delta);
 		mapHeight.update(delta);
+		tLayer.update(delta);
 		g.update(gc, delta);
 		c.update(gc);
 		x = gc.getInput().getMouseX() / 16;
@@ -293,20 +306,22 @@ public class MapEditorState extends BasicGameState {
 		
 		if (acceptingInput == true) {
 			if (gc.getInput().isKeyDown(Input.KEY_W)) {
-				c.center.y -= 2/c.zoom;
+				c.getCenter().y -= 2/c.getZoom();
 			} else if (gc.getInput().isKeyDown(Input.KEY_S)) {
-				c.center.y += 2/c.zoom;
+				c.getCenter().y += 2/c.getZoom();
 			}
 			if (gc.getInput().isKeyDown(Input.KEY_A)) {
-				c.center.x -= 2/c.zoom;
+				c.getCenter().x -= 2/c.getZoom();
 			} else if (gc.getInput().isKeyDown(Input.KEY_D)) {
-				c.center.x += 2/c.zoom;
+				c.getCenter().x += 2/c.getZoom();
 			}	
 			
 			if (gc.getInput().isKeyDown(Input.KEY_R)) {
-				c.zoom += 0.01f;
+				c.setZoom(c.getZoom() + 0.001f*delta);
+				System.out.println(c.getZoom());
 			} else if (gc.getInput().isKeyDown(Input.KEY_F)) {
-				c.zoom -= 0.01f;
+				c.setZoom(c.getZoom() - 0.001f*delta);
+				System.out.println(c.getZoom());
 			}
 			if (x >= 0 && x < m.getWidthInTiles() && y >= 0 && y < m.getHeightInTiles()) {
 				if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && clickCooldown <= 0) {
@@ -314,10 +329,10 @@ public class MapEditorState extends BasicGameState {
 					switch (mode) {
 						case PAINT_MODE:
 							if (m.getTile(x, y) != currentTile && canDraw)
-								m.setTile(x, y, currentTile);
+								m.setTile(x, y, currentTile, layer);
 							break;
 						case PICK_MODE:
-							currentTile = m.getTile(x, y);
+							currentTile = m.getTile(x, y, layer);
 							text.setText(m.getTileName(currentTile));
 							break;
 						case SET_SPAWN_MODE:
@@ -334,6 +349,13 @@ public class MapEditorState extends BasicGameState {
 						case MOVE_ENTITY_MODE:
 							if (selected != null) {
 								selected.getController().teleport(gc.getInput().getMouseX(), gc.getInput().getMouseY()+selected.hitbox.getHeight()/2);
+							} else {
+								for (int i = m.getInitialEntities().size()-1; i >= 0; i--) {
+									Entity e = m.getInitialEntities().get(i);
+									if (e.hitbox.contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
+										selected = e;
+									}
+								}
 							}
 							break;
 						default:
@@ -343,7 +365,7 @@ public class MapEditorState extends BasicGameState {
 					switch (mode) {
 						case PAINT_MODE:
 							if (m.getTile(x, y) != ' ' && canDraw == true)
-								m.setTile(x, y, ' ');
+								m.setTile(x, y, ' ', layer);
 							break;
 						
 					}
@@ -354,6 +376,8 @@ public class MapEditorState extends BasicGameState {
 				m.resize(Integer.valueOf(mapWidth.getText()), m.getHeightInTiles());
 			if (Math2.isInteger(mapHeight.getText()) && Integer.valueOf(mapHeight.getText()) != m.getHeightInTiles())
 				m.resize(m.getWidthInTiles(), Integer.valueOf(mapHeight.getText()));
+			if (Math2.isInteger(tLayer.getText()) && Integer.valueOf(tLayer.getText()) != layer && -1 < Integer.valueOf(tLayer.getText()) && m.getLayers().size() > Integer.valueOf(tLayer.getText()))
+				layer = Integer.valueOf(tLayer.getText());
 		}
 		for (int i = m.getInitialEntities().size()-1; i >= 0; i--) {
 			Entity e = m.getInitialEntities().get(i);
@@ -361,9 +385,9 @@ public class MapEditorState extends BasicGameState {
 				e.updateHitboxes();
 		}
 		if (selected != null)
-			cTile.setText("Current Tile: "+currentTile+"\nSelected Entity: "+selected.getName()+"\nMode: "+mode);
+			cTile.setText("Current Tile: "+currentTile+"\nSelected Entity: "+selected.getName()+"\nMode: "+mode+"\nLayer: "+layer);
 		else 
-			cTile.setText("Current Tile: "+currentTile+"\nMode: "+mode);
+			cTile.setText("Current Tile: "+currentTile+"\nMode: "+mode+"\nLayer: "+layer);
 		clickCooldown--;
 	}
 	
@@ -380,8 +404,8 @@ public class MapEditorState extends BasicGameState {
 	public void enter(GameContainer gc, StateBasedGame sbg) throws SlickException {
 		super.enter(gc, sbg);
 		clickCooldown = 50;
-		c.center = m.getCenter();
-		c.zoom = 1;
+		c.setCenter(m.getCenter());
+		c.setZoom(1);
 		text.resetOptions();
 		for (Entry<Character, String> e : m.getTileTypes().entrySet()) {
 			text.addOption(e.getValue());

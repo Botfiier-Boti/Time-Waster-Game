@@ -7,6 +7,7 @@ public class AdminRing extends EquippableItem {
 
 	public AdminRing() {
 		super(0, "Admin Ring", SlotType.EQUIP_RING, MainGame.getImage("Invulnerable"), Float.MAX_VALUE, Float.MAX_VALUE, 1000, Float.MAX_VALUE, Float.MAX_VALUE, 100);
+		setLore("A tiny shield that functions as a ring.");
 	}
 
 }

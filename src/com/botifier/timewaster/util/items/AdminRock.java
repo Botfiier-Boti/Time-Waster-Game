@@ -8,6 +8,7 @@ public class AdminRock extends WeaponItem {
 
 	public AdminRock() {
 		super(1, "Admin Rock", MainGame.getImage("Rock"), 0, 0, 0, 0, 0, 0, new RockThrowPattern());
+		setLore("Rock.");
 	}
 
 }

@@ -10,7 +10,7 @@ public class ExplodePattern extends BulletPattern {
 	public ExplodePattern() {
 		fireSpeed = 0.1f;
 		bulletSpeed = 60f;
-		duration = 7000;
+		duration = 4000;
 		shots = 12;
 		spread=360/shots;
 		mindamage = 100;

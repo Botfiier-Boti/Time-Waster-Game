@@ -9,18 +9,48 @@ import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.util.movements.LobbedController;
 
+/**
+ * Generic Lobbed projectile class
+ * @author Botifier
+ *
+ */
 public abstract class LobbedProjectile extends Entity {
-	public float rotate = 5f;
+	/**
+	 * How much the projectile image rotates
+	 */
+	private float rotate = 5f;
+	/**
+	 * The maxmimum height that the projectile reaches
+	 */
 	protected float maxHeight = 50;
-	Curve c;
-	Vector2f start;
-	int dist = 0;
-	int tdist = 0;
-	float cThrow = 0;
-	long time = 0;
-	long lifeTime = 0;
+	/**
+	 * Curve for the projectile to follow visually
+	 */
+	private Curve c;
+	/**
+	 * The origin postion of the projectile
+	 */
+	private Vector2f start;
+	
+	/*Old unused variables
+	private float cThrow = 0;
+	private long time = 0;
+	private long lifeTime = 0;*/
+	
+	/**
+	 * Unused multiplier
+	 */
 	protected float mult = 1f;
 	
+	/**
+	 * Lobbed projectile constructor
+	 * @param name String Name of the Entity
+	 * @param i Image Projectile Image
+	 * @param controller LobbedController The entity controller
+	 * @param dst Vector2f The projectile's destination
+	 * @param o Entity The projectile's owner
+	 * @param heightMod float The maximum height that the projectile can reach
+	 */
 	public LobbedProjectile(String name, Image i, LobbedController controller, Vector2f dst, Entity o, float heightMod) {
 		super(name, i, controller);
 		this.o = o;
@@ -30,7 +60,7 @@ public abstract class LobbedProjectile extends Entity {
 		healthbarVisible = false;
 		invulnerable = true;
 		start = controller.getLoc().copy();
-		tdist = (int) controller.getLoc().distance(dst);	
+		//tdist = (int) controller.getLoc().distance(dst);	
 		Vector2f p1 = start.copy();
 		p1.x += (start.x-dst.x)/controller.getDuration()*0.25f;
 		p1.y += (start.y-dst.y)/controller.getDuration()*0.25f-heightMod;
@@ -43,18 +73,28 @@ public abstract class LobbedProjectile extends Entity {
 			this.team = o.team;
 	}
 
+	/**
+	 * Action taken when the projectile lands
+	 * @throws SlickException
+	 */
 	public abstract void onLand() throws SlickException;
 	
+	/**
+	 * Action taken when the projectile is destroyed
+	 */
 	@Override
 	public void onDeath() throws SlickException {
 		super.onDeath();
 		onLand();
 	}
 	
+	/**
+	 * Updates the projectile rotating it and modifying the visual position based on the curve 
+	 */
 	@Override
 	public void update(int delta) throws SlickException {
 		getController().move(delta);
-		rotation+=rotate;
+		rotation+=getRotation();
 		if (rotation > 360)
 			rotation = rotation-360;
 		if (getController().getDst() != null) {
@@ -69,6 +109,9 @@ public abstract class LobbedProjectile extends Entity {
 		}
 	}
 	
+	/**
+	 * Draws the projectile
+	 */
 	@Override
 	public void draw(Graphics g) {
 		if (image != null && getController().getDst() != null) {
@@ -86,13 +129,36 @@ public abstract class LobbedProjectile extends Entity {
 		}
 	}
 	
+	/**
+	 * Overrides addBullet to add bullets to the owner instead of the projectile
+	 */
 	@Override
 	public void addBullet(Entity e) {
 		o.addBullet(e);
 	}
 	
+	/**
+	 * Returns the LobbedController
+	 * @return LobbedController Entity controller
+	 */
 	@Override
 	public LobbedController getController() {
 		return (LobbedController)super.getController();
+	}
+
+	/**
+	 * Returns the current rotation amount
+	 * @return float Current rotation amount
+	 */
+	public float getRotation() {
+		return rotate;
+	}
+
+	/**
+	 * Sets the current rotation amount
+	 * @param rotate float Rotation amount
+	 */
+	public void setRotation(float rotate) {
+		this.rotate = rotate;
 	}
 }

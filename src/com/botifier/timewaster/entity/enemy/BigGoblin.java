@@ -9,8 +9,6 @@ import com.botifier.timewaster.entity.FakeBagEntity;
 import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.statuseffect.effects.InvulnerabilityEffect;
 import com.botifier.timewaster.util.Enemy;
-import com.botifier.timewaster.util.Entity;
-import com.botifier.timewaster.util.Math2;
 import com.botifier.timewaster.util.behaviors.CenterBehavior;
 import com.botifier.timewaster.util.behaviors.CircleBehavior;
 import com.botifier.timewaster.util.behaviors.SetDashBehavior;

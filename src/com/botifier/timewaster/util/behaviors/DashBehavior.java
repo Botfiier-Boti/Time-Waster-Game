@@ -1,7 +1,5 @@
 package com.botifier.timewaster.util.behaviors;
 
-import java.sql.Time;
-
 import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.main.MainGame;

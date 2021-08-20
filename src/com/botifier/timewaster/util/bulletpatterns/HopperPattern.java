@@ -27,7 +27,7 @@ public class HopperPattern extends BulletPattern {
 			na = Math.toDegrees(angle)-mod;
 			Hopper h = new Hopper(x, y, new Vector2f(x+(float)(Math.cos(Math.toRadians(na))*(30)),y+(float)(Math.sin(Math.toRadians(na))*(30))), owner);
 			if (i % 2 == 1)
-				h.rotate = -h.rotate;
+				h.setRotation(-h.getRotation());
 			owner.b.add(h);
 		}
 

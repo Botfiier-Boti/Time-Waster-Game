@@ -12,11 +12,12 @@ public class GuidedBulletPattern extends BulletPattern {
 	public GuidedBulletPattern() {
 		fireSpeed = 1f;
 		atkScaling = true;
-		bulletSpeed = 100;
-		duration = 1000;
+		bulletSpeed = 60;
+		duration = 3000;
 		mindamage = 15;
 		shots = 1;
 		targeted = true;
+		homing = true;
 		armorPierce = true;
 		override = MainGame.getImage("Torpedo");
 	}
@@ -26,7 +27,8 @@ public class GuidedBulletPattern extends BulletPattern {
 		this.target = target;
 		for (int i = 0; i < shots; i++) {
 			Bullet b = createBullet(owner, x, y, angle,i);
-			b.effect = new SlowEffect(5000,5, 5);
+			b.setEffect(new SlowEffect(2000,5, 5));
+			b.getController().setHoming(true);
 		}
 	}
 

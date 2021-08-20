@@ -1,7 +1,6 @@
 package com.botifier.timewaster.util;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
@@ -15,23 +14,83 @@ import com.botifier.timewaster.util.bulletpatterns.BulletPattern;
 import com.botifier.timewaster.util.managers.StatusEffectManager;
 import com.botifier.timewaster.util.movements.EnemyController;
 
+/**
+ * Enemy class
+ * @author Botifier
+ *
+ */
 public class Enemy extends Entity {
+	/**
+	 * Idle animation
+	 */
 	protected Animation aIdle;
+	/**
+	 * Walk animation
+	 */
 	protected Animation aWalk;
+	/**
+	 * Attack animation
+	 */
 	protected Animation aAttack;
+	/**
+	 * The image to be rendered
+	 */
 	protected Image current;
-	SpriteSheet walk;
+	/**
+	 * Walk animation spritesheet
+	 */
+	protected SpriteSheet walk;
+	/**
+	 * Attack animation spritesheet
+	 */
 	protected SpriteSheet attack;
+	/**
+	 * Delay before the entity can do anything.
+	 */
 	protected long activateDelay = 0;
+	/**
+	 * Whether or not the entity is attacking
+	 */
 	protected boolean attacking = false;	
+	/**
+	 * Whether or not the attack animation is played automatically
+	 */
 	protected boolean autoPlayAttack = true;
+	/**
+	 * Whether or not the entity flips automatically
+	 */
 	public boolean autoFlip = true;
+	/**
+	 * The Entity's behaviors
+	 */
 	public ArrayList<Behavior> behaviors = new ArrayList<Behavior>();
+	/**
+	 * The Entity's bullet patterns
+	 */
 	public ArrayList<BulletPattern> patterns = new ArrayList<BulletPattern>();
+	/**
+	 * The currently used bullet pattern 
+	 * -1 for none
+	 */
 	public int currentPattern = -1;
+	/**
+	 * The currently used behavior
+	 * -1 for none
+	 */
 	public int currentBehavior = -1;
+	/**
+	 * The Entity's current target
+	 */
 	public Entity cls = null;
 	
+	/**
+	 * Enemy Constructor
+	 * @param name String Name of the entity
+	 * @param i Image Idle image of the entity.
+	 * @param controller EnemyController Controls entity movement
+	 * @param walk SpriteSheet Walk animation
+	 * @param attack SpriteSheet Attack animation
+	 */
 	public Enemy(String name, Image i, EnemyController controller, SpriteSheet walk, SpriteSheet attack) {
 		super(name, i, controller);
 		this.walk = walk;
@@ -50,6 +109,15 @@ public class Enemy extends Entity {
 		team = Team.ENEMY;
 	}
 	
+	/**
+	 * Enemy constructor with influence modifier
+	 * @param name String Name of the entity
+	 * @param i Image Idle image of the entity.
+	 * @param controller EnemyController Controls entity movement
+	 * @param walk SpriteSheet Walk animation
+	 * @param attack SpriteSheet Attack animation
+	 * @param imod float Influence multiplier 
+	 */
 	public Enemy(String name, Image i, EnemyController controller, SpriteSheet walk, SpriteSheet attack, float imod) {
 		super(name, i, controller, imod);
 		this.walk = walk;
@@ -68,6 +136,17 @@ public class Enemy extends Entity {
 		team = Team.ENEMY;
 	}
 	
+	/**
+	 * Enemy constructor with influence modifier and idle animation
+	 * @param name String Name of the entity
+	 * @param i Image Idle image of the entity.
+	 * @param controller EnemyController Controls entity movement
+	 * @param walk SpriteSheet Walk animation
+	 * @param attack SpriteSheet Attack animation
+	 * @param idle SpriteSheet Idle animation
+	 * @param idleSpeed int Speed of the idle animation
+	 * @param imod float Influence multiplier 
+	 */
 	public Enemy(String name, Image i, EnemyController controller, SpriteSheet walk, SpriteSheet attack, SpriteSheet idle, int idleSpeed, float imod) {
 		super(name, i, controller, imod);
 		this.walk = walk;
@@ -91,6 +170,10 @@ public class Enemy extends Entity {
 		team = Team.ENEMY;
 	}
 	
+	/**
+	 * Clone enemy constructor
+	 * @param e Enemy To clone
+	 */
 	public Enemy(Enemy e) {
 		super(e);
 		this.walk = e.walk;
@@ -179,6 +262,7 @@ public class Enemy extends Entity {
 				Image i = current.getScaledCopy(size).getFlippedCopy(dir, flip);
 				i.setCenterOfRotation(i.getWidth()/2, i.getHeight()/2);
 				i.setRotation(rotation);
+				
 				g.drawImage(i, iLoc.getX()-i.getWidth()/2, iLoc.getY()-i.getHeight());
 				/*if (attacking == true && aAttack != null) {
 					Image i = aAttack.getCurrentFrame().getScaledCopy(size).getFlippedCopy(dir, flip);
@@ -219,7 +303,6 @@ public class Enemy extends Entity {
 				}
 					
 			}
-			
 		}
 	}
 	
@@ -241,13 +324,20 @@ public class Enemy extends Entity {
 	}
 	
 
-	
+	/**
+	 * Shoot bullet from position
+	 * @param x float 
+	 * @param y float 
+	 * @param force boolean Whether or not it cares about cooldown
+	 * @return boolean Whether or not the shot was fired
+	 * @throws SlickException
+	 */
 	public boolean shootBullet(float x, float y, boolean force) throws SlickException {
 		if (cooldown <= 0 || force) {
 			BulletPattern bp = patterns.get(currentPattern);
 			bp.fire(this, x, y, angle, null);
 			float SPS = (1.5f + 6.5f*((getDexterity())/75f))*bp.fireSpeed;
-			cooldown = 60/SPS;
+			cooldown = 1000/SPS;
 			if (autoPlayAttack) 
 				playAttackAnimation(60/SPS);
 			return true;
@@ -255,12 +345,20 @@ public class Enemy extends Entity {
 		return false;
 	}
 	
+	/**
+	 * Shoot bullet targeting entity
+	 * @param angle float angle at which the bullet is fired.
+	 * @param e Entity Target entity
+	 * @param force boolean Whether or not it cares about cooldown
+	 * @return boolean Whether or not the shot was fired.
+	 * @throws SlickException
+	 */
 	public boolean shootBullet(float angle, Entity e, boolean force) throws SlickException {
 		if (cooldown <= 0 || force) {
 			BulletPattern bp = patterns.get(currentPattern);
 			bp.fire(this, getLocation().x, getLocation().y, angle, e);
 			float SPS = (1.5f + 6.5f*((getDexterity())/75f))*bp.fireSpeed;
-			cooldown = 60/SPS;
+			cooldown = 1000/SPS;
 			if (autoPlayAttack) 
 				playAttackAnimation(60/SPS);
 			return true;
@@ -268,6 +366,10 @@ public class Enemy extends Entity {
 		return false;
 	}
 	
+	/**
+	 * Plays attack animation
+	 * @param speed float Speed in which animation is played
+	 */
 	public void playAttackAnimation(float speed) {
 		if (attack == null)
 			return;
@@ -279,6 +381,10 @@ public class Enemy extends Entity {
 		
 	}
 	
+	/**
+	 * Add a behavior if it isn't already there
+	 * @param b Behavior To add
+	 */
 	public void addBehavior(Behavior b) {
 		boolean has = false;
 		for (int i = behaviors.size()-1; i >= 0; i--) {
@@ -302,6 +408,14 @@ public class Enemy extends Entity {
 		return e;
 	}*/
 
+	/**
+	 * Sets the current used image
+	 * @param i Image To use
+	 */
+	public void setCurrentImage(Image i) {
+		current = i;
+	}
+	
 	@Override
 	public EnemyController getController() {
 		return (EnemyController) super.getController();

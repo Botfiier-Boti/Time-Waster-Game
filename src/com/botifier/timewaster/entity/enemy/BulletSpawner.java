@@ -53,8 +53,8 @@ public class BulletSpawner extends Enemy {
 		}
 		if (cooldown3 <= 0) {
 
-			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, (float)Math.toRadians(180), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
-			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, 0, 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
+			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, (float)Math.toRadians(180), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false, false, 0, 0, 0));
+			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, 0, 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false, false, 0, 0, 0));
 			cooldown3 = 50;
 		}
 		if (delay <= 0) {
@@ -80,10 +80,10 @@ public class BulletSpawner extends Enemy {
 			}
 			if (cooldown2 <= 0) {
 				for (int i = 0; i < 16; i++) {
-					b.add(Bullet.createBullet("Bob", getController().getLoc().x-(length*15)-(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
-					b.add(Bullet.createBullet("Bob", getController().getLoc().x-(length*15)-(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(-90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
-					b.add(Bullet.createBullet("Bob", getController().getLoc().x+(length*15)+(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
-					b.add(Bullet.createBullet("Bob", getController().getLoc().x+(length*15)+(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(-90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false));
+					b.add(Bullet.createBullet("Bob", getController().getLoc().x-(length*15)-(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false, false, 0, 0, 0));
+					b.add(Bullet.createBullet("Bob", getController().getLoc().x-(length*15)-(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(-90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false, false, 0, 0, 0));
+					b.add(Bullet.createBullet("Bob", getController().getLoc().x+(length*15)+(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false, false, 0, 0, 0));
+					b.add(Bullet.createBullet("Bob", getController().getLoc().x+(length*15)+(i*15/2), getController().getLoc().y, 60, (float)Math.toRadians(-90), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false, false, 0, 0, 0));
 				}
 				cooldown2 = 300;
 			}

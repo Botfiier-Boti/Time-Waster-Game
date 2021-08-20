@@ -1,13 +1,24 @@
 package com.botifier.timewaster.util;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.SlickException;
-
 import com.botifier.timewaster.util.Item.SlotType;
 
+/**
+ * Equipment Inventory
+ * Handles equipped items
+ * @author Botifier
+ *
+ */
 public class EquipmentInventory extends Inventory {
+	/**
+	 * The type of items that can go in slots
+	 */
 	SlotType[] slots;
 	
+	/**
+	 * Equipment Inventory contructor
+	 * @param owner Entity Owner of this inventory
+	 * @param cap int The amount of slots in the inventory
+	 */
 	public EquipmentInventory(Entity owner, int cap) {
 		super(owner, cap);
 		slots = new SlotType[cap];
@@ -22,6 +33,8 @@ public class EquipmentInventory extends Inventory {
 			return false;
 		if (i != null && slots[slot] != i.getSlotType())
 			return false;
+		if (i != null && i.getContainer() != this)
+			i.setContainer(this);
 		if (items[slot] != null) {
 			Item save = i;
 			overrideItem(save, slot);
@@ -38,6 +51,8 @@ public class EquipmentInventory extends Inventory {
 	public boolean addItemAuto(Item i) {
 		for (int e = 0; e < getCap(); e++) {
 			if (getItem(e) == null && slots[e] == i.getSlotType()) {
+				if (i != null && i.getContainer() != this)
+					i.setContainer(this);
 				items[e] = i;
 				if (getItem(e) != null) {
 					getItem(e).onUse(getOwner());
@@ -70,6 +85,11 @@ public class EquipmentInventory extends Inventory {
 		return true;
 	}
 	
+	/**
+	 * Removes an item from the inventory
+	 * @param i int Slot to remove item from
+	 * @return boolean Whether or not the removal succeeded
+	 */
 	public boolean removeItem(int i) {
 		if (i < 0 || i >= getCap())
 			return false;
@@ -81,6 +101,12 @@ public class EquipmentInventory extends Inventory {
 		return true;
 	}
 	
+	/**
+	 * Sets the SlotType at position
+	 * @param slotType The new SlotType
+	 * @param pos int Position in which to modify
+	 * @return boolean Whether or not the SlotType was changed
+	 */
 	public boolean setSlotType(SlotType slotType, int pos) {
 		if (pos < 0 || pos >= getCap())
 			return false;
@@ -88,6 +114,11 @@ public class EquipmentInventory extends Inventory {
 		return true;
 	}
 
+	/**
+	 * Gets the SlotType at position
+	 * @param pos int The position to check
+	 * @return SlotType The SlotType at position
+	 */
 	public SlotType getSlotType(int pos) {
 		if (pos < 0 || pos >= getCap())
 			return SlotType.EQUIP_NONE;

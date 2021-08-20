@@ -1,18 +1,18 @@
 package com.botifier.timewaster.entity;
 
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
-
 import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.util.Entity;
+import com.botifier.timewaster.util.Inventory;
+import com.botifier.timewaster.util.Team;
 import com.botifier.timewaster.util.movements.EntityController;
 
 //visual
 public class FakeBagEntity extends Entity {
-	int maxtimealive = 12000;
-	int timealive = 0;
-	Sound s;
-	boolean played = false;
+	private Inventory i;
+	private int maxtimealive = 24000;
+	private int timealive = 0;
+	private boolean played = false;
 
 	public FakeBagEntity(float x, float y, int type) throws SlickException {
 		super("bag", MainGame.getImage("purplebag"), new EntityController(x,y),0f);
@@ -22,6 +22,8 @@ public class FakeBagEntity extends Entity {
 			maxtimealive = 48000;
 		}
 		//s = MainGame.getSound("lootappears");
+		i = new Inventory(this, 8);
+		team = Team.ALLY;
 		invincible = true;
 		healthbarVisible = false;
 	}
@@ -38,5 +40,9 @@ public class FakeBagEntity extends Entity {
 		if (timealive >= maxtimealive) {
 			destroy = true;
 		}
+	}
+	
+	public Inventory getInventory() {
+		return i;
 	}
 }

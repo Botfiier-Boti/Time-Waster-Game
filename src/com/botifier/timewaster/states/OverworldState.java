@@ -34,7 +34,10 @@ import com.botifier.timewaster.util.gui.ItemPickupComponent;
 import com.botifier.timewaster.util.gui.RectangleComponent;
 import com.botifier.timewaster.util.items.AdminRing;
 import com.botifier.timewaster.util.items.AdminRock;
+import com.botifier.timewaster.util.items.Bandage;
 import com.botifier.timewaster.util.items.DefenseTestSword;
+import com.botifier.timewaster.util.items.GenericSword;
+import com.botifier.timewaster.util.items.Gun;
 import com.botifier.timewaster.util.managers.EntityManager;
 import com.botifier.timewaster.util.movements.EntityController;
 
@@ -116,9 +119,18 @@ public class OverworldState extends BasicGameState {
 		p.getController().teleport(m.getSpawnPoint());
 		p.ei.purge();
 		p.inv.purge();
-		p.inv.addItem(new AdminRing(), 3);
-		p.inv.addItem(new AdminRock(), 0);
-		p.inv.addItem(new DefenseTestSword(), 1);
+		p.ei.addItem(new GenericSword(), 0);
+		if (MainGame.debug) {
+			p.inv.addItem(new AdminRing(), 3);
+			p.inv.addItem(new AdminRock(), 0);
+			p.inv.addItem(new DefenseTestSword(), 1);
+			p.inv.addItem(new Gun(), 2);
+			p.inv.addItem(new Bandage(3), 4);
+			p.inv.addItem(new Bandage(3), 5);
+			p.inv.addItem(new Bandage(4), 6);
+		} else {
+			p.inv.addItem(new Bandage(6), 0);
+		}
 		
 		eM.addEntity(p);
 		g = new GUI(p);
@@ -134,8 +146,10 @@ public class OverworldState extends BasicGameState {
 					mm.enterState(MapEditorState.ID);
 				}
 			},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.05f, (gc.getWidth() / 4) - 20, 20, true));
-		g.addComponent(new InventoryComponent(g, Color.lightGray,  gc.getWidth() * 0.75f + 10f, gc.getHeight()*0.335f+4, true, p.ei));
-		g.addComponent(new InventoryComponent(g, Color.lightGray,  gc.getWidth() * 0.75f + 10f, gc.getHeight()*0.335f+40, true, p.inv));
+		InventoryComponent invc = new InventoryComponent(g, Color.lightGray,  gc.getWidth() * 0.75f + (((gc.getWidth()/4)-20)/16)*MainGame.windowScale, gc.getHeight()*0.335f+40*MainGame.windowScale, true, p.inv);
+		invc.setUseInput(true);
+		g.addComponent(invc);
+		g.addComponent(new InventoryComponent(g, Color.lightGray,  gc.getWidth() * 0.75f + (((gc.getWidth()/4)-20)/16)*MainGame.windowScale, gc.getHeight()*0.335f+4*MainGame.windowScale, true, p.ei));
 		g.addComponent(new ItemPickupComponent(g));
 		
 		/*System.out.println((gc.getWidth()/4)-20);
@@ -205,7 +219,7 @@ public class OverworldState extends BasicGameState {
 			g.drawString("TPS: " + tps, 10, 52);
 			g.drawString("Bullets: " + eM.getBullets().size(), 10, 66);
 			g.drawString("Entities: " + eM.getEntities().size(), 10, 80);
-			if (getCamera().centerE == mtrack)
+			if (getCamera().getCenterEntity() == mtrack)
 				mtrack.getLocation().set(gc.getInput().getAbsoluteMouseX(), gc.getInput().getAbsoluteMouseY());
 			else
 				mtrack.getLocation().set(gc.getInput().getMouseX(), gc.getInput().getMouseY());
@@ -230,7 +244,7 @@ public class OverworldState extends BasicGameState {
 		tticks += delta;
 		dead.update(delta);
 		
-		if (c.centerE == null)
+		if (c.getCenterEntity() == null)
 			c.setCenterEntity(p);
 
 		if (targeted != null && targeted.destroy) {
@@ -250,7 +264,7 @@ public class OverworldState extends BasicGameState {
 			reset(gc);
 			return;
 		}
-		if (c.centerE == p && p != null && p.getStats().getCurrentHealth() <= 0) {
+		if (c.getCenterEntity() == p && p != null && p.getStats().getCurrentHealth() <= 0) {
 			if (i.isKeyPressed(Input.KEY_SPACE)) {
 				p.getStats().heal(p.getMaxHealth());
 				p.getController().getLoc().set(100, 100);
@@ -260,14 +274,14 @@ public class OverworldState extends BasicGameState {
 			return;
 		}
 		
-		if (p != null &&  p.getStats().getCurrentHealth() > 0 || getCamera().centerE == mtrack) {
+		if (p != null &&  p.getStats().getCurrentHealth() > 0 || getCamera().getCenterEntity() == mtrack) {
 			g.update(gc, delta);
 			getCamera().update(gc);
 			m.update(gc, delta);
 			//handleEntities(gc, delta);
 			for (int ie = eM.getEntities().size() - 1; ie >= 0; ie--) {
 				Entity en = eM.getEntities().get(ie);
-				if (getCamera().centerE != null && getCamera().centerE == mtrack) {
+				if (getCamera().getCenterEntity() != null && getCamera().getCenterEntity() == mtrack) {
 					if (en.hitbox.contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
 						if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
 							targeted = en;
@@ -321,8 +335,13 @@ public class OverworldState extends BasicGameState {
 	public void reset(GameContainer gc) throws SlickException {
 		m.reset();
 		p.b.clear();
+		p.getStatusEffectManager().clearEffects();
 		m.eM.clearBullets();
 		init(gc, mm);
+	}
+	
+	public Player getPlayer() {
+		return p;
 	}
 	
 	public EntityManager getEntityManager() {

@@ -18,6 +18,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -36,6 +37,7 @@ public class MainGame extends StateBasedGame {
 	public static boolean debug = false;
 	public static boolean displayHitboxes = false;
 	public static float camRatio = 2f;
+	public static float windowScale = 1.5f;
 	public static ArrayList<String> s = new ArrayList<String>();
 	public static AngelCodeFont ttf, ttfS, ttfB;
 	public static MainGame mm; 
@@ -56,57 +58,68 @@ public class MainGame extends StateBasedGame {
 	}
 
 	public void loadImages() throws SlickException {
-		i.put("biggobboidle", new Image("Images/BigGobboIdle.png"));
-		i.put("biggobbowalk", new Image("Images/BigGobboWalk.png"));
-		i.put("biggobboattack", new Image("Images/BigGobboAttack.png"));
-		i.put("fakeice", new Image("Images/FakeIce.png"));
-		i.put("defaultshot", new Image("Images/Shots.png"));
-		i.put("debugman", new Image("Images/Testy.png"));
-		i.put("purplebag", new Image("Images/Purplebag.png"));
-		i.put("whitebag", new Image("Images/Whitebag.png"));
-		i.put("testchest", new Image("Images/Testchest.png"));
-		i.put("boomerang", new Image("Images/Boomerang.png"));
-		i.put("bee", new Image("Images/Bee.png"));
-		i.put("beehive", new Image("Images/Beehive.png"));
-		i.put("sheep", new Image("Images/Sheep.png"));
-		i.put("idlesheep", new Image("Images/Sheep-Idle.png"));
-		i.put("fireball", new Image("Images/Fire.png"));
-		i.put("rock", new Image("Images/Rock.png"));
-		i.put("smallrock", new Image("Images/Rock-Small.png"));
-		i.put("rocktile", new Image("Images/Tile.png"));
-		i.put("floatingwine", new Image("Images/FloatingWine.png"));
-		i.put("wineattack", new Image("Images/WineAttack.png"));
-		i.put("wineglass", new Image("Images/WineGlass.png"));
-		i.put("reddrop", new Image("Images/RedDrop.png"));
-		i.put("whitearrow", new Image("Images/WhiteArrow.png"));
-		i.put("fontsmall", new Image("Images/PressStart2P-sml.png"));
-		i.put("fontmedium", new Image("Images/PressStart2P-mid.png"));
-		i.put("font", new Image("Fonts/PressStart2P.png"));
-		i.put("head", new Image("Images/Head.png"));
-		i.put("body", new Image("Images/Body.png"));
-		i.put("brickwall", new Image("Images/WallTile.png"));
-		i.put("blanktile", new Image("Images/BlankTile.png"));
-		i.put("tiledarkup", new Image("Images/TileDarkUp.png"));
-		i.put("playeridle", new Image("Images/PlayerIdle.png"));
-		i.put("playerwalk", new Image("Images/PlayerWalk.png"));
-		i.put("shadow", new Image("Images/Shadow.png"));
-		i.put("torpedo", new Image("Images/Torpedo.png"));
-		i.put("shiny", new Image("Images/Shiny.png"));
-		i.put("signal", new Image("Images/Signal.png"));
-		i.put("slow", new Image("Images/Slow.png"));
-		i.put("invulnerable", new Image("Images/Invulnerable.png"));
-		i.put("pickblock", new Image("Images/Pickblock.png"));
-		i.put("v", new Image("Images/V.png"));
-		i.put("notv", new Image("Images/NotV.png"));
-		i.put("patterntile", new Image("Images/PatternTile.png"));
-		i.put("spearman", new Image("Images/SpearManIdle.png"));
-		i.put("spearmanwalk", new Image("Images/SpearManWalk.png"));
-		i.put("fly",new Image("Images/Fly.png"));
-		i.put("weaponslot", new Image("Images/Inventory/WeaponSlot.png"));
-		i.put("ringslot", new Image("Images/Inventory/RingSlot.png"));
-		i.put("abilityslot", new Image("Images/Inventory/AbilitySlot.png"));
-		i.put("armorslot", new Image("Images/Inventory/ArmorSlot.png"));
-		i.put("genericsword", new Image("Images/GenericSword.png"));
+		addImage("biggobboidle", "Images/BigGobboIdle.png");
+		addImage("biggobbowalk", "Images/BigGobboWalk.png");
+		addImage("biggobboattack", "Images/BigGobboAttack.png");
+		addImage("fakeice", "Images/FakeIce.png");
+		addImage("defaultshot", "Images/Shots.png");
+		addImage("debugman", "Images/Testy.png");
+		addImage("purplebag", "Images/Purplebag.png");
+		addImage("whitebag", "Images/Whitebag.png");
+		addImage("testchest", "Images/Testchest.png");
+		addImage("boomerang", "Images/Boomerang.png");
+		addImage("bee", "Images/Bee.png");
+		addImage("beehive", "Images/Beehive.png");
+		addImage("sheep", "Images/Sheep.png");
+		addImage("idlesheep", "Images/Sheep-Idle.png");
+		addImage("fireball", "Images/Fire.png");
+		addImage("rock", "Images/Rock.png");
+		addImage("smallrock", "Images/Rock-Small.png");
+		addImage("rocktile", "Images/Tile.png");
+		addImage("floatingwine", "Images/FloatingWine.png");
+		addImage("wineattack", "Images/WineAttack.png");
+		addImage("wineglass", "Images/WineGlass.png");
+		addImage("reddrop", "Images/RedDrop.png");
+		addImage("whitearrow", "Images/WhiteArrow.png");
+		addImage("fontsmall", "Images/PressStart2P-sml.png");
+		addImage("fontmedium", "Images/PressStart2P-mid.png");
+		addImage("font", "Fonts/PressStart2P.png");
+		addImage("head", "Images/Head.png");
+		addImage("body", "Images/Body.png");
+		addImage("brickwall", "Images/WallTile.png");
+		addImage("blanktile", "Images/BlankTile.png");
+		addImage("tiledarkup", "Images/TileDarkUp.png");
+		addImage("playeridle", "Images/PlayerIdle.png");
+		addImage("playerwalk", "Images/PlayerWalk.png");
+		addImage("shadow", "Images/Shadow.png");
+		addImage("torpedo", "Images/Torpedo.png");
+		addImage("shiny", "Images/Shiny.png");
+		addImage("signal", "Images/Signal.png");
+		addImage("slow", "Images/Slow.png");
+		addImage("invulnerable", "Images/Invulnerable.png");
+		addImage("pickblock", "Images/Pickblock.png");
+		addImage("v", "Images/V.png");
+		addImage("notv", "Images/NotV.png");
+		addImage("patterntile", "Images/PatternTile.png");
+		addImage("spearman", "Images/SpearmanIdle.png");
+		addImage("spearmanwalk", "Images/SpearmanWalk.png");
+		addImage("fly", "Images/Fly.png");
+		addImage("weaponslot", "Images/Inventory/WeaponSlot.png");
+		addImage("ringslot", "Images/Inventory/RingSlot.png");
+		addImage("abilityslot", "Images/Inventory/AbilitySlot.png");
+		addImage("armorslot", "Images/Inventory/ArmorSlot.png");
+		addImage("genericsword", "Images/GenericSword.png");
+		addImage("hoppy", "Images/Hoppy.png");
+		addImage("hoppyidle", "Images/HoppyTPose.png");
+		addImage("construct", "Images/Construct.png");
+		addImage("constructactivate", "Images/ConstructActivate.png");
+		addImage("constructwalk", "Images/ConstructWalk.png");
+		addImage("holetile", "Images/HoleTile.png");
+		addImage("rockywall", "Images/RockyWall.png");
+		addImage("rockywallns", "Images/RockyWallNoShadow.png");
+		addImage("bandage", "Images/Bandage.png");
+		addInSpriteSheet("crackedrock", "Images/CrackedRockSheet.png", 16, 16);
+		addInSpriteSheet("outline16", "Images/16x16Outline.png", 16, 16);
 		Iterator<Entry<String, Image>> it = i.entrySet().iterator();
 		while (it.hasNext()) {
 			Image i = it.next().getValue();
@@ -115,7 +128,19 @@ public class MainGame extends StateBasedGame {
 	}
 	
 	public void addImage(String name, String s) throws SlickException {
-		i.put(name, new Image(s,false, Image.FILTER_NEAREST));
+		i.put(name.toLowerCase(), new Image(s,false, Image.FILTER_NEAREST));
+	}
+	
+	public void addInSpriteSheet(String name, String s, int width, int height) throws SlickException {
+		SpriteSheet sh = new SpriteSheet(s, width, height);
+		for (int y = 0; y < sh.getHeight()/height; y++) {
+			for (int x = 0; x < sh.getWidth()/width; x++) {
+				Image im = sh.getSprite(x, y);
+				im.setFilter(Image.FILTER_NEAREST);
+				i.put(name.toLowerCase()+x+"x"+y, im);
+				System.out.println(name.toLowerCase()+x+"x"+y);
+			}
+		}
 	}
 
 	public void loadSounds() throws SlickException {
@@ -162,7 +187,7 @@ public class MainGame extends StateBasedGame {
 	public static void main(String[] args) throws SlickException {
 		mm = new MainGame();
 		AppGameContainer gc = new AppGameContainer(mm, 640, 480, false);
-		//gc.setTargetFrameRate(59);
+		gc.setTargetFrameRate(59);
 		gc.setMinimumLogicUpdateInterval(16);
 		gc.setMaximumLogicUpdateInterval(16);
 		gc.setShowFPS(false);
@@ -177,8 +202,12 @@ public class MainGame extends StateBasedGame {
 			} else if (arg.startsWith("-map:")) {
 				arg = arg.replaceFirst("-map:", "");
 				startMap = arg;
+			} else if (arg.startsWith("-small")) {
+				windowScale = 1f;
 			}
 		}
+		camRatio *= windowScale;
+		gc.setDisplayMode((int)(640*windowScale), (int)(480*windowScale), false);
 		gc.start();
 	}
 	

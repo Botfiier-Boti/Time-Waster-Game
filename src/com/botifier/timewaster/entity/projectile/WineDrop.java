@@ -18,7 +18,7 @@ public class WineDrop extends LobbedProjectile {
 		hasshadow = true;
 		flip = true;
 		dir = true;
-		rotate = 0;
+		setRotation(0);
 	}
 	@Override
 	public void update(int delta) throws SlickException {
