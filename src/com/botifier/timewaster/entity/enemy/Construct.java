@@ -17,6 +17,7 @@ import com.botifier.timewaster.util.movements.EnemyController;
 public class Construct extends Enemy {
 	Animation activate;
 	boolean activated = false;
+	boolean fired = false;
 	int phase = 0;
 	
 	//Phase change percentage
@@ -33,11 +34,17 @@ public class Construct extends Enemy {
 		this.behaviors.add(new OrbitBehavior(this));
 		this.behaviors.add(new SetDashBehavior(this));
 		StabPattern stp = new StabPattern();
-		stp.shots = 1;
-		stp.shotMultiplier = 4;
-		stp.momentumDelay = 1000;
+		stp.shots = 4;
+		stp.shotMultiplier = 8;
+		stp.momentumDelay = 750;
+		stp.boomerang = false;
+		stp.inf = true;
 		stp.homing = true;
-		stp.homingThreshold = 0.2f;
+		stp.obstaclePierce = false;
+		stp.enemyPierce = false;
+		stp.homingThreshold = 0.01f;
+		stp.duration = 8000;
+		stp.fireSpeed = 4.0f;
 		this.patterns.add(stp);
 		this.patterns.add(new ConstructEyeLasers());
 	}
@@ -55,7 +62,7 @@ public class Construct extends Enemy {
 		autoPlayAttack = false;
 		spawncap = 10;
 		linger = false;		
-		size = 3f;
+		setSize(3f);
 		this.updateHitboxes();
 	}
 	
@@ -73,12 +80,14 @@ public class Construct extends Enemy {
 			getStats().setCurrentHealth(getMaxHealth()*lastHealth);
 			getController().stop();
 			getStatusEffectManager().removeEffect(InvulnerabilityEffect.class);
+			SetDashBehavior db = (SetDashBehavior)behaviors.get(1);
+			db.stop();
 			phase++;
 		}
 		if (activated) {
 			if (activate.isStopped()) {
 				getStatusEffectManager().removeEffect(InvulnerabilityEffect.class);
-				cls = MainGame.getEntityManager().findClosestEnemy(this, 200);
+				cls = MainGame.getEntityManager().findClosestEnemy(this, 400);
 				if (cls != null) {
 					float angle = Math2.calcAngle(cls.getLocation(),getLocation());
 					switch (phase) {
@@ -95,12 +104,18 @@ public class Construct extends Enemy {
 							currentBehavior = 1;
 							currentPattern = 0;
 							SetDashBehavior db = (SetDashBehavior)behaviors.get(1);
-							db.setDashDistance(1);
-							db.setBonusSpeed(50);
+							db.setDashDistance(10000);
+							db.setBonusSpeed(75);
 							if (db.isDashing() == false) {
-								shootBullet(Math2.calcAngle(getLocation(),cls.getLocation()), cls, true);
-								db.setTarget(cls.getLocation());
+								if (db.getTarget() == null)
+									db.setTarget(cls.getLocation());
+							} else if (getController().wasMovementHindered()) {
+								shootBullet(Math2.calcAngle(getLocation(),cls.getLocation()), cls, false);
+								db.stop();
+								db.setAngle((float) ((db.getAngle()-Math.PI)*1.25 % (2 * Math.PI)));
 							}
+							break;
+						case 2:
 							break;
 						default:
 							currentBehavior = 0;

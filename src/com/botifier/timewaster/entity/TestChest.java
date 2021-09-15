@@ -17,7 +17,7 @@ public class TestChest extends Entity {
 		solid = true;
 		obstacle = true;
 		setMaxHealth(2000, true);
-		size = 1f;
+		setSize(1f);
 	}
 	@Override
 	public void update(int delta) throws SlickException {

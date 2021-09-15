@@ -17,7 +17,7 @@ public class SnakeBody extends Enemy{
 	public SnakeBody(float x, float y, Entity owner) {
 		super("SnakeBody", MainGame.getImage("Body"), new EnemyController(x,y,1f,100,false), null, null);
 		setMaxHealth(2000, true);
-		o = owner;
+		setOwner(owner);
 		getStats().setDefense(50);
 		getStats().setDexterity(50);
 		getStats().setSpeed(200);
@@ -36,11 +36,11 @@ public class SnakeBody extends Enemy{
 	@Override
 	public void update(int delta) throws SlickException {
 		super.update(delta);
-		if (o == null) {
+		if (getOwner() == null) {
 			destroy = true;
 			return;
 		}
-		if (o.destroy == true) {
+		if (getOwner().destroy == true) {
 			destroy = true;
 			return;
 		}
@@ -56,12 +56,12 @@ public class SnakeBody extends Enemy{
 			b.add(bul);
 			cooldown = (int)(1000/(2.5f + 6.5f*((getDexterity())/75f)));
 		}
-		fb.setTarget(o);
+		fb.setTarget(getOwner());
 		/*if (index > 0) {
 			fb.setTarget(o.spawns.get(index-1));
 		} else {
 			fb.setTarget(o);
 		}*/
-		getStats().setSpeed(o.getSpeed()*2);
+		getStats().setSpeed(getOwner().getSpeed()*2);
 	}
 }

@@ -88,7 +88,7 @@ public class Dungeon {
 				}
 			}
 		}
-		MainGame.getCurrentMap().tiles = tiles;
+		//MainGame.getCurrentMap().tiles = tiles;
 	}
 	
 	private void hCorri(int x1, int x2, int y) {

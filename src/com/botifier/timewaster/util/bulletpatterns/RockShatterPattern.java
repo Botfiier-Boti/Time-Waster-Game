@@ -9,14 +9,15 @@ public class RockShatterPattern extends BulletPattern {
 
 	public RockShatterPattern() {
 		fireSpeed = 1f;
-		bulletSpeed = 25f;
-		duration = 2500;
-		shots = 5;
+		bulletSpeed = 50f;
+		duration = 1250;
+		shots = 3;
 		spread= 360/shots;
-		mindamage = 55;
+		mindamage = 65;
 		armorPierce = true;
 		atkScaling = false;
 		hasShadow = false;
+		itShots = false;
 		override = MainGame.getImage("smallrock");
 	}
 

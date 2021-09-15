@@ -28,7 +28,7 @@ public class ConstructEyeLasers extends BulletPattern {
 	@Override
 	public void fire(Entity owner, float x, float y, float angle, Entity target) throws SlickException {
 		for (int i = 0; i < shots; i++) {
-			Vector2f loc = new Vector2f(owner.getLocation().x-(i % 2 == 0 ? -1.6666666f : 1.6666666f)*owner.size, owner.getLocation().y-((owner.hitbox.getHeight()-3.5f*owner.size)));
+			Vector2f loc = new Vector2f(owner.getLocation().x-(i % 2 == 0 ? -1.6666666f : 1.6666666f)*owner.getSize(), owner.getLocation().y-((owner.getHitbox().getHeight()-3.5f*owner.getSize())));
 			Vector2f targetA = new Vector2f(x+(float)Math.cos(angle), y+(float)Math.sin(angle));
 			if (target != null)
 				targetA = target.getLocation();

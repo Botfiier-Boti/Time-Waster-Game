@@ -53,8 +53,8 @@ public class BulletSpawner extends Enemy {
 		}
 		if (cooldown3 <= 0) {
 
-			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, (float)Math.toRadians(180), 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false, false, 0, 0, 0));
-			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, 0, 20000, OUTER_DAMAGE, 0,this,false,true,false,false,false, false, 0, 0, 0));
+			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, (float)Math.toRadians(180), 20000, 0, 0,this,false,true,false,false,false, false, 0, 0, 0));
+			b.add(Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 100, 0, 20000, 0, 0,this,false,true,false,false,false, false, 0, 0, 0));
 			cooldown3 = 50;
 		}
 		if (delay <= 0) {

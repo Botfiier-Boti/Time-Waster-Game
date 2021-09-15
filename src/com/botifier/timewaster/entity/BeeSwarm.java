@@ -9,9 +9,24 @@ import com.botifier.timewaster.util.Entity;
 import com.botifier.timewaster.util.behaviors.OrbitBehavior;
 import com.botifier.timewaster.util.movements.EnemyController;
 
+/**
+ * Bee Swarm class
+ * @author Botifier
+ *
+ */
 public class BeeSwarm extends Enemy{
+	/**
+	 * Circle of influence
+	 */
 	Circle influenceCircle = null;
 	
+	/**
+	 * Bee Swarm constructor
+	 * @param x float X position
+	 * @param y float Y position
+	 * @param size int Amount of bees within the swarm
+	 * @param owner Entity The owner of the swarm
+	 */
 	public BeeSwarm(float x, float y, int size, Entity owner) {
 		super("Bee Swarm", MainGame.getImage("beehive"), new EnemyController(x,y,3f,50, false), null, null);
 		visible = true;
@@ -21,10 +36,10 @@ public class BeeSwarm extends Enemy{
 		invulnerable = true;
 		healthbarVisible = false;
 		getStats().setSpeed(50);
-		o = owner;
+		setOwner(owner);
 		getController().allyCollision = false;
 		//Destroy if owner is invalid
-		if (o == null) {
+		if (getOwner() == null) {
 			destroy = true;
 			return;
 		}
@@ -33,13 +48,13 @@ public class BeeSwarm extends Enemy{
 			Bee b = new Bee(x,y);
 			b.getController().allyCollision = false;
 			b.getStats().setAttack(getOwner().getAttack()/4);
-			b.team = this.team;
-			b.o = this;
+			b.setTeam(this.getTeam());
+			b.setOwner(this);
 			spawns.add(b);
 		}
 		behaviors.add(new OrbitBehavior(this));
 		currentBehavior = 0;
-		influenceCircle = new Circle(this.getLocation().x, this.getLocation().y, influence);
+		influenceCircle = new Circle(this.getLocation().x, this.getLocation().y, getInfluence());
 	}
 	
 	@Override
@@ -73,8 +88,8 @@ public class BeeSwarm extends Enemy{
 					MainGame.getEntityManager().removeEntity(b);
 					continue;
 				}
-				if (b.team != this.team)
-					b.team = this.team;
+				if (b.getTeam() != this.getTeam())
+					b.setTeam(this.getTeam());
 				if (!MainGame.getEntities().contains(b) && b.destroy != true)
 					MainGame.getEntities().add(b);
 				if (b.getController().wanderArea != this.influenceCircle) {

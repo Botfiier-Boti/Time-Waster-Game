@@ -21,6 +21,7 @@ dwalkable ! CrackedRock0x0
 dwalkable @ CrackedRock2x0
 dwalkable $ CrackedRock2x2
 dwalkable % CrackedRock0x2
+addentity 200, BigGoblin, 240, 240
 startmap
 BBBBBBBBBBBBBBBBBBBBBB
 BB##################BB

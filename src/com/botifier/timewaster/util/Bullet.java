@@ -1,8 +1,11 @@
 package com.botifier.timewaster.util;
 
+
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
+
 import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.statuseffect.StatusEffect;
 import com.botifier.timewaster.util.movements.BulletController;
@@ -66,8 +69,8 @@ public class Bullet extends Entity {
 		super(name, MainGame.getImage("DefaultShot"), new BulletController(x, y, speed, lifeTime, angle, origin),0);
 		rotation = (float) Math.toDegrees(angle);
 		setBaseDamage(new int[] {minDmg, maxDmg});
-		wOverride = 3;
-		hOverride = 3;
+		wOverride = 6;
+		hOverride = 6;
 		healthbarVisible = false;
 		hasshadow = false;
 	}
@@ -92,8 +95,8 @@ public class Bullet extends Entity {
 		super(name, MainGame.getImage("DefaultShot"), new BulletController(x, y, speed, lifeTime, angle, origin, pierceObstacles, pierceEnemies, boomerang),0);
 		rotation = (float) Math.toDegrees(angle);
 		setBaseDamage(new int[] {minDmg, maxDmg});
-		wOverride = 3;
-		hOverride = 3;
+		wOverride = 6;
+		hOverride = 6;
 		healthbarVisible = false;
 		hasshadow = false;
 	}
@@ -119,8 +122,8 @@ public class Bullet extends Entity {
 		super(name, i, new BulletController(x, y, speed, lifeTime, angle, origin, pierceObstacles, pierceEnemies, boomerang),0);
 		rotation = (float) Math.toDegrees(angle);
 		setBaseDamage(new int[] {minDmg, maxDmg});
-		wOverride = 3;
-		hOverride = 3;
+		wOverride = 6;
+		hOverride = 6;
 		healthbarVisible = false;
 		hasshadow = false;
 	}
@@ -135,22 +138,24 @@ public class Bullet extends Entity {
 		super(name,i,controller);
 		rotation = 0;
 		setBaseDamage(new int[] {0, 0});
-		wOverride = 3;
-		hOverride = 3;
 		healthbarVisible = false;
 		hasshadow = false;
 	}
 
 	@Override
 	public void update(int delta) throws SlickException {
-		angle = getController().visualAngle;
+		setAngle(getController().visualAngle);
 		if (!overrideMove && getController() != null)
 			getController().move(delta);
-		if (getController().getOrigin() != null && getController().getOrigin().team != team)
-			team = getController().getOrigin().team;
+		if (getController().getOrigin() != null && getController().getOrigin().getTeam() != getTeam())
+			setTeam(getController().getOrigin().getTeam());
 		if (hitbox != null) {
 			hitbox.setCenterX(getLocation().getX());
 			hitbox.setY(getLocation().getY()-posMod.y-(hitbox.getHeight()));	
+		}
+		if (collisionbox != null) {
+			collisionbox.setCenterX(getLocation().getX());
+			collisionbox.setY(getLocation().getY()-posMod.y-(collisionbox.getHeight()));	
 		}
 		rotation = (float) Math.toDegrees(getController().visualAngle);
 		if (getController().isMoving() == false) {
@@ -167,12 +172,24 @@ public class Bullet extends Entity {
 	
 	@Override
 	public void addBullet(Entity e) {
-		o.addBullet(e);
+		getOwner().addBullet(e);
 	}
 	
 	@Override
 	public BulletController getController() {
 		return ((BulletController)super.getController());
+	}
+	
+	@Override
+	public void init() {//Gives the entity a random UUID
+		wOverride = 1;
+		hOverride = 1;
+		//Creates a hitbox
+		hitbox = new Rectangle(getLocation().getX(), getLocation().getY(), wOverride, hOverride);
+		//Creates a collisonbox
+		collisionbox = new Rectangle(getLocation().getX(), getLocation().getY(), wOverride, hOverride);
+		//Indicates that the bullet is initialized
+		initialized = true;
 	}
 	
 	/**
@@ -206,7 +223,7 @@ public class Bullet extends Entity {
 		b.spread = spread;
 		b.shot = shotIt;
 		b.shots = shots;
-		b.team = origin.team;
+		b.setTeam(origin.getTeam());
 		return b;
 	}
 	

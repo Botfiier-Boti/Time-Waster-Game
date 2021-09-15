@@ -6,7 +6,7 @@ import org.newdawn.slick.SlickException;
 
 import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.util.Entity;
-import com.botifier.timewaster.util.movements.EntityController;
+import com.botifier.timewaster.util.movements.SimpleEntityController;
 
 //Text
 public class PopupText extends Entity {
@@ -16,7 +16,7 @@ public class PopupText extends Entity {
 	boolean inf = false;
 	
 	public PopupText(String text, float x, float y, Color c) throws SlickException {
-		super("Text", null, new EntityController(x, y));
+		super("Text", null, new SimpleEntityController(x, y));
 		getController().setDestination(x, y-30);
 		getController().setCollision(false);
 		getStats().setSpeed(15);
@@ -25,6 +25,7 @@ public class PopupText extends Entity {
 		solid = false;
 		healthbarVisible = false;
 		invincible = true;
+		getController().allyCollision = false;
 	}
 	
 	@Override

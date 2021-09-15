@@ -39,7 +39,7 @@ public class WineDrop extends LobbedProjectile {
 		MainGame.spawnTempEffect(c, 100, Color.red);
 		for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
 			Entity en = MainGame.getEntities().get(i);
-			if (en instanceof Bullet || en.isInvincible() || en == this || en.team == team || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > 5)
+			if (en instanceof Bullet || en.isInvincible() || en == this || en.getTeam() == getTeam() || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > 5)
 				continue;
 			en.onHit(15, this, true);
 		}

@@ -25,6 +25,7 @@ public class EntityController implements Cloneable {
 	protected float truespeed;
 	protected boolean moving = false;
 	protected boolean obeysCollision = true;
+	protected boolean movementAffected = false;
 	public Rectangle testBox = new Rectangle(0, 0, 0, 0);
 	protected float angle = 0;
 	protected float anglemod = 0;
@@ -124,7 +125,7 @@ public class EntityController implements Cloneable {
 	}
 
 	public float getPPS() {
-		return getOwner().getStats().getPPS();
+		return getOwner().getStats().getPPU();
 	}
 
 	public boolean isBlocked() {
@@ -141,6 +142,7 @@ public class EntityController implements Cloneable {
 		DOWN = true;
 		LEFT = true;
 		RIGHT = true;
+		movementAffected = false;
 		if (dst == null) {
 			moving = false;
 			return;
@@ -164,9 +166,9 @@ public class EntityController implements Cloneable {
 		visualAngle = angle;
 		angle = Math2.calcAngle(src, dst);
 		lDst = src.copy();
-		if (path.size() > owner.followers.size() * 16)
+		if (path.size() > owner.getFollowers().size() * 16)
 			path.removeLast();
-		if (owner.followers.size() > 0 && moving)
+		if (owner.getFollowers().size() > 0 && moving)
 			path.addFirst(lDst);
 		else {
 			if (path.size() > 0)
@@ -177,18 +179,22 @@ public class EntityController implements Cloneable {
 		
 		if (UP == false && hold.y < 0) {
 			hold.y = 0;
+			movementAffected = true;
 		}
 
 		if (DOWN == false && hold.y > 0) {
 			hold.y = 0;
+			movementAffected = true;
 		}
 
 		if (LEFT == false && hold.x < 0) {
 			hold.x = 0;
+			movementAffected = true;
 		}
 
 		if (RIGHT == false && hold.x > 0) {
 			hold.x = 0;
+			movementAffected = true;
 		}
 
 		if (src.distance(dst) < getPPS()) {
@@ -257,23 +263,27 @@ public class EntityController implements Cloneable {
 			moving = true;
 		}
 	}
+	
+	public boolean wasMovementHindered() {
+		return movementAffected;
+	}
 
 	public boolean obeysCollision() {
 		return this.obeysCollision;
 	}
 
 	public void seperate() {
-		int seperateRadius = (int) (getOwner().collisionbox.getWidth() / 4);
+		int seperateRadius = (int) (getOwner().getCollisionbox().getWidth() / 4);
 		int count = 0;
 		for (int i = MainGame.getEntities().size() - 1; i > 0; i--) {
 			Entity e = MainGame.getEntities().get(i);
 			if (count > 10)
 				break;
-			if (e == getOwner() || e.getController().isMoving() == false || e.team != getOwner().team
+			if (e == getOwner() || e.getController().isMoving() == false || e.getTeam() != getOwner().getTeam()
 					|| e.targetable == false || e.getController().allyCollision == false || e.active == false || e.visible == false || e.destroy == true
 					|| e.getController().obeysCollision == false
 					|| (getLoc().distance(e.getLocation()) >= seperateRadius
-							&& e.getLocation().distance(getLoc()) >= e.collisionbox.getWidth() / 4)) {
+							&& e.getLocation().distance(getLoc()) >= e.getCollisionbox().getWidth() / 4)) {
 				continue;
 			}
 			desired.sub(src.copy().sub(e.getLocation()));
@@ -470,7 +480,7 @@ public class EntityController implements Cloneable {
 			int y =  (int)(src.y / 16);
 			
 			if (MainGame.getCurrentMap().blocked(x, y)) {
-				if (Math2.overlaps(getOwner().collisionbox, new Rectangle(x*16, y*16, 16, 16), move)) {
+				if (Math2.overlaps(getOwner().getCollisionbox(), new Rectangle(x*16, y*16, 16, 16), move)) {
 					newMove.x=0;
 					newMove.y=0;
 					System.out.println("e");
@@ -502,16 +512,16 @@ public class EntityController implements Cloneable {
 		int cYMD = (int) ((getOwner().collisionbox.getCenterY()+getPPS()) / 16);*/
 		
 		if (obeysCollision) {//((minX >= 0 && (maxX < m.getWidthInTiles())) && (minY >= 0 && maxY < m.getHeightInTiles()))) {
-			int xL = (int) ((getOwner().collisionbox.getMinX()-getPPS()) / 16);
-			int yU = (int) ((getOwner().collisionbox.getMinY()-getPPS()) / 16);
-			int xR = (int) ((getOwner().collisionbox.getMaxX()+getPPS()) / 16);
-			int yD = (int) ((getOwner().collisionbox.getMaxY()+getPPS()) / 16);
-			for (int e = 0; e < getOwner().collisionbox.getHeight(); e++) {
-				for (int i = 0; i < getOwner().collisionbox.getWidth(); i++) {
-					if ((i > 0 && i < getOwner().collisionbox.getWidth()-1)&& e != 0 && e != getOwner().collisionbox.getHeight()-1)
+			int xL = (int) ((getOwner().getCollisionbox().getMinX()-getPPS()) / 16);
+			int yU = (int) ((getOwner().getCollisionbox().getMinY()-getPPS()) / 16);
+			int xR = (int) ((getOwner().getCollisionbox().getMaxX()+getPPS()) / 16);
+			int yD = (int) ((getOwner().getCollisionbox().getMaxY()+getPPS()) / 16);
+			for (int e = 0; e < getOwner().getCollisionbox().getHeight(); e++) {
+				for (int i = 0; i < getOwner().getCollisionbox().getWidth(); i++) {
+					if ((i > 0 && i < getOwner().getCollisionbox().getWidth()-1)&& e != 0 && e != getOwner().getCollisionbox().getHeight()-1)
 						continue;
-					int x = (int) ((getOwner().collisionbox.getMinX()+i) / 16);
-					int y = (int) ((getOwner().collisionbox.getMinY()+e) / 16);
+					int x = (int) ((getOwner().getCollisionbox().getMinX()+i) / 16);
+					int y = (int) ((getOwner().getCollisionbox().getMinY()+e) / 16);
 					
 					if (UP == true && yU >= 0 && m.blocked(x, yU)) {
 						UP = false;

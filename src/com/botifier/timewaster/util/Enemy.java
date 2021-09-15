@@ -106,7 +106,7 @@ public class Enemy extends Entity {
 			aAttack.stop();
 			//aAttack.start();
 		}
-		team = Team.ENEMY;
+		setTeam(Team.ENEMY);
 	}
 	
 	/**
@@ -133,7 +133,7 @@ public class Enemy extends Entity {
 			aAttack.stop();
 			//aAttack.start();
 		}
-		team = Team.ENEMY;
+		setTeam(Team.ENEMY);
 	}
 	
 	/**
@@ -167,7 +167,7 @@ public class Enemy extends Entity {
 			aIdle.setLooping(true);
 			//aIdle.start();
 		}
-		team = Team.ENEMY;
+		setTeam(Team.ENEMY);
 	}
 	
 	/**
@@ -189,7 +189,7 @@ public class Enemy extends Entity {
 			aAttack.stop();
 			//aAttack.start();
 		}
-		team = Team.ENEMY;
+		setTeam(Team.ENEMY);
 	}
 	
 	@Override
@@ -248,7 +248,7 @@ public class Enemy extends Entity {
 				dir = false;
 			}
 		}
-		if (cls != null && cls.getLocation().distance(getLocation()) > influence)
+		if (cls != null && cls.getLocation().distance(getLocation()) > getInfluence())
 			cls = null;
 	}
 
@@ -259,11 +259,12 @@ public class Enemy extends Entity {
 				Vector2f iLoc = getLocation().copy();
 				iLoc.y -= posMod.y;
 				iLoc.x -= posMod.x;
-				Image i = current.getScaledCopy(size).getFlippedCopy(dir, flip);
+				Image i = current.getFlippedCopy(dir, flip);
 				i.setCenterOfRotation(i.getWidth()/2, i.getHeight()/2);
 				i.setRotation(rotation);
 				
-				g.drawImage(i, iLoc.getX()-i.getWidth()/2, iLoc.getY()-i.getHeight());
+				i.draw(iLoc.getX()-(i.getWidth()*getSize())/2, iLoc.getY()-i.getHeight()*getSize(), i.getWidth()*getSize(), i.getHeight()*getSize());
+				
 				/*if (attacking == true && aAttack != null) {
 					Image i = aAttack.getCurrentFrame().getScaledCopy(size).getFlippedCopy(dir, flip);
 					Vector2f iLoc = getLocation().copy();
@@ -294,7 +295,7 @@ public class Enemy extends Entity {
 				g.drawString(getName().substring(0, 1), getLocation().getX(), getLocation().getY());
 			
 			if (MainGame.displayHitboxes) {
-				g.drawLine(getLocation().getX(), getLocation().getY(), getLocation().getX()+((float)Math.cos(angle)*5), getLocation().getY()+((float)Math.sin(angle)*5));
+				g.drawLine(getLocation().getX(), getLocation().getY(), getLocation().getX()+((float)Math.cos(getAngle())*5), getLocation().getY()+((float)Math.sin(getAngle())*5));
 				g.draw(hitbox);
 				if (getController().testBox != null)
 					g.draw(getController().testBox);
@@ -335,7 +336,7 @@ public class Enemy extends Entity {
 	public boolean shootBullet(float x, float y, boolean force) throws SlickException {
 		if (cooldown <= 0 || force) {
 			BulletPattern bp = patterns.get(currentPattern);
-			bp.fire(this, x, y, angle, null);
+			bp.fire(this, x, y, getAngle(), null);
 			float SPS = (1.5f + 6.5f*((getDexterity())/75f))*bp.fireSpeed;
 			cooldown = 1000/SPS;
 			if (autoPlayAttack) 

@@ -247,7 +247,7 @@ public class MapEditorState extends BasicGameState {
 				e.draw(g);
 		}
 		if (selected != null)
-			g.draw(selected.hitbox);
+			g.draw(selected.getHitbox());
 		g.drawString("S", m.getSpawnPoint().x+11, m.getSpawnPoint().y+11);
 		switch (mode) {
 			case PAINT_MODE:
@@ -341,18 +341,18 @@ public class MapEditorState extends BasicGameState {
 						case SELECT_ENTITY_MODE:
 							for (int i = m.getInitialEntities().size()-1; i >= 0; i--) {
 								Entity e = m.getInitialEntities().get(i);
-								if (e.hitbox.contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
+								if (e.getHitbox().contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
 									selected = e;
 								}
 							}
 							break;
 						case MOVE_ENTITY_MODE:
 							if (selected != null) {
-								selected.getController().teleport(gc.getInput().getMouseX(), gc.getInput().getMouseY()+selected.hitbox.getHeight()/2);
+								selected.getController().teleport(gc.getInput().getMouseX(), gc.getInput().getMouseY()+selected.getHitbox().getHeight()/2);
 							} else {
 								for (int i = m.getInitialEntities().size()-1; i >= 0; i--) {
 									Entity e = m.getInitialEntities().get(i);
-									if (e.hitbox.contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
+									if (e.getHitbox().contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
 										selected = e;
 									}
 								}

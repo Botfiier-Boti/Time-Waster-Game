@@ -10,7 +10,6 @@ import static com.botifier.timewaster.main.MainGame.startMap;
 import static com.botifier.timewaster.main.MainGame.ttf;
 import static com.botifier.timewaster.main.MainGame.ttfB;
 
-import java.io.IOException;
 import java.util.Random;
 
 import org.newdawn.slick.Color;
@@ -64,9 +63,15 @@ public class OverworldState extends BasicGameState {
 			m = new TileMap(tiles);
 			try {
 				m.loadFromFile(startMap);
-			} catch (IOException e) {
-				System.out.println("An Error occured loading the map.");
+			} catch (Exception e) {
+				System.out.println("An Error occured loading the map. Attempting to load default...");
 				e.printStackTrace();
+				try {
+					m.loadFromFile("testmap.map");
+				} catch (Exception e1) {
+					System.out.println("TOTAL FAILURE: Default map does not exist.");
+					e1.printStackTrace();
+				}
 			}
 		}
 		m.init();
@@ -142,7 +147,7 @@ public class OverworldState extends BasicGameState {
 			g.addComponent(new ButtonComponent(g, "Edit Map", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
 				@Override
 				public void run() {
-					m.eM.getBullets().clear();
+					m.getEntityManager().getBullets().clear();
 					mm.enterState(MapEditorState.ID);
 				}
 			},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.05f, (gc.getWidth() / 4) - 20, 20, true));
@@ -203,10 +208,8 @@ public class OverworldState extends BasicGameState {
 		}
 		g.setColor(Color.white);
 		if (targeted != null && targeted.image != null) {
-			g.draw(targeted.hitbox);
+			g.draw(targeted.getHitbox());
 		}
-		if (m.big.getPoints().length > 0)
-			g.draw(m.big);
 		dead.draw(g);
 		g.resetTransform();
 		if (!g.getFont().equals(ttf))
@@ -232,7 +235,7 @@ public class OverworldState extends BasicGameState {
 				g.drawString("Targeted Health: " + targeted.getStats().getCurrentHealth() + "/" + targeted.getStats().getMaxHealth()+targeted.getStats().getHealthMod(), 10, 136);
 				g.drawString("Targeted Atk: " + targeted.getAttack(), 10, 150);
 				g.drawString("Targeted Def: " + targeted.getDefense(), 10, 164);
-				g.drawString("Influence: " + (int) targeted.influence, 10, 178);
+				g.drawString("Influence: " + (int) targeted.getInfluence(), 10, 178);
 			}
 		}
 	}
@@ -282,7 +285,7 @@ public class OverworldState extends BasicGameState {
 			for (int ie = eM.getEntities().size() - 1; ie >= 0; ie--) {
 				Entity en = eM.getEntities().get(ie);
 				if (getCamera().getCenterEntity() != null && getCamera().getCenterEntity() == mtrack) {
-					if (en.hitbox.contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
+					if (en.getHitbox().contains(gc.getInput().getMouseX(), gc.getInput().getMouseY())) {
 						if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
 							targeted = en;
 						}
@@ -334,9 +337,9 @@ public class OverworldState extends BasicGameState {
 	
 	public void reset(GameContainer gc) throws SlickException {
 		m.reset();
-		p.b.clear();
+		p.getBullets().clear();
 		p.getStatusEffectManager().clearEffects();
-		m.eM.clearBullets();
+		m.getEntityManager().clearBullets();
 		init(gc, mm);
 	}
 	

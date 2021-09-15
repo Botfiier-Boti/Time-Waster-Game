@@ -81,11 +81,11 @@ public abstract class BulletPattern {
 			ny = (int) ((rad*8) * Math.sin(angle+aRad));		
 		}
 		if (predictive == true && target != null && target.getController().isMoving()) {
-			na = Math.toDegrees(Math2.calcAngle(new Vector2f(x+nx, y+ny), new Vector2f(target.getLocation().x+(float)(Math.sin(target.angle))*target.getController().getPPS()*10,target.getLocation().y+(float)(Math.cos(target.angle))*target.getController().getPPS()*10)));
+			na = Math.toDegrees(Math2.calcAngle(new Vector2f(x+nx, y+ny), new Vector2f(target.getLocation().x+(float)(Math.sin(target.getAngle()))*target.getController().getPPS()*10,target.getLocation().y+(float)(Math.cos(target.getAngle()))*target.getController().getPPS()*10)));
 		}
 		Bullet b = Bullet.createBullet("Bob", x+nx, y+ny, bulletSpeed, (float)Math.toRadians(na+aMod), duration, mindamage,maxdamage,owner, obstaclePierce, enemyPierce, armorPierce, boomerang, hasShadow, atkScaling, shotIt, shots, spread);
 		b.getController().inf = inf;
-		b.size = scale;
+		b.setSize(scale);
 		b.getController().wavy = wavy;
 		b.getController().frequency = frequency;
 		b.getController().amplitude = amplitude;

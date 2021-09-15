@@ -29,7 +29,7 @@ public class SnakeHead extends Enemy {
 		linger = false;
 		invulnerable = true;
 		healthbarVisible = false;
-		spawncap = 1000;
+		spawncap = length;
 		setMaxHealth(4500, true);
 		posMod.y = 3;
 		getController().setCollision(false);

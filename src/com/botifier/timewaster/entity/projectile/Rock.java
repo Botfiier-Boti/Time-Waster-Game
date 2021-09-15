@@ -24,6 +24,7 @@ public class Rock extends LobbedProjectile {
 			rotate = -rotate;
 		iModifier = 5f;
 		rsp = new RockShatterPattern();
+		visible = false;
 	}
 	
 	@Override
@@ -35,11 +36,14 @@ public class Rock extends LobbedProjectile {
 	@Override
 	public void onLand() throws SlickException {
 		cls = MainGame.getEntityManager().findClosestEnemy(this, 500);
-		if (cls == null) {
-			rsp.fire(this, this.getLocation().getX(),  this.getLocation().getY(), (float)Math.toRadians(r.nextInt(360)));
-		} else {
-			float angle = Math2.calcAngle(getLocation(),cls.getLocation());
-			rsp.fire(this, this.getLocation().getX(),  this.getLocation().getY(), angle);
+		if (seen) {
+
+			if (cls == null) {
+				rsp.fire(this, this.getLocation().getX(),  this.getLocation().getY(), (float)Math.toRadians(r.nextInt(360)));
+			} else {
+				float angle = Math2.calcAngle(getLocation(),cls.getLocation());
+				rsp.fire(this, this.getLocation().getX(),  this.getLocation().getY(), angle);
+			}
 		}
 		destroy = true;
 	}

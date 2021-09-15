@@ -25,16 +25,16 @@ public class RockThrowPattern extends BulletPattern {
 	
 	public void fire(Entity owner, float x, float y, float angle, float distance) throws SlickException {
 		if (dir) {
-			owner.b.add(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x+distance,owner.getLocation().y+distance), owner));
-			owner.b.add(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x-distance,owner.getLocation().y+distance), owner));
-			owner.b.add(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x+distance,owner.getLocation().y-distance), owner));
-			owner.b.add(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x-distance,owner.getLocation().y-distance), owner));
+			owner.addBullet(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x+distance,owner.getLocation().y+distance), owner));
+			owner.addBullet(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x-distance,owner.getLocation().y+distance), owner));
+			owner.addBullet(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x+distance,owner.getLocation().y-distance), owner));
+			owner.addBullet(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x-distance,owner.getLocation().y-distance), owner));
 			dir = false;
 		} else {
-			owner.b.add(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x,owner.getLocation().y+distance*1.35f), owner));
-			owner.b.add(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x-distance*1.35f,owner.getLocation().y), owner));
-			owner.b.add(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x,owner.getLocation().y-distance*1.35f), owner));
-			owner.b.add(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x+distance*1.35f,owner.getLocation().y), owner));
+			owner.addBullet(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x,owner.getLocation().y+distance*1.35f), owner));
+			owner.addBullet(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x-distance*1.35f,owner.getLocation().y), owner));
+			owner.addBullet(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x,owner.getLocation().y-distance*1.35f), owner));
+			owner.addBullet(new Rock(owner.getLocation().getX(), owner.getLocation().getY(), new Vector2f(owner.getLocation().x+distance*1.35f,owner.getLocation().y), owner));
 			dir = true;
 		}
 	}

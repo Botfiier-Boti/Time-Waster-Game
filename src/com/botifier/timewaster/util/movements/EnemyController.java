@@ -50,7 +50,7 @@ public class EnemyController extends EntityController {
 			nx = (int) (wanderArea.getCenterX() + rad * (r.nextBoolean() == true ? -1 : 1 ) * Math.cos(theta));
 			ny = (int) (wanderArea.getCenterY() + rad * (r.nextBoolean() == true ? -1 : 1 ) * Math.sin(theta));
 		} else {
-			rad = (float) (((e.influence*rangeMult)*Math.sqrt(Math.random())));
+			rad = (float) (((e.getInfluence()*rangeMult)*Math.sqrt(Math.random())));
 			nx = (int) (e.getLocation().x + rad * (r.nextBoolean() == true ? -1 : 1 ) * Math.cos(theta));
 			ny = (int) (e.getLocation().y + rad * (r.nextBoolean() == true ? -1 : 1 ) * Math.sin(theta));
 		}

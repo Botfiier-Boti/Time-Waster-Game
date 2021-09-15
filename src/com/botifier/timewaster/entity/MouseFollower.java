@@ -28,12 +28,12 @@ public class MouseFollower extends Enemy {
 		healthbarVisible = false;
 		targetable = false;
 		getController().allyCollision = false;
-		o = owner;
-		getStats().setAttack(o.getAttack());
+		setOwner(owner);
+		getStats().setAttack(getOwner().getAttack());
 		getStats().setSpeed(500);
 		OrbitBehavior b = new OrbitBehavior(this);
 		b.setRadius(1);
-		b.setTarget(o);
+		b.setTarget(getOwner());
 		b.setAutomatic(false);
 		b.setTeleport(true);
 		behaviors.add(b);
@@ -51,8 +51,8 @@ public class MouseFollower extends Enemy {
 		}
 
 		Vector2f mouse = new Vector2f(i.getMouseX(), i.getMouseY());
-		angle = Math2.calcAngle(getOwner().getController().getLoc(), mouse);
-		((OrbitBehavior)behaviors.get(0)).setTheta(angle+Math.toRadians(angleMod));
+		setAngle(Math2.calcAngle(getOwner().getController().getLoc(), mouse));
+		((OrbitBehavior)behaviors.get(0)).setTheta(getAngle()+Math.toRadians(angleMod));
 		if (getOwner() instanceof Player) {
 			Player p = (Player)getOwner();
 			current = p.p;	
@@ -62,15 +62,15 @@ public class MouseFollower extends Enemy {
 		if (i.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) || (getOwner() instanceof Player && ((Player)getOwner()).autofire == true)) {
 			float SPS = 1.5f + 6.5f*((getDexterity())/75f);;
 			if (current == null) {
-				this.shootBullet(angle);	
+				this.shootBullet(getAngle());	
 			} else {
 				if (cooldown <= 0) {
 					if (current.lob == true) {
-						current.fire(getOwner(), mouse.x, mouse.y, angle);
+						current.fire(getOwner(), mouse.x, mouse.y, getAngle());
 					} else if (current.targeted == true) {
-						current.fire(getOwner(), getLocation().x, getLocation().y, angle);//, ((OverworldState)MainGame.mm.getState(1)).mtrack);
+						current.fire(getOwner(), getLocation().x, getLocation().y, getAngle());//, ((OverworldState)MainGame.mm.getState(1)).mtrack);
 					}else {
-						current.fire(getOwner(), getLocation().x, getLocation().y, angle);
+						current.fire(getOwner(), getLocation().x, getLocation().y, getAngle());
 					}
 					cooldown = 3000/SPS;
 				}
@@ -85,7 +85,7 @@ public class MouseFollower extends Enemy {
 			firing = true;	
 		}
 		if (cooldown <= 0 || force) {
-			getOwner().b.add(new Bullet("Bob", getController().getLoc().x, getController().getLoc().y, 200, angle, 350, 75, 90,this));
+			getOwner().addBullet(new Bullet("Bob", getController().getLoc().x, getController().getLoc().y, 200, angle, 350, 75, 90,this));
 			float SPS = 1.5f + 6.5f*((getDexterity())/75f);
 			cooldown = 1000/SPS;
 			firing = false;

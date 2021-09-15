@@ -13,15 +13,30 @@ import com.botifier.timewaster.util.behaviors.OrbitBehavior;
 import com.botifier.timewaster.util.bulletpatterns.GuidedBulletPattern;
 import com.botifier.timewaster.util.movements.EnemyController;
 
+/**
+ * Bee Enemy
+ * @author Botifier
+ *
+ */
 public class Bee extends Enemy {
-	//Bullet Pattern
+	/**
+	 * Bee's bullet pattern
+	 */
 	GuidedBulletPattern gb;
-	//Hit sound
+	/**
+	 * Sound played when the bee is hit
+	 */
 	Sound s;
-	//Shot cooldown
+	/**
+	 * Bee's shot cooldown
+	 */
 	long cooldown = 0;
 
-	//Bee constructor
+	/**
+	 * Bee constructor
+	 * @param x float X position
+	 * @param y float Y position
+	 */
 	public Bee(float x, float y) {
 		super("Bee", MainGame.getImage("Bee"), new EnemyController(x,y, 0.5f, 0), null, null);
 		s = MainGame.getSound("yalikejazz");
@@ -62,7 +77,7 @@ public class Bee extends Enemy {
 			//Find closest target
 			for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
 				Entity en = MainGame.getEntities().get(i);
-				if (en instanceof Bullet || en.isInvincible() || en == this || en.team == team || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > influence)
+				if (en instanceof Bullet || en.isInvincible() || en == this || en.getTeam() == getTeam() || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > getInfluence())
 					continue;
 				if (cls == null)
 					cls = en;

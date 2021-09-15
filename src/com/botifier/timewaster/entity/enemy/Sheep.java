@@ -20,7 +20,7 @@ public class Sheep extends Enemy {
 	public Sheep(float x, float y) {
 		super("Sheep", MainGame.getImage("idlesheep"), new EnemyController(x, y, 1f, 200), new SpriteSheet(MainGame.getImage("sheep"), 8, 8), null,0.5f);
 		sp = new SpinPattern();
-		team = Team.ENEMY;
+		setTeam(Team.ENEMY);
 		setMaxHealth(500, true);
 		getStats().setSpeed(5);
 		getStats().setDefense(50);
@@ -31,10 +31,10 @@ public class Sheep extends Enemy {
 		super.update(delta);
 		if (lastAttacker != null) {
 			//Attack the last entity to attack the sheep
-			if (lastAttacker.getLocation().distance(getLocation()) < influence) {
+			if (lastAttacker.getLocation().distance(getLocation()) < getInfluence()) {
 				float angle = Math2.calcAngle(getController().getLoc(), lastAttacker.getLocation());
 				sp.fire(this, getLocation().getX(), getLocation().getY(), angle);
-				if (lastAttacker.getLocation().distance(getLocation()) < influence*0.75)
+				if (lastAttacker.getLocation().distance(getLocation()) < getInfluence()*0.75)
 					//flee from attacker
 					getController().flee(lastAttacker.getLocation().x,lastAttacker.getLocation().y);
 				else 

@@ -131,17 +131,17 @@ public class EntityManager {
 		
 		g.setColor(Color.black);
 		
-		//Rendering entity shadows
+		//Rendering entity shadows and marking entities as seen
 		for (int i = entities.size()-1; i > -1; i--) {
 			Entity en = entities.get(i);
 			if (en == null)
 				continue;
 			if (en.getLocation().distance(c.getCenter()) <= MainGame.getViewDistance()) {
 				en.seen = true;
-				if (en.visible && en.hasshadow && shadowImage != null)
-					shadowImage.draw(en.getLocation().getX() - en.collisionbox.getWidth() / 2,
-							en.getLocation().getY() - en.collisionbox.getHeight()+1, en.collisionbox.getWidth(),
-							en.collisionbox.getHeight());
+				if (en.visible && en.hasshadow && shadowImage != null && MainGame.displayShadows)
+					shadowImage.draw(en.getLocation().getX() - en.getCollisionbox().getWidth() / 2,
+							en.getLocation().getY() - en.getCollisionbox().getHeight()+1, en.getCollisionbox().getWidth(),
+							en.getCollisionbox().getHeight());
 			} else {
 				en.seen = false;
 			}
@@ -154,10 +154,10 @@ public class EntityManager {
 				continue;
 			if (bu.getLocation().distance(c.getCenter()) <= MainGame.getViewDistance()) {
 				bu.seen = true;
-				if (bu.hasshadow)
-					shadowImage.draw(bu.getLocation().getX() - bu.collisionbox.getWidth() / 2,
-							bu.getLocation().getY() - bu.collisionbox.getHeight()+1, bu.collisionbox.getWidth(),
-							bu.collisionbox.getHeight() + 1);
+				if (bu.hasshadow && bu.getCollisionbox() != null && MainGame.displayShadows)
+					shadowImage.draw(bu.getLocation().getX() - bu.getCollisionbox().getWidth() / 2,
+							bu.getLocation().getY() - bu.getCollisionbox().getHeight()+1, bu.getCollisionbox().getWidth(),
+							bu.getCollisionbox().getHeight() + 1);
 			} else {
 				bu.seen = false;
 			}
@@ -186,19 +186,19 @@ public class EntityManager {
 						Image im = symbols.get(e);
 						if (im == null)
 							continue;
-						im.draw(en.hitbox.getCenterX()-offset-(e*8), en.hitbox.getMinY()-8);
+						im.draw(en.getHitbox().getCenterX()-offset-(e*8), en.getHitbox().getMinY()-8);
 					}
 				}
 				if (en.isHealthbarVisible()) {
 					g.setColor(Color.red);
-					g.fillRect(en.getLocation().x-6, en.hitbox.getMaxY()+1, 12, 3);
+					g.fillRect(en.getLocation().x-6, en.getHitbox().getMaxY()+1, 12, 3);
 					g.setColor(Color.green);
-					g.fillRect(en.getLocation().x-6, en.hitbox.getMaxY()+1, (12)*(Math.max(en.getStats().getCurrentHealth(), 0)/en.getMaxHealth()), 3);
+					g.fillRect(en.getLocation().x-6, en.getHitbox().getMaxY()+1, (12)*(Math.max(en.getStats().getCurrentHealth(), 0)/en.getMaxHealth()), 3);
 					if (en.invulnerable == false || en.isInvincible() == true)
 						g.setColor(Color.black);
 					else
 						g.setColor(Color.blue);
-					g.drawRect(en.getLocation().x-6, en.hitbox.getMaxY()+1, 12, 3);
+					g.drawRect(en.getLocation().x-6, en.getHitbox().getMaxY()+1, 12, 3);
 					g.setColor(Color.white);
 				}
 			}
@@ -233,7 +233,7 @@ public class EntityManager {
 	public void clearBullets() {
 		for (int i = entities.size()-1; i >= 0; i--) {
 			Entity e = entities.get(i);
-			e.b.clear();
+			e.getBullets().clear();
 		}
 		bullets.clear();
 	}
@@ -261,7 +261,7 @@ public class EntityManager {
 	public ArrayList<Entity> getAllNearbyEnemies(Entity e, float max) {
 		Stream<Entity> ent = entities.stream()
 			.filter(e2 -> e2 != null)
-			.filter(e2 -> e2.team != e.team)
+			.filter(e2 -> e2.getTeam() != e.getTeam())
 			.filter(e2 -> e2.getLocation().distance(e.getLocation()) <= max)
 			.filter(e2 -> e2.visible == true);
 		List<Entity> l = ent.collect(Collectors.toList());
@@ -285,35 +285,40 @@ public class EntityManager {
 	}
 	
 	public Entity findClosestEnemy(Entity e, float max) {
+		//long time = System.nanoTime();
 		if (entities.size() < 4) {
 			Entity cls = null;
 			for (int i = entities.size() - 1; i > -1; i--) {
 				Entity en = entities.get(i);
-				if (en instanceof Bullet || en.isInvincible() || en == e || en.team == e.team || en.invulnerable == true
+				if (en instanceof Bullet || en.isInvincible() || en == e || en.getTeam() == e.getTeam() || en.invulnerable == true
 						|| en.targetable == false || en.active == false || en.visible == false
 						|| e.getLocation().distance(en.getLocation()) > max || (cls != null && e.getLocation().distance(en.getLocation()) > e.getLocation().distance(cls.getLocation())))
 					continue;
 				cls = en;
 			}
+
 			return cls;
 		}
 		boolean full = false;
 		for (int i = entities.size() - 1; i > -1; i--) {
 			Entity e2 = entities.get(i);
 			float dist = e2.getLocation().distance(e.getLocation());
-			if (dist > max || e2.team == e.team || e2 == e || e2.targetable == false || e2.invulnerable == true || e2.visible == false )
+			if (dist > max || e2.getTeam() == e.getTeam() || e2 == e || e2.targetable == false || e2.invulnerable == true || e2.visible == false )
 				continue;
 			if (i-1 < -1 && full == false) {
 				i = entities.size()-1;
 				full = true;
 				continue;
 			}
-			if ((i-1 >= 0 && (dist < entities.get(i-1).getLocation().distance(e.getLocation()) || (entities.get(i-1).targetable == false || entities.get(i-1).visible == false || entities.get(i-1).active == false || entities.get(i-1).invulnerable == true || entities.get(i-1).team == e.team ))))
+			if ((i-1 >= 0 && (dist < entities.get(i-1).getLocation().distance(e.getLocation()) || (entities.get(i-1).targetable == false || entities.get(i-1).visible == false || entities.get(i-1).active == false || entities.get(i-1).invulnerable == true || entities.get(i-1).getTeam() == e.getTeam() )))) {
 				return e2;
-			if (i+1 < entities.size() && (dist < entities.get(i+1).getLocation().distance(e.getLocation()) || (entities.get(i+1).targetable == false || entities.get(i+1).visible == false || entities.get(i+1).active == false || entities.get(i+1).invulnerable == true || entities.get(i+1).team == e.team)))
+			}
+			if (i+1 < entities.size() && (dist < entities.get(i+1).getLocation().distance(e.getLocation()) || (entities.get(i+1).targetable == false || entities.get(i+1).visible == false || entities.get(i+1).active == false || entities.get(i+1).invulnerable == true || entities.get(i+1).getTeam() == e.getTeam()))) {
 				return e2;
-			if (i-1 < 0 || i+1 >= entities.size())
+			}
+			if (i-1 < 0 || i+1 >= entities.size()) {
 				return e2;
+			}
 		}
 		return null;
 	}
@@ -323,7 +328,7 @@ public class EntityManager {
 			Entity e2 = entities.get(i);
 			float dist = e2.getLocation().distance(e.getLocation());
 			System.out.println(dist);
-			if (dist > max || e2.team != e.team|| e2.targetable == false )
+			if (dist > max || e2.getTeam() != e.getTeam()|| e2.targetable == false )
 				continue;
 			if ((i-1 >= 0 && dist > entities.get(i-1).getLocation().distance(e.getLocation())))
 				return e2;
@@ -331,6 +336,17 @@ public class EntityManager {
 				return e2;
 		}
 		return null;
+	}
+	
+	public int countEntityType(Class<?> e) {
+		int count = 0;
+		for (int i = entities.size()-1; i > -1; i--) {
+			Entity en = entities.get(i);
+			if (en.getClass().equals(e)) {
+				count++;
+			}
+		}
+		return count;
 	}
 	
 	public static void loadEntities() throws SlickException {

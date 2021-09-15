@@ -45,9 +45,9 @@ public class Hopper extends LobbedProjectile {
 		Circle c = new Circle(getLocation().x,getLocation().y, 5);
 		for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
 			Entity en = MainGame.getEntities().get(i);
-			if (en instanceof Bullet || en.isInvincible() || en == this || en.team == team || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > 20)
+			if (en instanceof Bullet || en.isInvincible() || en == this || en.getTeam() == getTeam() || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > 20)
 				continue;
-			if (en.hitbox.intersects(c))
+			if (en.getHitbox().intersects(c))
 				en.onHit(175, this, true);
 		}
 		

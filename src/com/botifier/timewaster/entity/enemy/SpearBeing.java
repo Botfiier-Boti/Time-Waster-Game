@@ -38,7 +38,7 @@ public class SpearBeing extends Enemy {
 		super.update(delta);
 		if (((DashBehavior)behaviors.get(0)).isDashing() == false) {
 			if (shot == false) {
-				shootBullet(angle);
+				shootBullet(getAngle());
 				shot = true;
 			}
 			getController().wander(false, 0.15f);

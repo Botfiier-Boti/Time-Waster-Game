@@ -5,9 +5,30 @@ import org.newdawn.slick.Image;
 import com.botifier.timewaster.entity.player.Player;
 import com.botifier.timewaster.util.bulletpatterns.BulletPattern;
 
+/**
+ * Weapon Item class
+ * @author Botifier
+ *
+ */
 public class WeaponItem extends EquippableItem {
+	/**
+	 * The BulletPattern that this weapon uses
+	 */
 	BulletPattern p = null;
 	
+	/**
+	 * Weapon Item constructor
+	 * @param id int Item ID
+	 * @param name String Item name
+	 * @param image Image Item image
+	 * @param hp float HP granted on equip
+	 * @param def float DEF granted on equip
+	 * @param atk float ATK granted on equip
+	 * @param vit float VIT granted on equip
+	 * @param dex float DEX granted on equip
+	 * @param spd float SPD granted on equip
+	 * @param p BulletPattern The weapon's bullet pattern
+	 */
 	public WeaponItem(int id, String name, Image image, float hp, float def, float atk, float vit,
 			float dex, float spd, BulletPattern p) {
 		super(id, name, SlotType.EQUIP_WEAPON, image, hp, def, atk, vit, dex, spd);

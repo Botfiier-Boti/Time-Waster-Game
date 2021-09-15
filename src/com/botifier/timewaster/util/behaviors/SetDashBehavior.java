@@ -26,17 +26,32 @@ public class SetDashBehavior extends Behavior {
 		}
 		if (distanceDashed < baseDashDistance && dashing) {
 			dashing = true;
-			float nx = (float)Math.cos(angle)*(getOwner().getController().getPPS()*2*getOwner().size);
-			float ny = (float)Math.sin(angle)*(getOwner().getController().getPPS()*2*getOwner().size);
+			float nx = (float)Math.cos(angle)*(getOwner().getController().getPPS()*2*getOwner().getSize());
+			float ny = (float)Math.sin(angle)*(getOwner().getController().getPPS()*2*getOwner().getSize());
 			Vector2f v = new Vector2f(getOwner().getLocation().x+nx, getOwner().getLocation().y+ny);
-			getOwner().angle = angle;
+			getOwner().setAngle(angle);
 			getOwner().getController().dash(v.x, v.y);
 			distanceDashed+=getOwner().getController().getPPS();
 		} else {
-			dashing = false;
-			getOwner().getController().stop();
+			stop();
 		}
 
+	}
+	
+	public void stop() {
+		dashing = false;
+		distanceDashed = 0;
+		getOwner().getController().stop();
+	}
+	
+	public void setAngle(float angle) {
+		dashing = true;
+		this.angle = angle;
+		distanceDashed = 0;
+	}
+	
+	public Vector2f getTarget() {
+		return this.target;
 	}
 
 	public void setTarget(Vector2f target) {

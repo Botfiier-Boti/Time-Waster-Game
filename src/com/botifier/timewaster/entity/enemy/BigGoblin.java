@@ -19,6 +19,7 @@ import com.botifier.timewaster.util.bulletpatterns.StabPattern;
 import com.botifier.timewaster.util.movements.EnemyController;
 
 public class BigGoblin extends Enemy {
+	boolean attemptedSpawn = false;
 	boolean started = false;
 	boolean dashing = false;
 	//Cooldowns
@@ -68,7 +69,7 @@ public class BigGoblin extends Enemy {
 	@Override
 	public void init() {
 		super.init();
-		activateDelay = 500;
+		activateDelay = 1000;
 		solid = false;
 		setMaxHealth(20000,true);
 		getStats().setDexterity(10);;
@@ -76,7 +77,7 @@ public class BigGoblin extends Enemy {
 		getStats().setSpeed(75);
 		obstacle = false;
 		autoPlayAttack = false;
-		size = 2.5f;
+		setSize(2.5f);
 		spawncap = 10;
 		phase = 1;
 		chaseduration = 1;//10;
@@ -92,17 +93,9 @@ public class BigGoblin extends Enemy {
 			return;
 		//Find target
 		cls = null;
-		if (currentBehavior == 0 || currentBehavior == -1)
-			cls = MainGame.getEntityManager().findClosestEnemy(this, influence);
-		/*for (int i = MainGame.getEntities().size() - 1; i > -1; i--) {
-			Entity en = MainGame.getEntities().get(i);
-			if (en instanceof Bullet || en.isInvincible() || en == this || en.team == team || en.invulnerable == true
-					|| en.active == false || en.visible == false
-					|| getLocation().distance(en.getLocation()) > influence || (cls != null && getLocation().distance(en.getLocation()) > getLocation().distance(cls.getLocation())))
-				continue;
-			cls = en;
-		}*/
-		
+		if ((currentBehavior == 0 || currentBehavior == -1) && attacking == false) {
+			cls = MainGame.getEntityManager().findClosestEnemy(this, getInfluence());
+		}
 		//Phase change 
 		if (this.getStats().getCurrentHealth()/this.getMaxHealth() < lastHealth-phasechange) {
 			spawns.clear();
@@ -123,69 +116,58 @@ public class BigGoblin extends Enemy {
 
 			float SPS = (1.5f + 6.5f*((getDexterity())/75f));
 			//Functionality if has an owner
-			if (o != null) {
-				if (o.getLocation().distance(getLocation()) <= 30) {
+			if (getOwner() != null) {
+				if (getOwner().getLocation().distance(getLocation()) <= 30) {
 					dashing = false;
 					getController().stop();
 				}  else {
 					dashing = true;
-					getController().dash(o.getLocation().x, o.getLocation().y);
+					getController().dash(getOwner().getLocation().x, getOwner().getLocation().y);
 				}
 				if (cooldown <= 0 && dashing) {
-					shootBullet(o.angle);
+					shootBullet(getOwner().getAngle());
 				} 
 				cooldown--;
 				return;
 			}
 			switch (phase) {
-			case 1:
-				//Phase 1
-				currentBehavior = 0;
-				currentPattern = 0;
-				basedash = 40;
-				if (cls == null && dashing == false) {
-					phase = -1;
-					break;
-				}
-				dashing = ((SetDashBehavior) behaviors.get(currentBehavior)).dashing;
-				if (dashing == false) {
-					if (chaseduration > 0) {
-						if (cls != null && dashcooldown <= 0) {
-							((SetDashBehavior) behaviors.get(currentBehavior)).setTarget(cls.getLocation());
-							dashcooldown = basedash;
+				case 1:
+					//Phase 1
+					currentBehavior = 0;
+					currentPattern = 0;
+					basedash = 40;
+					/*if (cls == null && dashing == false) {
+						phase = -1;
+						break;
+					}*/
+					dashing = ((SetDashBehavior) behaviors.get(currentBehavior)).dashing;
+					if (dashing == false) {
+						if (chaseduration > 0) {
+							if (cls != null && dashcooldown <= 0) {
+								((SetDashBehavior) behaviors.get(currentBehavior)).setTarget(cls.getLocation());
+								dashcooldown = basedash;
+							}
+							if (dashcooldown > 0 && dashing == false) {
+								dashcooldown--;
+							}
+							chaseduration -= 1;
 						}
-						if (dashcooldown > 0 && dashing == false) {
-							dashcooldown--;
-						}
-						chaseduration -= 1;
+					} else {
+						try {						
+							if (shootBullet(((SetDashBehavior)behaviors.get(currentBehavior)).getAngle())) {
+								playAttackAnimation(60/SPS);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}	
+					} 
+					/*if (cls == null && attacking == true) {
+						attacking = false;
+					}*/
+					if (chaseduration <= 0) {
+						chaseduration = basechase;
 					}
-				} else {
-					try {
-						/*if (cooldown <= 0 && dashing) {
-							playAttackAnimation((int) (5 * (3.5f * fireSpeed)/2));
-						}
-						if (attacking == false && dashing && cooldown <= 0) {
-							sp.fire(this, getController().getLoc().getX(), getController().getLoc().getY(),
-									((SetDashBehavior) behaviors.get(currentBehavior)).getAngle());
-							cooldown = (long) (5 * (3.5f * fireSpeed));
-						}*/
-						
-						if (shootBullet(((SetDashBehavior)behaviors.get(currentBehavior)).getAngle()))
-							playAttackAnimation(60/SPS);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}	
-				} 
-				if (cls == null && attacking == true) {
-					attacking = false;
-				}
-				if (chaseduration <= 0) {
-					/*
-					 * if (spawns.size() == 0) phase = 2; else phase = 0;
-					 */
-					chaseduration = basechase;
-				}
-				break;
+					break;
 			case 2:
 				//Phase 1.5
 				currentBehavior = 1;
@@ -208,6 +190,7 @@ public class BigGoblin extends Enemy {
 					getStatusEffectManager().removeEffect(InvulnerabilityEffect.class);
 				} else {
 					centeringTime++;
+					getController().allyCollision = false;
 					if (this.getStatusEffectManager().hasEffect(InvulnerabilityEffect.class) == false) {
 						InvulnerabilityEffect e = new InvulnerabilityEffect(10);
 						e.setInfinite(true);
@@ -259,11 +242,14 @@ public class BigGoblin extends Enemy {
 				break;
 			case 5:
 				//Phase 4
-				if (spawns.size() < 4) {
-					for (int i = 0; i < 4; i++) 
-						addSpawn(new SnakeHead(MainGame.getCurrentMap().getCenter().x, MainGame.getCurrentMap().getCenter().y, 20,  i*90));
-					this.getStatusEffectManager().addEffect(new InvulnerabilityEffect(1500));
-					this.dashcooldown = 100;
+				if (attemptedSpawn == false) {
+					if (MainGame.getEntityManager().countEntityType(SnakeHead.class) < 4) {
+						for (int i = 0; i < 4; i++) 
+							addSpawn(new SnakeHead(MainGame.getCurrentMap().getCenter().x, MainGame.getCurrentMap().getCenter().y, 20,  i*90));
+						this.getStatusEffectManager().addEffect(new InvulnerabilityEffect(1500));
+						this.dashcooldown = 100;
+					}
+					attemptedSpawn = true;
 					return;
 				}
 				basedash = 0;
@@ -280,8 +266,8 @@ public class BigGoblin extends Enemy {
 						count = 1;
 					}
 					if (count > (long)aAttack.getDuration(0)*1.1) {
-						if (shootBullet(angle, true)) {
-							getController().setAngle(angle-((float)Math.PI/128f));
+						if (shootBullet(getAngle(), true)) {
+							getController().setAngle(getAngle()-((float)Math.PI/128f));
 						}
 						count = 0;
 					}

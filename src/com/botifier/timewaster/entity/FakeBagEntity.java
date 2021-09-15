@@ -23,7 +23,7 @@ public class FakeBagEntity extends Entity {
 		}
 		//s = MainGame.getSound("lootappears");
 		i = new Inventory(this, 8);
-		team = Team.ALLY;
+		setTeam(Team.ALLY);
 		invincible = true;
 		healthbarVisible = false;
 	}

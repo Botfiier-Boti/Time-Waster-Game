@@ -29,7 +29,7 @@ public class ExternalPlayer extends Entity {
 		super(name, MainGame.getImage("debugman"), new ExternalPlayerControl(x, y));
 		s = new Sound("bladeSwing.wav");
 		getController().setCollision(true);
-		team = Team.ALLY;
+		setTeam(Team.ALLY);
 		overrideMove = true;
 	}
 	

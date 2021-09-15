@@ -53,7 +53,7 @@ public abstract class LobbedProjectile extends Entity {
 	 */
 	public LobbedProjectile(String name, Image i, LobbedController controller, Vector2f dst, Entity o, float heightMod) {
 		super(name, i, controller);
-		this.o = o;
+		this.setOwner(o);
 		controller.setCollision(false);
 		controller.dst = dst.copy();
 		setMaxHealth(1,false);
@@ -69,8 +69,8 @@ public abstract class LobbedProjectile extends Entity {
 		p2.y += (start.y-dst.y)/controller.getDuration()*0.75f-heightMod;
 		c = new Curve(start, p1, p2, controller.dst, (int) controller.getDuration());
 		maxHeight = heightMod;
-		if (o.team != this.team)
-			this.team = o.team;
+		if (o.getTeam() != this.getTeam())
+			this.setTeam(o.getTeam());
 	}
 
 	/**
@@ -98,7 +98,8 @@ public abstract class LobbedProjectile extends Entity {
 		if (rotation > 360)
 			rotation = rotation-360;
 		if (getController().getDst() != null) {
-			posMod.y = getLocation().y-c.pointAt((float)getController().getTimeElapsed()/getController().getDuration()).y;
+			float f = (float)getController().getTimeElapsed()/getController().getDuration();
+			posMod.y = getLocation().y-c.pointAt(f).y;
 			if (posMod.y < 0)
 				posMod.y = 0;
 			/*if (getController().getTimeLeft() > getController().getDuration()/2) {
@@ -115,10 +116,10 @@ public abstract class LobbedProjectile extends Entity {
 	@Override
 	public void draw(Graphics g) {
 		if (image != null && getController().getDst() != null) {
-			if (size != lSize) {
-				image = image.getScaledCopy((int)(image.getWidth()*size), (int)(image.getHeight()*size));
+			if (getSize() != lSize) {
+				image = image.getScaledCopy((int)(image.getWidth()*getSize()), (int)(image.getHeight()*getSize()));
 				init();
-				lSize = size;
+				lSize = getSize();
 			} 
 			Image y = image.getFlippedCopy(dir, flip);
 			Vector2f iLoc = getLocation().copy();
@@ -134,7 +135,7 @@ public abstract class LobbedProjectile extends Entity {
 	 */
 	@Override
 	public void addBullet(Entity e) {
-		o.addBullet(e);
+		getOwner().addBullet(e);
 	}
 	
 	/**

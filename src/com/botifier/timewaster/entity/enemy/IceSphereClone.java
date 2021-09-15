@@ -40,7 +40,7 @@ public class IceSphereClone extends Enemy {
 			Entity cls = null;
 			for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
 				Entity en = MainGame.getEntities().get(i);
-				if (en instanceof Bullet || en.isInvincible() || en == this || en.team == team || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > influence)
+				if (en instanceof Bullet || en.isInvincible() || en == this || en.getTeam() == getTeam() || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > getInfluence())
 					continue;
 				if (cls == null)
 					cls = en;
@@ -64,12 +64,12 @@ public class IceSphereClone extends Enemy {
 			//wander
 			getController().wander(false,0.25f);
 		}
-		if (o != null) {
+		if (getOwner() != null) {
 			//Circle owner if it exists
 			CircleBehavior cb = (CircleBehavior)(behaviors.get(0));
 			currentBehavior = 0;
 			cb.setRadius(2);
-			cb.setCirclePos(o.getLocation());
+			cb.setCirclePos(getOwner().getLocation());
 		}
 		//Fire shots
 		if (cooldown <= 0) {

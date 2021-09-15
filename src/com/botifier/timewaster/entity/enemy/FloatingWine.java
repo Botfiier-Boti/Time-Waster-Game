@@ -22,7 +22,7 @@ public class FloatingWine extends Enemy {
 
 	public FloatingWine(float x, float y) {
 		super("Floating Wine", MainGame.getImage("WineGlass"), new EnemyController(x,y, 1f, 100), new SpriteSheet(MainGame.getImage("FloatingWine"),16,16), new SpriteSheet(MainGame.getImage("WineAttack"),16,16),2);
-		size = 0.75f;
+		setSize(0.75f);
 		iModifier = 0.20f;
 		healthbarVisible = false;
 		FollowBehavior fb = new FollowBehavior(this);
@@ -39,7 +39,7 @@ public class FloatingWine extends Enemy {
 		cls = null;
 		for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
 			Entity en = MainGame.getEntities().get(i);
-			if (en instanceof Bullet || en.isInvincible() || en.team == this.team || en == this|| en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > influence)
+			if (en instanceof Bullet || en.isInvincible() || en.getTeam() == this.getTeam() || en == this|| en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > getInfluence())
 				continue;
 			if (cls == null) {
 				if (en.getLocation().distance(getLocation()) > 5); 
@@ -58,13 +58,13 @@ public class FloatingWine extends Enemy {
 			if (getController().isMoving()) {
 				if (cooldown <= 0 ) {
 					//Shoot 'drop' behind 
-					float x = this.getLocation().x-10*(float)Math.cos(-angle)*(getController().getPPS());
-					float y =  this.getLocation().y+10*(float)Math.sin(-angle)*(getController().getPPS());
+					float x = this.getLocation().x-10*(float)Math.cos(-getAngle())*(getController().getPPS());
+					float y =  this.getLocation().y+10*(float)Math.sin(-getAngle())*(getController().getPPS());
 					Circle c = new Circle(x, y, 5);
 					MainGame.spawnTempEffect(c, 25, Color.red);
 					for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
 						Entity en = MainGame.getEntities().get(i);
-						if (en instanceof Bullet || en.isInvincible() || en == this || en.team == team || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > 5)
+						if (en instanceof Bullet || en.isInvincible() || en == this || en.getTeam() == getTeam() || en.invulnerable == true || en.active == false || en.visible == false || getLocation().distance(en.getLocation()) > 5)
 							continue;
 						en.onHit(15, this, true);
 					}

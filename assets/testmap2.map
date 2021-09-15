@@ -5,7 +5,7 @@ define B BlankTile
 define # BrickWall
 dwalkable F RockTile
 dwalkable U TileDarkUp
-addentity 1, dammahclone, 280,280,750
+addentity 1, dammahclone, 280,280,1050
 startmap
 ####BBBBBBBBBBBBBBBBBBBBBBBBBB#### 
 ###BFFFFFFFFFFFFFFFFFFFFFFFFFFB###

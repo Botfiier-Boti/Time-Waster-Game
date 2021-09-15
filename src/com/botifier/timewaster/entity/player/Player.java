@@ -67,7 +67,7 @@ public class Player extends Entity {
 		walk.start();
 		//s = MainGame.getSound("bladeswing");
 		getController().setCollision(true);
-		team = Team.ALLY;
+		setTeam(Team.ALLY);
 		overrideMove = true;
 		setMaxHealth(620, true);
 		getStats().setAttack(60);
@@ -222,24 +222,24 @@ public class Player extends Entity {
 				if (autofire || ((i.isMousePressed(Input.MOUSE_LEFT_BUTTON) || i.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) && MainGame.getGUI().getFocused() == null) && build == false) {
 					if (cooldown <= 0) {
 						Vector2f mouse = new Vector2f(i.getMouseX(), i.getMouseY());
-						angle = Math2.calcAngle(getController().getLoc(), mouse);
+						setAngle(Math2.calcAngle(getController().getLoc(), mouse));
 						if (p == null) {
 							//Default 
-							shootBullet(angle);
+							shootBullet(getAngle());
 						} else {
 							//Vary based on shot pattern
 							if (p.lob == true) {
-								p.fire(this, mouse.x, mouse.y, angle);
+								p.fire(this, mouse.x, mouse.y, getAngle());
 							} else if (p.targeted == true) {
-								p.fire(this, getLocation().x, getLocation().y, angle, ((OverworldState)MainGame.mm.getState(1)).mtrack);
+								p.fire(this, getLocation().x, getLocation().y, getAngle(), ((OverworldState)MainGame.mm.getState(1)).mtrack);
 							}else {
-								p.fire(this, getLocation().x, getLocation().y, angle);
+								p.fire(this, getLocation().x, getLocation().y, getAngle());
 							}
 
 							cooldown = 60/SPS;
 						}
 						//Change the direction of the player
-						if ((angle < Math.PI && angle > Math.PI/2) || (angle > -Math.PI && angle < -Math.PI/2)) {
+						if ((getAngle() < Math.PI && getAngle() > Math.PI/2) || (getAngle() > -Math.PI && getAngle() < -Math.PI/2)) {
 							dir = false;
 						} else {
 							dir = true;
@@ -265,7 +265,7 @@ public class Player extends Entity {
 			Vector2f iLoc = getLocation().copy();
 			iLoc.y -= posMod.y;
 			iLoc.x -= posMod.x;
-			Image i = walk.getCurrentFrame().getScaledCopy(size).getFlippedCopy(dir, flip);
+			Image i = walk.getCurrentFrame().getScaledCopy(getSize()).getFlippedCopy(dir, flip);
 			i.setCenterOfRotation(i.getWidth()/2, i.getHeight()/2);
 			i.setRotation(rotation);
 			//i.drawFlash(iLoc.getX()-1-i.getWidth()/2, iLoc.getY()-1-i.getHeight(), i.getWidth()+2f, i.getHeight()+2f, Color.black);
@@ -275,7 +275,7 @@ public class Player extends Entity {
 			Vector2f iLoc = getLocation().copy();
 			iLoc.y -= posMod.y;
 			iLoc.x -= posMod.x;
-			Image i = image.getScaledCopy(size).getFlippedCopy(dir, flip);
+			Image i = image.getScaledCopy(getSize()).getFlippedCopy(dir, flip);
 			i.setCenterOfRotation(i.getWidth()/2, i.getHeight()/2);
 			i.setRotation(rotation);
 			//i.drawFlash(iLoc.getX()-1-i.getWidth()/2, iLoc.getY()-1-i.getHeight(), i.getWidth()+2f, i.getHeight()+2f, Color.black);
@@ -286,7 +286,7 @@ public class Player extends Entity {
 			g.drawOval(target.getX(), target.getY(), 3, 3);
 		}
 		if (MainGame.displayHitboxes) {
-			g.drawLine(getLocation().getX(), getLocation().getY(), getLocation().getX()+((float)Math.cos(angle)*5), getLocation().getY()+((float)Math.sin(angle)*5));
+			g.drawLine(getLocation().getX(), getLocation().getY(), getLocation().getX()+((float)Math.cos(getAngle())*5), getLocation().getY()+((float)Math.sin(getAngle())*5));
 			g.draw(hitbox);
 			g.draw(collisionbox);
 			if (getController().testBox != null)

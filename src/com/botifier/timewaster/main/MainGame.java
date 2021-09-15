@@ -30,12 +30,14 @@ import com.botifier.timewaster.util.GUI;
 import com.botifier.timewaster.util.TileMap;
 import com.botifier.timewaster.util.managers.EntityManager;
 
+//Need to comment this stuff
 public class MainGame extends StateBasedGame {
-	private static final String versionId = "0.0.8";
+	private static final String versionId = "0.0.7";
 	private static boolean loaded = false;
 	public static String startMap = "testmap.map";
 	public static boolean debug = false;
 	public static boolean displayHitboxes = false;
+	public static boolean displayShadows = true;
 	public static float camRatio = 2f;
 	public static float windowScale = 1.5f;
 	public static ArrayList<String> s = new ArrayList<String>();
@@ -161,13 +163,15 @@ public class MainGame extends StateBasedGame {
 	public static Image getImage(String name) {
 		return mm.i.get(name.toLowerCase());
 	}
+	
+	public static void unloadImage(String name) throws SlickException {
+		mm.i.get(name.toLowerCase()).destroy();
+	}
 
 	public static Sound getSound(String name) {
 		return mm.so.get(name.toLowerCase());
 	}
 	
-	
-
 	public static boolean isLoaded() {
 		return loaded;
 	}

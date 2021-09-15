@@ -24,7 +24,7 @@ public class FollowBehavior extends Behavior{
 			if (target.getController().isMoving() == false)
 				return;
 			LinkedList<Vector2f> ll = target.getController().path;
-			LinkedList<Entity> f = target.followers;
+			LinkedList<Entity> f = target.getFollowers();
 			if (f.size() <= 0) {
 				if (target.getLocation().distance(getOwner().getLocation()) < maxDistance) {
 					getOwner().getController().stop();
