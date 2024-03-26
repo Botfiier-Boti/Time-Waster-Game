@@ -21,7 +21,9 @@ import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.util.ResourceLoader;
 
+import com.botifier.timewaster.states.MainMenuState;
 import com.botifier.timewaster.states.MapEditorState;
 import com.botifier.timewaster.states.OverworldState;
 import com.botifier.timewaster.util.Camera;
@@ -34,7 +36,7 @@ import com.botifier.timewaster.util.managers.EntityManager;
 public class MainGame extends StateBasedGame {
 	private static final String versionId = "0.0.7";
 	private static boolean loaded = false;
-	public static String startMap = "testmap.map";
+	public static String startMap = "testmap4.map";
 	public static boolean debug = false;
 	public static boolean displayHitboxes = false;
 	public static boolean displayShadows = true;
@@ -59,6 +61,7 @@ public class MainGame extends StateBasedGame {
 		super("Time Waster v" + versionId);
 	}
 
+	//Move a majority of image loading to that of tilemap/Make image loader files called within tilemap
 	public void loadImages() throws SlickException {
 		addImage("biggobboidle", "Images/BigGobboIdle.png");
 		addImage("biggobbowalk", "Images/BigGobboWalk.png");
@@ -120,6 +123,8 @@ public class MainGame extends StateBasedGame {
 		addImage("rockywall", "Images/RockyWall.png");
 		addImage("rockywallns", "Images/RockyWallNoShadow.png");
 		addImage("bandage", "Images/Bandage.png");
+		addImage("healthbar", "Images/UI/Healthbar.png");
+		addImage("barinsert", "Images/UI/BarInsert.png");
 		addInSpriteSheet("crackedrock", "Images/CrackedRockSheet.png", 16, 16);
 		addInSpriteSheet("outline16", "Images/16x16Outline.png", 16, 16);
 		Iterator<Entry<String, Image>> it = i.entrySet().iterator();
@@ -129,17 +134,17 @@ public class MainGame extends StateBasedGame {
 		}
 	}
 	
-	public void addImage(String name, String s) throws SlickException {
-		i.put(name.toLowerCase(), new Image(s,false, Image.FILTER_NEAREST));
+	public static void addImage(String name, String s) throws SlickException {
+		mm.i.put(name.toLowerCase(), new Image(s,false, Image.FILTER_NEAREST));	
 	}
 	
-	public void addInSpriteSheet(String name, String s, int width, int height) throws SlickException {
+	public static void addInSpriteSheet(String name, String s, int width, int height) throws SlickException {
 		SpriteSheet sh = new SpriteSheet(s, width, height);
 		for (int y = 0; y < sh.getHeight()/height; y++) {
 			for (int x = 0; x < sh.getWidth()/width; x++) {
 				Image im = sh.getSprite(x, y);
 				im.setFilter(Image.FILTER_NEAREST);
-				i.put(name.toLowerCase()+x+"x"+y, im);
+				mm.i.put(name.toLowerCase()+x+"x"+y, im);
 				System.out.println(name.toLowerCase()+x+"x"+y);
 			}
 		}
@@ -249,6 +254,7 @@ public class MainGame extends StateBasedGame {
 		ttfB = new AngelCodeFont("Fonts/PressStart2P.fnt", getImage("font"));
 		ttfS = new AngelCodeFont("PressStart2P-sml.fnt", getImage("fontsmall"));
 		gc.getGraphics().setFont(ttf);
+		addState(new MainMenuState());
 		addState(new OverworldState());
 		addState(new MapEditorState());
 		//this.enterState(2);

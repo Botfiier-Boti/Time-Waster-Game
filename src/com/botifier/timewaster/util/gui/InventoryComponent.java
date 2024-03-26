@@ -7,12 +7,14 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 
 import com.botifier.timewaster.main.MainGame;
+import com.botifier.timewaster.util.AbilityItem;
 import com.botifier.timewaster.util.ConsumableItem;
 import com.botifier.timewaster.util.EquipmentInventory;
 import com.botifier.timewaster.util.EquippableItem;
 import com.botifier.timewaster.util.GUI;
 import com.botifier.timewaster.util.Inventory;
 import com.botifier.timewaster.util.Item;
+import com.botifier.timewaster.util.Math2;
 import com.botifier.timewaster.util.StackableItem;
 
 public class InventoryComponent extends Component {
@@ -46,29 +48,31 @@ public class InventoryComponent extends Component {
 			}
 		}
 		
-		if (target != null && quickClick) {
-			int e = -1;
-			//I wish I could use a switch statement here, but Slick2d...
-			if (in.isKeyPressed(Input.KEY_1)) {
-				e = 0;
-			} else if (in.isKeyPressed(Input.KEY_2)) {
-				e = 1;
-			} else if (in.isKeyPressed(Input.KEY_3)) {
-				e = 2;
-			} else if (in.isKeyPressed(Input.KEY_4)) {
-				e = 3;
-			} else if (in.isKeyPressed(Input.KEY_5)) {
-				e = 4;
-			} else if (in.isKeyPressed(Input.KEY_6)) {
-				e = 5;
-			} else if (in.isKeyPressed(Input.KEY_7)) {
-				e = 6;
-			} else if (in.isKeyPressed(Input.KEY_8)) {
-				e = 7;
-			}
-			Item i = target.getItem(e);
-			if (i != null && i instanceof ConsumableItem) {
-				i.onUse(target.getOwner());
+		if (target != null) {
+			if (quickClick) {
+				int e = -1;
+				//I wish I could use a switch statement here, but Slick2d...
+				if (in.isKeyPressed(Input.KEY_1)) {
+					e = 0;
+				} else if (in.isKeyPressed(Input.KEY_2)) {
+					e = 1;
+				} else if (in.isKeyPressed(Input.KEY_3)) {
+					e = 2;
+				} else if (in.isKeyPressed(Input.KEY_4)) {
+					e = 3;
+				} else if (in.isKeyPressed(Input.KEY_5)) {
+					e = 4;
+				} else if (in.isKeyPressed(Input.KEY_6)) {
+					e = 5;
+				} else if (in.isKeyPressed(Input.KEY_7)) {
+					e = 6;
+				} else if (in.isKeyPressed(Input.KEY_8)) {
+					e = 7;
+				}
+				Item i = target.getItem(e);
+				if (i != null && i instanceof ConsumableItem) {
+					i.onUse(target.getOwner());
+				}
 			}
 		}
 	}
@@ -109,9 +113,21 @@ public class InventoryComponent extends Component {
 					g.setColor(Color.white);
 					g.drawString(si.getCurrentAmount()+"", r.getX()+32*MainGame.windowScale-(g.getFont().getWidth(si.getCurrentAmount()+"")), r.getY()+22*MainGame.windowScale);
 				}
+				if (it instanceof AbilityItem) {
+					AbilityItem ai = (AbilityItem)it;
+					long time = ai.getLastTimeUsed()-System.currentTimeMillis();
+					if (Math.abs(time) < ai.getAbilityCooldown()) {
+						Color transparentBlack = new Color(0, 0, 0, 0.4f);
+						g.setColor(transparentBlack);
+						g.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
+						g.setColor(Color.white);
+						String timeLeft = ""+(time/1000+ai.getAbilityCooldown()/1000);
+						g.drawString(timeLeft, r.getX()+(32*MainGame.windowScale-(g.getFont().getWidth(timeLeft)))/2, r.getY()+(32*MainGame.windowScale-(g.getFont().getHeight(timeLeft)))/2);
+					}
+				}
 			}
 		}
-
+		
 		for (int i = slots.size()-1; i >= 0; i--) {
 			RectangleComponent r = slots.get(i);
 			Item it = target.getItem(i);

@@ -1,6 +1,5 @@
 package com.botifier.timewaster.util;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.newdawn.slick.geom.Rectangle;
@@ -18,7 +17,7 @@ public class Math2 {
 		return x > y ? x : y > x ? y : x;
 	}
 	public static float calcAngle(Vector2f src2,Vector2f dst2) {
-		return (float)Math.atan2(dst2.getY()-src2.getY(),dst2.getX()-src2.getX());
+		return (float)Math.atan2(dst2.getY()-src2.getY(), dst2.getX()-src2.getX());
 	}
 	
 	public static float lowestNumber(float x, float y) {
@@ -42,20 +41,7 @@ public class Math2 {
 	}
 	
 	public static float round(float f, int dec) {
-		String d = "#";
-		if (dec > 0) {
-			d += ".";
-		}
-		for (int i = 0; i < dec; i++) {
-			d += "#";
-		}
-		try {
-			DecimalFormat df = new DecimalFormat(d);
-			return Float.valueOf(df.format(f));
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		}
-		return 0;
+		return (((int)(f * (dec * 10)))/(dec * 10f));
 	}
 	
 	public static Vector2f truncate(Vector2f a, float max) {
@@ -113,6 +99,10 @@ public class Math2 {
 			return newMove;
 		}
 		return move;
+	}
+	
+	public static float distance(Entity e, Entity e2) {
+		return e.getLocation().distance(e2.getLocation());
 	}
 	
 	public static ArrayList<Vector2f> getIntersected(Shape s1, Shape s2) {

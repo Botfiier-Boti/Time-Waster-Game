@@ -28,6 +28,7 @@ import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.util.Bullet;
 import com.botifier.timewaster.util.Camera;
 import com.botifier.timewaster.util.Entity;
+import com.botifier.timewaster.util.Math2;
 
 public class EntityManager {
 	public static HashMap<String, Class<?>[]> entityClasses = new HashMap<String, Class<?>[]>();
@@ -190,7 +191,7 @@ public class EntityManager {
 					}
 				}
 				if (en.isHealthbarVisible()) {
-					g.setColor(Color.red);
+					/*g.setColor(Color.red);
 					g.fillRect(en.getLocation().x-6, en.getHitbox().getMaxY()+1, 12, 3);
 					g.setColor(Color.green);
 					g.fillRect(en.getLocation().x-6, en.getHitbox().getMaxY()+1, (12)*(Math.max(en.getStats().getCurrentHealth(), 0)/en.getMaxHealth()), 3);
@@ -198,7 +199,10 @@ public class EntityManager {
 						g.setColor(Color.black);
 					else
 						g.setColor(Color.blue);
-					g.drawRect(en.getLocation().x-6, en.getHitbox().getMaxY()+1, 12, 3);
+					g.drawRect(en.getLocation().x-6, en.getHitbox().getMaxY()+1, 12, 3);*/
+					MainGame.getImage("healthbar").draw(en.getLocation().getX()-8, en.getHitbox().getMaxY()+1, 16, 4);
+					MainGame.getImage("barinsert").draw(en.getLocation().x-7f, en.getHitbox().getMaxY()+2f, (14)*(Math.max(en.getStats().getCurrentHealth(), 0)/en.getMaxHealth()), 2, Color.green);
+					
 					g.setColor(Color.white);
 				}
 			}
@@ -284,6 +288,16 @@ public class EntityManager {
 		return null;
 	}
 	
+	public Entity findClosestEnemyStream(Entity e, float max) {
+		Stream<Entity> ent = entities.stream()
+				.filter(e2 -> e2 != null)
+				.filter(e2 -> e2.getTeam() != e.getTeam())
+				.filter(e2 -> e2.getLocation().distance(e.getLocation()) <= max)
+				.filter(e2 -> e2.visible == true);
+		Entity e2 = ent.min((ee, ee2) -> (int)Math2.distance(ee, ee2)).get();
+		return e2;
+	}
+	
 	public Entity findClosestEnemy(Entity e, float max) {
 		//long time = System.nanoTime();
 		if (entities.size() < 4) {
@@ -300,6 +314,7 @@ public class EntityManager {
 			return cls;
 		}
 		boolean full = false;
+		//ArrayList<Entity> entities = getAllNearbyEnemies(e, max);
 		for (int i = entities.size() - 1; i > -1; i--) {
 			Entity e2 = entities.get(i);
 			float dist = e2.getLocation().distance(e.getLocation());
@@ -398,6 +413,7 @@ public class EntityManager {
 				truename = getFromAlias(name);
 			e = (Entity) Class.forName(truename).getConstructor(getEntityInstArgs(name)).newInstance(args);
 		} catch (Exception e1 ) {
+			System.out.println("An error occured trying to create entity: "+name);
 			e1.printStackTrace();
 		}
 		return e;

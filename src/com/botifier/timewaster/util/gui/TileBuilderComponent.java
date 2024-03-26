@@ -18,11 +18,14 @@ public class TileBuilderComponent extends PopupComponent {
 		for (String s : MainGame.getAllImages().keySet()) {
 			ddc.addOption(s);
 		}
+		ddc.setParent(this);
 		tic = new TextInputComponent(g, c, x+(width/2)-(width*0.4f), y+(height/2), width*(0.80f),30, "Enter a Char", false);
 		tic.resetOnClick = true;
 		tic.setMaxLength(1);
+		tic.setParent(this);
 		walkable = new ButtonComponent(g, "Walkable", c.darker(0.2f), c.brighter(0.2f), c, null, x+(width/2)-(width*0.4f), y+(height/2)-70, width*(0.80f),25, true);
 		walkable.setTogglable(true);
+		walkable.setParent(this);
 	}
 	
 	@Override
@@ -79,7 +82,7 @@ public class TileBuilderComponent extends PopupComponent {
 	
 	public static TileBuilderComponent createPopup(GUI g, Color c, float x, float y, boolean outline) {
 		TileBuilderComponent tbc = new TileBuilderComponent(g, c, x, y,  200, 200, outline);
-		if (g.hasComponentType(InputComponent.class)) {
+		if (g.hasComponentType(PopupComponent.class)) {
 			return null;
 		}
 		g.addComponent(tbc);

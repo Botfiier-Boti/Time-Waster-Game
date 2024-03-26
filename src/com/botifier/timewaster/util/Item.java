@@ -1,5 +1,7 @@
 package com.botifier.timewaster.util;
 
+import java.util.UUID;
+
 import org.newdawn.slick.Image;
 
 /**
@@ -72,6 +74,11 @@ public abstract class Item {
 	private Inventory container;
 	
 	/**
+	 * Item's uuid
+	 */
+	private UUID uuid;
+	
+	/**
 	 * Item constructor
 	 * @param id int Item ID
 	 * @param name String Item name
@@ -83,6 +90,7 @@ public abstract class Item {
 		this.name = name;
 		this.slotType = slotType;
 		this.image = image;
+		this.uuid = UUID.randomUUID();
 	}
 	
 	/**
@@ -153,6 +161,14 @@ public abstract class Item {
 	 */
 	public String getLore() {
 		return lore;
+	}
+	
+	/**
+	 * Returns the Item's UUID
+	 * @return UUID Item UUID
+	 */
+	public UUID getUUID() {
+		return uuid;
 	}
 	
 	@Override

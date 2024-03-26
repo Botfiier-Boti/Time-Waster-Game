@@ -93,7 +93,7 @@ public class BigGoblin extends Enemy {
 			return;
 		//Find target
 		cls = null;
-		if ((currentBehavior == 0 || currentBehavior == -1) && attacking == false) {
+		if ((currentBehavior == 0 || currentBehavior == -1) && attacking == false && dashing == false) {
 			cls = MainGame.getEntityManager().findClosestEnemy(this, getInfluence());
 		}
 		//Phase change 

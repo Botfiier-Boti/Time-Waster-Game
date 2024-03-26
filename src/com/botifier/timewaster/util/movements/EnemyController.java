@@ -80,8 +80,7 @@ public class EnemyController extends EntityController {
 	public void dash(float nx, float ny) {
 		fleeing = false;
 		stop();
-		Vector2f v = new Vector2f(nx, ny);
-		setDestination(v.x, v.y); 
+		setDestination(nx, ny); 
 	}
 	
 	public void dash(Vector2f v) {

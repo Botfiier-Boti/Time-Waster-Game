@@ -52,7 +52,8 @@ public class BeeSwarm extends Enemy{
 			b.setOwner(this);
 			spawns.add(b);
 		}
-		behaviors.add(new OrbitBehavior(this));
+		//behaviors.add(new OrbitBehavior(this));
+		//((OrbitBehavior)behaviors.get(0)).setTeleport(true);
 		currentBehavior = 0;
 		influenceCircle = new Circle(this.getLocation().x, this.getLocation().y, getInfluence());
 	}
@@ -68,9 +69,10 @@ public class BeeSwarm extends Enemy{
 		
 		if (spawns.size() > 0) {
 			//getController().wander(false, 1f);
-			((OrbitBehavior)behaviors.get(0)).setRadius(2);
+			//((OrbitBehavior)behaviors.get(0)).setRadius(2);
 			//Orbit owner
-			((OrbitBehavior)behaviors.get(0)).setTarget(this.getOwner());
+			//if (((OrbitBehavior)behaviors.get(0)).getTarget() != getOwner())
+				//((OrbitBehavior)behaviors.get(0)).setTarget(this.getOwner());
 			/*Change based on owner movement
 			if (getOwner().getController().isMoving()) {
 
@@ -79,7 +81,7 @@ public class BeeSwarm extends Enemy{
 				getStats().setSpdMod(0);
 			}*/
 
-			getStats().setSpdMod(getOwner().getSpeed()*2);
+			getStats().setSpdMod(getOwner().getSpeed());
 			//Iterate through bees
 			for (int i = spawns.size()-1; i > -1; i--) {
 				Bee b = (Bee) spawns.get(i);

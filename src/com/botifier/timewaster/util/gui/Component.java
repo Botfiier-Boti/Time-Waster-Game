@@ -11,6 +11,7 @@ public abstract class Component {
 	private boolean enabled = true;
 	private boolean outline;
 	private Color c;
+	private Component parent;
 	private GUI g;
 	private Vector2f pos;
 	
@@ -59,6 +60,10 @@ public abstract class Component {
 		c = color;
 	}
 	
+	public void setParent(Component c) {
+		parent = c;
+	}
+	
 	public Vector2f getPosition() {
 		return pos;
 	}
@@ -73,6 +78,10 @@ public abstract class Component {
 	
 	public GUI getOwner() {
 		return g;
+	}
+	
+	public Component getParent() {
+		return parent;
 	}
 
 	public Color getColor() {
@@ -92,6 +101,6 @@ public abstract class Component {
 	}
 	
 	public boolean isFocused() {
-		return this == g.getFocused();
+		return (getParent() != null && getParent() == g.getFocused()) || this == g.getFocused();
 	}
 }

@@ -10,7 +10,7 @@ public class RockShatterPattern extends BulletPattern {
 	public RockShatterPattern() {
 		fireSpeed = 1f;
 		bulletSpeed = 50f;
-		duration = 1250;
+		duration = 1550;
 		shots = 3;
 		spread= 360/shots;
 		mindamage = 65;

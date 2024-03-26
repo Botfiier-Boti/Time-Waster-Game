@@ -27,6 +27,7 @@ public class DropDownComponent extends Component {
 		this.tic = new TextInputComponent(g, c, x, y, width*0.85f, height, "", outline);
 		tic.setMaxLength(16);
 		tic.setCanEdit(false);
+		tic.setParent(this);
 		this.button = new ButtonComponent(g, "v", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
 			@Override
 			public void run() {
@@ -34,6 +35,7 @@ public class DropDownComponent extends Component {
 			}
 		},x+(width*0.85f), y, width*0.15f, height, true);
 		button.setTogglable(true);
+		button.setParent(this);
 		changeDisplaySize(display);
 	}
 	
@@ -44,6 +46,7 @@ public class DropDownComponent extends Component {
 		this.tic = new TextInputComponent(g, c, x, y, width*0.85f, height, "", outline);
 		tic.setMaxLength(16);
 		tic.setCanEdit(false);
+		tic.setParent(this);
 		this.button = new ButtonComponent(g, "v", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
 			@Override
 			public void run() {
@@ -51,6 +54,7 @@ public class DropDownComponent extends Component {
 			}
 		},x+(width*0.85f), y, width*0.15f, height, true);
 		button.setTogglable(true);
+		button.setParent(this);
 		changeDisplaySize(display);
 	}
 	
@@ -60,10 +64,10 @@ public class DropDownComponent extends Component {
 		tic.update(delta);
 		button.update(delta);
 		if (holder != null && holder.isVisible() == true) {
-			holder.focus();
 			for (ButtonComponent b : buttons) {
-				if (b != null)
+				if (b != null) {
 					b.update(delta);
+				}
 			}
 		} else {
 			if (holder != null && holder.isFocused())
@@ -102,6 +106,7 @@ public class DropDownComponent extends Component {
 			}
 		},holder.getX()+(holder.getWidth()-20), holder.getY(), 20, 20, true);
 		b1.setCustomSymbol(arrow);
+		b1.setParent(this);
 		buttons.add(b1);
 		ButtonComponent b2 = new ButtonComponent(getOwner(), "v", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
 			@Override
@@ -111,6 +116,7 @@ public class DropDownComponent extends Component {
 			}
 		},holder.getX()+(holder.getWidth()-20), holder.getY()+holder.getHeight()-20, 20, 20, true);
 		b2.setCustomSymbol(arrow2);
+		b2.setParent(this);
 		buttons.add(b2);
 		for (int i = 0; i < display; i++) {
 			ButtonComponent b = new ButtonComponent(getOwner(), "{PLACEHOLDER}", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
@@ -130,6 +136,7 @@ public class DropDownComponent extends Component {
 				}
 				
 			});
+			b.setParent(this);
 			buttons.add(b);
 		}
 	}

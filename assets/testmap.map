@@ -21,6 +21,9 @@ dwalkable ! CrackedRock0x0
 dwalkable @ CrackedRock2x0
 dwalkable $ CrackedRock2x2
 dwalkable % CrackedRock0x2
+addimage biggobboidle, Images/BigGobboIdle.png
+addimage biggobbowalk, Images/BigGobboWalk.png
+addimage biggobboattack, Images/BigGobboAttack.png
 addentity 1, BigGoblin, 176, 176
 startmap
 BBBBBBBBBBBBBBBBBBBBBB

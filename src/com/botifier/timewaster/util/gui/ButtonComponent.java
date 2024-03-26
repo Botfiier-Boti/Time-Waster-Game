@@ -43,7 +43,18 @@ public class ButtonComponent extends Component {
 	@Override
 	public void update(int delta) {
 		Input i = MainGame.mm.getInput();
-		if (isVisible() && r.contains(i.getAbsoluteMouseX(), i.getAbsoluteMouseY())) {
+		if (isVisible() == false)
+			return;
+		if (getOwner().getFocused() != null) {
+			if (getParent() != null) {
+				if (getOwner().getFocused() != getParent() && getOwner().getFocused() != this)
+					return;
+			} else {
+				if (getOwner().getFocused() != this)
+					return;
+			}
+		}
+		if (r.contains(i.getAbsoluteMouseX(), i.getAbsoluteMouseY())) {
 			r.setColor(hover);
 			if (i.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
 				if (toggle == true)

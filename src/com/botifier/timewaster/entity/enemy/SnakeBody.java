@@ -49,7 +49,7 @@ public class SnakeBody extends Enemy{
 
 		if (shotdelay > 0)
 			shotdelay -= delta;
-		float angle = (float) (Math2.calcAngle(getLocation(), ((CircleBehavior)((Enemy)getOwner()).behaviors.get(0)).getCirclePos())-Math.PI);
+		float angle = (float) ((Math2.calcAngle(getLocation(), ((CircleBehavior)((Enemy)getOwner()).behaviors.get(0)).getCirclePos()))-Math.PI);
 		if (cooldown <= 0 && shotdelay <= 0) {
 			Bullet bul = Bullet.createBullet("Bob", getController().getLoc().x, getController().getLoc().y, 70, angle, 4000, 75, 0,this,false,true,true,false,false, false, 0, 0, 0);
 			bul.setImage(MainGame.getImage("smallrock"));

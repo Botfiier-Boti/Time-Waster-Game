@@ -3,6 +3,7 @@ package com.botifier.timewaster.util;
 import java.util.ArrayList;
 
 import org.newdawn.slick.Animation;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -295,14 +296,17 @@ public class Enemy extends Entity {
 				g.drawString(getName().substring(0, 1), getLocation().getX(), getLocation().getY());
 			
 			if (MainGame.displayHitboxes) {
+
+				g.setColor(Color.yellow);
 				g.drawLine(getLocation().getX(), getLocation().getY(), getLocation().getX()+((float)Math.cos(getAngle())*5), getLocation().getY()+((float)Math.sin(getAngle())*5));
+				g.setColor(Color.white);
 				g.draw(hitbox);
 				if (getController().testBox != null)
 					g.draw(getController().testBox);
 				if (getController().dst != null) {
 					g.drawLine(getLocation().getX(), getLocation().getY(), getController().getDst().getX(), getController().getDst().getY());
 				}
-					
+				g.setColor(Color.white);	
 			}
 		}
 	}

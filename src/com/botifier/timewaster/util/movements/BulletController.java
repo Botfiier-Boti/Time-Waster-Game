@@ -96,8 +96,8 @@ public class BulletController extends EntityController {
 					target = MainGame.getEntityManager().findClosestEnemy(getOwner(), 1000);
 				}
 			}
-			float x = (float)(Math.cos((angle+angleMod) % (2*Math.PI))*(PPS))*(delta/18f);
-			float y = (float)(Math.sin((angle+angleMod) % (2*Math.PI))*(PPS))*(delta/18f);
+			float x = (float)(Math.cos((angle+angleMod) % (Math.PI * 2))*(PPS))*(delta/18f);
+			float y = (float)(Math.sin((angle+angleMod) % (Math.PI * 2))*(PPS))*(delta/18f);
 
 			if (wavy) {
 				float beta = (float) (angle+angleMod + Math.PI/2);

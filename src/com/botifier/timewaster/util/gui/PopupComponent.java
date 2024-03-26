@@ -24,7 +24,7 @@ public abstract class PopupComponent extends Component {
 				pc.destroy();
 			}
 			
-		}, x+(width)-(width/8)-70, y+(height*0.9f)-25 , 70, 20, true);
+		}, x+(width)-(width/8)-70, y+(height-25) , 70, 20, true);
 		deny = new ButtonComponent(g, "CANCEL", c.darker(0.2f), c.brighter(0.2f), c, new Runnable() {
 			@Override
 			public void run() {
@@ -32,10 +32,12 @@ public abstract class PopupComponent extends Component {
 				pc.destroy();
 			}
 			
-		}, x+(width/8), y+(height*0.9f)-25 , 70, 20, true);
+		}, x+(width/8), y+(height-25) , 70, 20, true);
 		confirm.toggle = true;
+		confirm.setParent(this);
+		deny.setParent(this);
 		pc = this;
-		t = new TextComponent(g, Color.white,title, x+width/2,y+height*0.1f, true);
+		t = new TextComponent(g, Color.white,title, x+width/2,y+9, true);
 		t.setCentered(true);
 	}
 
@@ -45,6 +47,9 @@ public abstract class PopupComponent extends Component {
 		confirm.draw(g);
 		deny.draw(g);
 		t.draw(g);
+		float yLoc = container.getY()+18;
+		g.setColor(Color.black);
+		g.drawLine(container.getX()+1, yLoc, container.getX()+container.getWidth()-1, yLoc);
 	}
 	
 	@Override

@@ -40,6 +40,8 @@ public class OrbitBehavior extends Behavior {
 				}
 				time++;
 			} else {
+				if (auto)
+					theta += sliceE;
 				getOwner().getController().teleport(loc.x+nx, loc.y+ny);
 			}
 		}

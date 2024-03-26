@@ -11,8 +11,10 @@ import com.botifier.timewaster.util.LobbedProjectile;
 import com.botifier.timewaster.util.movements.LobbedController;
 
 public class Beehive extends LobbedProjectile{
+	public int swarmSize = 5;
+	
 	public Beehive(float x, float y, Vector2f dst, Entity o) {
-		super("Beehive", MainGame.getImage("beehive"), new LobbedController(x,y,2000,dst,o), dst, o, 50);
+		super("Beehive", MainGame.getImage("beehive"), new LobbedController(x,y,500,dst,o), dst, o, 50);
 		if (dst.x < x)
 			setRotation(-getRotation());
 	}
@@ -35,7 +37,7 @@ public class Beehive extends LobbedProjectile{
 		if (y > MainGame.getCurrentMap().getHeightInTiles()*16)
 			return;
 		if (!MainGame.getCurrentMap().blocked(null, (int)x/16, (int)y/16)) {
-			BeeSwarm isc = new BeeSwarm(x, y, 5, getOwner());
+			BeeSwarm isc = new BeeSwarm(x, y, swarmSize, getOwner());
 			getOwner().addSpawn(isc);	
 		}
 	}

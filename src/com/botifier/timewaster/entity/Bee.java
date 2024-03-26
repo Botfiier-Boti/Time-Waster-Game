@@ -43,20 +43,27 @@ public class Bee extends Enemy {
 		//Changes the "influence" modifier to 0.1f
 		iModifier = 0.1f;
 		//Changes max health to 250 and sets current health to that amount.
-		setMaxHealth(250, true);
+		setMaxHealth(50, true);
 		//Gives the bee an insane amount of defense
 		getStats().setDefense(20000);
+		getStats().setDexterity((float)(2*Math.random()));
 		//Randomizes the bee's movement speed
 		getStats().setSpeed((float) (20+Math.random()*50));
 		//Make the bee ignore collision with entities on the same team.
 		getController().allyCollision = false;
 		//Prevent the bee from lingering without an owner
 		linger = false;
+		targetable = false;
 		//Adds the "Orbit" Behavior the bee and makes it orbit at a radius of 1
 		behaviors.add(new OrbitBehavior(this));
 		((OrbitBehavior)behaviors.get(0)).setRadius(1);
-		//Sets the Bullet Pattern to the GuidedBullet Pattern
+
+		//Adds the bullet pattern
 		gb = new GuidedBulletPattern();
+		patterns.add(gb);
+
+		//Sets the Bullet Pattern to the GuidedBullet Pattern
+		currentPattern = 0;
 		//Sets the behavior to the "Orbit Behavior"
 		currentBehavior = 0;
 	}
@@ -71,8 +78,14 @@ public class Bee extends Enemy {
 		}
 		//Orbit the owner
 		((OrbitBehavior)behaviors.get(0)).setTarget(getOwner());
-		
-		if (cooldown <= 0) {
+		cls = null;
+		if ((currentBehavior == 0 || currentBehavior == -1) && attacking == false) {
+			cls = MainGame.getEntityManager().findClosestEnemy(this, getInfluence());
+		}
+		if (cls != null) {
+			shootBullet(Math2.calcAngle(getLocation(),cls.getLocation()), cls, false);
+		}
+		/*if (cooldown <= 0) {
 			Entity cls = null;
 			//Find closest target
 			for (int i = MainGame.getEntities().size()-1; i > -1; i--) {
@@ -100,7 +113,7 @@ public class Bee extends Enemy {
 			} else if (cls == null && attacking == true){
 				attacking = false;
 			}
-		}
+		}*/
 		//Die over time
 		getStats().setCurrentHealth(getStats().getCurrentHealth()-0.1f);
 		cooldown--;

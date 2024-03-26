@@ -24,10 +24,12 @@ import com.botifier.timewaster.util.TileMap;
 import com.botifier.timewaster.util.gui.ButtonComponent;
 import com.botifier.timewaster.util.gui.DropDownComponent;
 import com.botifier.timewaster.util.gui.PopInputComponent;
+import com.botifier.timewaster.util.gui.PopupMessageComponent;
 import com.botifier.timewaster.util.gui.RectangleComponent;
 import com.botifier.timewaster.util.gui.TextComponent;
 import com.botifier.timewaster.util.gui.TextInputComponent;
 import com.botifier.timewaster.util.gui.TileBuilderComponent;
+import com.botifier.timewaster.util.managers.EntityManager;
 
 public class MapEditorState extends BasicGameState {
 	public static final int ID = 2;
@@ -159,7 +161,29 @@ public class MapEditorState extends BasicGameState {
 		g.addComponent(new ButtonComponent(g, "Add Entity", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {
 			@Override
 			public void run() {
-				
+				if (g.hasComponentType(PopInputComponent.class) || g.hasComponentType(TileBuilderComponent.class))
+					return;
+				PopInputComponent pic = PopInputComponent.createPopup(g, Color.gray, "Add Entity", "BigGoblin", null, 200, 200, 200, 80, true, PopInputComponent.ALL_CHARACTERS);
+				Runnable customAction = new Runnable() {
+
+					@Override
+					public void run() {
+						if (EntityManager.getEntityInstArgs(pic.getText()).length == 2) {
+							Entity e = EntityManager.createEntityOfType(pic.getText(), (m.getWidthInTiles()/2)*16, (m.getHeightInTiles()/2)*16);
+							if (e == null) {
+								PopupMessageComponent.createPopup(g, "Error!", "Invalid Entity.", Color.lightGray, gc.getWidth()/2, gc.getHeight()/2, true);
+								return;
+							}
+							e.init();
+							m.getInitialEntities().add(e); 
+							m.getEntityManager().addEntity(e);
+						} else {
+							PopupMessageComponent.createPopup(g, "Error!", "Invalid Entity.", Color.lightGray, gc.getWidth()/2, gc.getHeight()/2, true);
+						}
+					}
+					
+				};
+				pic.setCustomAction(customAction);
 			}
 		},gc.getWidth() * 0.75f + 10, gc.getHeight() * 0.25f+180, (gc.getWidth() / 4) - 20, 20, true));
 		g.addComponent(new ButtonComponent(g, "Reset Camera", Color.darkGray, Color.lightGray, Color.gray, new Runnable() {

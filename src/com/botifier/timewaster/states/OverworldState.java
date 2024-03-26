@@ -34,6 +34,7 @@ import com.botifier.timewaster.util.gui.RectangleComponent;
 import com.botifier.timewaster.util.items.AdminRing;
 import com.botifier.timewaster.util.items.AdminRock;
 import com.botifier.timewaster.util.items.Bandage;
+import com.botifier.timewaster.util.items.BeehiveLauncher;
 import com.botifier.timewaster.util.items.DefenseTestSword;
 import com.botifier.timewaster.util.items.GenericSword;
 import com.botifier.timewaster.util.items.Gun;
@@ -133,6 +134,7 @@ public class OverworldState extends BasicGameState {
 			p.inv.addItem(new Bandage(3), 4);
 			p.inv.addItem(new Bandage(3), 5);
 			p.inv.addItem(new Bandage(4), 6);
+			p.inv.addItem(new BeehiveLauncher(), 7);
 		} else {
 			p.inv.addItem(new Bandage(6), 0);
 		}
@@ -210,7 +212,7 @@ public class OverworldState extends BasicGameState {
 		if (targeted != null && targeted.image != null) {
 			g.draw(targeted.getHitbox());
 		}
-		dead.draw(g);
+		//dead.draw(g);
 		g.resetTransform();
 		if (!g.getFont().equals(ttf))
 			g.setFont(ttf);
@@ -338,6 +340,7 @@ public class OverworldState extends BasicGameState {
 	public void reset(GameContainer gc) throws SlickException {
 		m.reset();
 		p.getBullets().clear();
+		p.purgeSpawns();
 		p.getStatusEffectManager().clearEffects();
 		m.getEntityManager().clearBullets();
 		init(gc, mm);

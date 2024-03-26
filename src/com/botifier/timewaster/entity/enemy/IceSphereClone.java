@@ -56,7 +56,7 @@ public class IceSphereClone extends Enemy {
 				dashcooldown = 500;
 				return;
 			} else {
-				getStats().setSpeed(1);
+				getStats().setSpeed(10);
 				getController().wander(false,0.25f);
 			}
 		} else {

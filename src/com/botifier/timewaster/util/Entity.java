@@ -364,8 +364,8 @@ public class Entity implements Comparable<Entity> {
 	 */
 	public void update(int delta) throws SlickException {
 		//Modifies the angle based on controller angle
-		setAngle(getController().getAngle());
-		setAngle((float) (getAngle()%Math.PI*2));
+		setAngle((float) getController().getAngle());
+		setAngle((float) (getAngle() % Math.PI*2));
 		setAngle((float) ((getAngle() + Math.PI*2) % Math.PI*2));
 		if (getAngle() > Math.PI)
 			setAngle((float)(getAngle() - Math.PI*2));
@@ -518,6 +518,14 @@ public class Entity implements Comparable<Entity> {
 		}
 		destroy = true;
 	}
+	
+	/**
+	 * Purges spawns
+	 */
+	public void purgeSpawns() {
+		spawns.clear();
+	}
+	
 	/**
 	 * Action taken when a bullet hits a target
 	 * @param b Bullet Bullet that hit

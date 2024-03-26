@@ -125,4 +125,12 @@ public class EquipmentInventory extends Inventory {
 		return slots[pos];
 	}
 	
+	public Item getFirstItemOfSlot(SlotType slotType) {
+		for (int i = 0; i < slots.length; i++) {
+			if (slots[i] == slotType)
+				return items[i];
+		}
+		return null;
+	}
+	
 }

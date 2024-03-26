@@ -16,7 +16,8 @@ public class TextInputComponent extends InputComponent {
 	boolean changed = false;
 	boolean cursor = true;
 	int cursorPos = -1;
-	int maxlength = 16;
+	int maxlength = -1;
+	int maxvisible = 1;
 	RectangleComponent r;
 	RectangleComponent r2;
 	TextComponent t;
@@ -29,6 +30,7 @@ public class TextInputComponent extends InputComponent {
 		r2 = new RectangleComponent(g, Color.black, x+2, y+(0.1f*height), width-4, height-(height*0.2f), false);
 		t = new TextComponent(g, Color.white, defaultText, x+4, y+4+(0.10f*height), outline);
 		cur = new TextComponent(g, Color.white,"|",t.getX(),t.getY(), outline);
+		maxvisible = (int) ((width*(0.80f))/11);
 	}
 
 	@Override
@@ -43,7 +45,7 @@ public class TextInputComponent extends InputComponent {
 	@Override
 	public void update(int delta) {
 		super.update(delta);
-		if (t.getText().length() > maxlength) {
+		if (t.getText().length() > maxlength && maxlength >= 0) {
 			t.setText(t.getText().substring(0, maxlength));
 		}
 
@@ -91,7 +93,7 @@ public class TextInputComponent extends InputComponent {
 				textSave = t.getText();
 				onDeselect();
 				input = false;
-			} else if (t.getText().length() < maxlength) {
+			} else if (t.getText().length() < maxlength || maxlength <= -1) {
 				if (allowAlphabet == false && Character.isAlphabetic(c))
 					return;
 				if (allowNumbers == false && Character.isDigit(c))

@@ -35,7 +35,7 @@ public class Rock extends LobbedProjectile {
 	
 	@Override
 	public void onLand() throws SlickException {
-		cls = MainGame.getEntityManager().findClosestEnemy(this, 500);
+		cls = MainGame.getEntityManager().findClosestEnemy(this, 600);
 		if (seen) {
 
 			if (cls == null) {

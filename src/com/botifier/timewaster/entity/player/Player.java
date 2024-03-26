@@ -15,10 +15,12 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Vector2f;
 
+import com.botifier.timewaster.entity.MouseFollower;
 import com.botifier.timewaster.entity.projectile.Beehive;
 import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.states.OverworldState;
 import com.botifier.timewaster.statuseffect.effects.InvulnerabilityEffect;
+import com.botifier.timewaster.util.AbilityItem;
 //import com.botifier.timewaster.entity.ShotgunPattern;
 import com.botifier.timewaster.util.Entity;
 import com.botifier.timewaster.util.EquipmentInventory;
@@ -142,8 +144,12 @@ public class Player extends Entity {
 			if (i.isKeyPressed(Input.KEY_I))
 				autofire = !autofire;
 			
-			if (i.isKeyPressed(Input.KEY_E))
-				ei.purge();
+			if (i.isKeyPressed(Input.KEY_SPACE)) {
+				AbilityItem ai = (AbilityItem) ei.getFirstItemOfSlot(SlotType.EQUIP_ABILITY);
+				if (ai != null) {
+					ai.onUseAbility(this, null, new Vector2f(i.getMouseX(), i.getMouseY()));
+				}
+			}
 			
 			//Lob functionality
 			if (lob == true || (p != null && p.lob)) {
@@ -294,7 +300,7 @@ public class Player extends Entity {
 			if (getController().dst != null) {
 				g.drawLine(getLocation().getX(), getLocation().getY(), getController().dst.getX(), getController().dst.getY());
 			}
-			g.drawRect(((int)getLocation().getX()/16)*16, ((int)getLocation().getY()/16)*16, 16, 16);
+			/*g.drawRect(((int)getLocation().getX()/16)*16, ((int)getLocation().getY()/16)*16, 16, 16);
 			g.drawRect(((int)getLocation().getX()/16+1)*16, ((int)getLocation().getY()/16)*16, 16, 16);
 			g.drawRect(((int)getLocation().getX()/16-1)*16, ((int)getLocation().getY()/16)*16, 16, 16);
 			g.drawRect(((int)getLocation().getX()/16)*16, ((int)getLocation().getY()/16+1)*16, 16, 16);
@@ -302,7 +308,7 @@ public class Player extends Entity {
 			g.drawRect(((int)getLocation().getX()/16+1)*16, ((int)getLocation().getY()/16+1)*16, 16, 16);
 			g.drawRect(((int)getLocation().getX()/16-1)*16, ((int)getLocation().getY()/16+1)*16, 16, 16);
 			g.drawRect(((int)getLocation().getX()/16+1)*16, ((int)getLocation().getY()/16-1)*16, 16, 16);
-			g.drawRect(((int)getLocation().getX()/16-1)*16, ((int)getLocation().getY()/16-1)*16, 16, 16);
+			g.drawRect(((int)getLocation().getX()/16-1)*16, ((int)getLocation().getY()/16-1)*16, 16, 16);*/
 		}
 	}
 	

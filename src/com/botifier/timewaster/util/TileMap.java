@@ -67,6 +67,10 @@ public class TileMap  {
 	 */
 	private ArrayList<char[][]> layers = new ArrayList<char[][]>();
 	/**
+	 * Loaded images
+	 */
+	private ArrayList<String> images = new ArrayList<String>();
+	/**
 	 * Tile collider rectangles
 	 */
 	private Rectangle[][] tileCol;
@@ -419,7 +423,7 @@ public class TileMap  {
 	 * @throws IOException
 	 */
 	public void loadFromFile(File f) throws IOException {
-		loadFromFile(new FileInputStream(f));
+		loadFromFile(new FileInputStream(f), f.getParentFile().getCanonicalPath());
 	}
 	
 	/**
@@ -430,7 +434,7 @@ public class TileMap  {
 	public void loadFromFile(String name) throws IOException {
 		InputStream fis = org.newdawn.slick.util.ResourceLoader
 				.getResourceAsStream(name);
-		loadFromFile(fis);
+		loadFromFile(fis, name);
 	}
 	
 	/**
@@ -438,7 +442,7 @@ public class TileMap  {
 	 * @param fis InputStream InputStream of the file
 	 * @throws IOException
 	 */
-	public void loadFromFile(InputStream fis) throws IOException {
+	public void loadFromFile(InputStream fis, String origin) throws IOException {
 		//Creates a Reader using the InputStream
 		Reader r = new InputStreamReader(fis);
 		//Creates a BufferedReader using the Reader
@@ -452,12 +456,25 @@ public class TileMap  {
 				e.printStackTrace();
 			}
 		}
+		
+		//Unloads all images
+		for (String s : images) {
+			try {
+				MainGame.getImage(s).destroy();
+			} catch (SlickException e) {
+				System.out.println("Failed to destroy image: "+s);
+			}
+			MainGame.getAllImages().remove(s);
+		}
+		
 		//Clears the current layers
 		getLayers().clear();
 		//Clears all of the tile types
 		tileTypes.clear();
 		//Clears all of the initial entities
 		initialEntities.clear();
+		//Clears all images
+		images.clear();
 		//Begin reading the mapfile
 		System.out.println("Reading mapfile...");
 		//Current line being read
@@ -660,6 +677,42 @@ public class TileMap  {
 				}
 				System.out.println("Done!");
 				continue;
+			} else if (line.startsWith("addimage")) {
+				//Removes keyword from the line
+				line = line.replaceFirst("addimage", "");
+				//Splits the line by commas
+				String[] s = line.split(",");
+				if (s.length == 2) {
+					String name = s[0];
+					String location = s[1];
+					
+					//Checks if alias is taken
+					if (MainGame.getImage(name) != null) {
+						System.out.println("Image alias: "+name+" is already taken.");
+						continue;
+					}
+					
+					//Allow for local images
+					if (location.startsWith("./")) {
+						location = location.replaceFirst(".", "");
+						location = origin + location;
+					}
+					
+					//Attempts to add image
+					try {
+						MainGame.addImage(name, location);
+					} catch (Exception e) { 
+						System.out.println("An error occured attempting to add image: "+name);
+						e.printStackTrace();
+						continue;
+					}
+					
+					images.add(name.toLowerCase());
+					System.out.println("Added image: "+name+" from \""+location.replaceAll("\\\\", "/")+"\"");
+				} else {
+					System.out.println("Wrong number of arguments for addimage.");
+					continue;
+				}
 			}
 		}
 		//Reset the tile colliders

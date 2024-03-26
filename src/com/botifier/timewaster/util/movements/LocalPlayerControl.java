@@ -7,6 +7,7 @@ public class LocalPlayerControl extends EntityController {
 	boolean UP, DOWN, LEFT, RIGHT;
 	public LocalPlayerControl(float x, float y) {
 		super(x, y);
+		boid = false;
 	}
 	
 	public void control(Input i) {

@@ -14,7 +14,7 @@ import com.botifier.timewaster.util.TileMap;
 //Based on information I could find on boids.
 
 public class EntityController implements Cloneable {
-	private final int ARRIVERADIUS = 1;
+	private final int ARRIVERADIUS = 3;
 	private final int TIMEDIVISOR = 12;
 	
 	public LinkedList<Vector2f> path = new LinkedList<Vector2f>();
@@ -22,6 +22,7 @@ public class EntityController implements Cloneable {
 	public Vector2f lDst;
 	public float visualAngle;
 	public boolean allyCollision = true;
+	public boolean boid = true;
 	protected float truespeed;
 	protected boolean moving = false;
 	protected boolean obeysCollision = true;
@@ -51,7 +52,7 @@ public class EntityController implements Cloneable {
 	}
 
 	public void arrive() {
-		desired.sub(dst.copy().sub(src));
+		desired.sub(dst.copy().sub(src.copy()));
 		distance = desired.length();
 		if (distance > 0) {
 			float spd = getPPS() * (distance / ARRIVERADIUS);
@@ -147,24 +148,43 @@ public class EntityController implements Cloneable {
 			moving = false;
 			return;
 		}
-		if (allyCollision && !(getOwner() instanceof Player) && getOwner().visible) {
-			seperate();
+		if (boid) {
+			if (allyCollision && !(getOwner() instanceof Player) && getOwner().visible) {
+				seperate();
+			}
+			if (fleeing) {
+				fleeArrive();
+			} else {
+				arrive();
+			}
 		}
-		if (fleeing) {
-			fleeArrive();
-		} else {
-			arrive();
-		}
+		
 		/*
 		 * switch (b) { default: arrive(); break; case FLEEING: fleeArrive(); break;
 		 * case CHASING: arrive(); break; }
 		 */
 		if (dst == null)
 			return;
-		velocity.add(steer);
-		hold = Math2.truncate(velocity, getPPS());
-		visualAngle = angle;
+
 		angle = Math2.calcAngle(src, dst);
+
+		velocity.add(steer);
+		if (boid) {
+			hold = Math2.truncate(velocity, getPPS());
+		}
+		else {
+			float x = (float)(Math.cos(angle) % (Math.PI*2))*(getPPS());
+			float y = (float)(Math.sin(angle) % (Math.PI*2))*(getPPS());
+			
+			//Prevents minor drifting 
+			if (Math2.round(y, 2) == 0)
+				y = 0;
+			if (Math2.round(x, 2) == 0)
+				x = 0;
+			
+			hold = new Vector2f(x, y);
+		}
+		visualAngle = angle;
 		lDst = src.copy();
 		if (path.size() > owner.getFollowers().size() * 16)
 			path.removeLast();
@@ -219,29 +239,14 @@ public class EntityController implements Cloneable {
 				moving = false;
 			}
 		}
-		/*if (dst != null) {
-			if (dst.x > src.x && RIGHT == false) {
-				dst.x = src.x;
-				hold.x = 0;
-			}
-			if (dst.x < src.x && LEFT == false) {
-				dst.x = src.x;
-				hold.x = 0;
-			}
-			if (dst.y > src.y && DOWN == false) {
-				dst.y = src.y;
-				hold.y = 0;
-			}
-			if (dst.y < src.y && UP == false) {
-				dst.y = src.y;
-				hold.y = 0;
-			}
-		}*/
-		hold.x = hold.x*(delta/TIMEDIVISOR);
-		hold.y = hold.y*(delta/TIMEDIVISOR);
+		
+		hold.x = Math2.round((float) hold.getX()*(delta/TIMEDIVISOR), 2);
+		hold.y = Math2.round((float) hold.getY()*(delta/TIMEDIVISOR), 2);
 		if (moving)
 			src.add(hold);
-		lastMove = hold;
+		
+		lastMove = hold.copy();
+		
 		// make the object "snap" to the destination if it's close enough (to avoid
 		// vibrating)
 		if (dst != null && Math.round(src.getX()) == Math.round(dst.getX())) {
@@ -300,7 +305,7 @@ public class EntityController implements Cloneable {
 	public void setDestination(float x, float y) {
 		if (x == src.getX() && y == src.getY())
 			return;
-		dst = new Vector2f(Math2.round(x, 2), Math2.round(y, 2));
+		dst = new Vector2f(x, y);
 		moving = true;
 	}
 

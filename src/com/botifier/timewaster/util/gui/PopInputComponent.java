@@ -15,12 +15,14 @@ public class PopInputComponent extends PopupComponent {
 	public static final int NO_SPECIAL = 7;
 	TextInputComponent target;
 	TextInputComponent tic;
+	Runnable customAction;
 
 	private PopInputComponent(GUI g, Color c, String title, String defaultText, TextInputComponent target, float x, float y, float width, float height, boolean outline, int state) {
 		super(g, title, c, x, y, width, height, outline);
-		tic = new TextInputComponent(g, c, x+(width*0.1f), y+(height/6), width*(0.80f),30, defaultText, false);
+		tic = new TextInputComponent(g, c, x+(width*0.1f), y+19, width*(0.80f),30, defaultText, false);
 		tic.maxlength = (int) ((width*(0.80f))/11);
 		tic.resetOnClick = true;
+		tic.setParent(this);
 		switch (state) {
 			case ALL_CHARACTERS:
 				tic.allowAlphabet = true;
@@ -74,11 +76,17 @@ public class PopInputComponent extends PopupComponent {
 		target = t;
 	}
 
+	public void setCustomAction(Runnable customAction) {
+		this.customAction = customAction;
+	}
+
 	@Override
 	public void runAction() {
 		if (target != null)  {
 			target.setText(tic.getText().replaceAll("|", ""));
 		}
+		if (customAction != null)
+			customAction.run();
 	}
 	
 	@Override
@@ -100,11 +108,19 @@ public class PopInputComponent extends PopupComponent {
 	public int getMaxLength() {
 		return tic.getMaxLength();
 	}
+	
+	public String getText() {
+		return tic.getText();
+	}
+	
+	public Runnable getCustomAction() {
+		return customAction;
+	}
 
 
 	public static PopInputComponent createPopup(GUI g, Color c, String title, String defaultText, TextInputComponent target, float x, float y, float width, float height, boolean outline, int state) {
 		PopInputComponent pic = new PopInputComponent(g, c, title, defaultText, target, x, y, width, height, outline, state);
-		if (g.hasComponentType(InputComponent.class)) {
+		if (g.hasComponentType(PopupComponent.class)) {
 			return null;
 		}
 		g.addComponent(pic);

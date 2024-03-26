@@ -1,10 +1,12 @@
 package com.botifier.timewaster.util;
 
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
 
 import com.botifier.timewaster.main.MainGame;
 import com.botifier.timewaster.statuseffect.StatusEffect;
@@ -167,7 +169,38 @@ public class Bullet extends Entity {
 	
 	@Override
 	public void draw(Graphics g) {
-		super.draw(g);
+		if (visible == true && active == true) {
+			//Checks if the image is null
+			if (image != null) {
+				//Modifies the image to match parameters
+				Image y = null;
+				if ((getSize() > 1 || getSize() < 1) && getSize() != lSize) {
+					y = image.getScaledCopy(getSize());
+					lSize = getSize();
+				}
+				else 
+					y = image;
+				Vector2f iLoc = getLocation().copy();
+				y.setCenterOfRotation(y.getWidth()/2, y.getHeight()/2);
+				y.setRotation(rotation);
+				y.draw(iLoc.x- (y.getWidth()/2), iLoc.y - (y.getHeight()/2));
+			}
+			else
+				//Draws a letter at Entity's location
+				g.drawString(getName().substring(0, 1),getLocation().getX(), getLocation().getY());
+		}
+		//Renders hitboxs if enabled
+		if (MainGame.displayHitboxes) {
+			g.setColor(Color.blue);
+			if (hitbox != null)
+				g.draw(hitbox);
+			if (collisionbox != null)
+				g.draw(collisionbox);
+			g.setColor(Color.red);
+			if (getController().testBox != null)
+				g.draw(getController().testBox);
+			g.setColor(Color.white);
+		}
 	}
 	
 	@Override

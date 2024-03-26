@@ -389,7 +389,7 @@ public class Stats {
 	 * @return
 	 */
 	public float getPPU() {
-		return Math2.round(0.6f + 1.5f*((spd+spdMod)/75f), 1);
+		return Math2.round(0.6f + 1.5f*((spd+spdMod)/75f), 2);
 	}
 	
 	/**
